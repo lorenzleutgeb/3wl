@@ -1,6 +1,4 @@
-% Copyright (C) 2014-2016 by Thomas Auzinger <thomas@auzinger.name>
-
-\documentclass[draft,final]{vutinfth} % Remove option 'final' to obtain debug information.
+\documentclass{vutinfth} % Remove option 'final' to obtain debug information.
 
 % Load packages to allow in- and output of non-ASCII characters.
 \usepackage{lmodern}        % Use an extension of the original Computer Modern font to minimize the use of bitmapped letters.
@@ -25,16 +23,15 @@
 
 % Define convenience functions to use the author name and the thesis title in the PDF document properties.
 \newcommand{\authorname}{Lorenz Leutgeb} % The author name without titles.
-\newcommand{\thesistitle}{Lazy Answer Set Solving} % The title of the thesis. The English version should be used, if it exists.
+\newcommand{\thesistitle}{Efficient propagation for lazy-grounding Answer Set solving} % The title of the thesis. The English version should be used, if it exists.
 
-% Set PDF document properties
 \hypersetup{
-    pdfpagelayout   = TwoPageRight,           % How the document is shown in PDF viewers (optional).
-    linkbordercolor = {Melon},                % The color of the borders of boxes around crosslinks (optional).
-    pdfauthor       = {\authorname},          % The author's name in the document properties (optional).
-    pdftitle        = {\thesistitle},         % The document's title in the document properties (optional).
+    pdfpagelayout   = TwoPageRight,
+    linkbordercolor = {Melon},
+    pdfauthor       = {\authorname},
+    pdftitle        = {\thesistitle},
     pdfsubject      = {Subject},              % The document's subject in the document properties (optional).
-    pdfkeywords     = {a, list, of, keywords} % The document's keywords in the document properties (optional).
+    pdfkeywords     = {asp, solver, propagation, nogood}
 }
 
 \setsecnumdepth{subsection} % Enumerate subsections.
@@ -57,7 +54,6 @@
 %\setsecondassistant{Pretitle}{Forename Surname}{Posttitle}{male}
 %\setthirdassistant{Pretitle}{Forename Surname}{Posttitle}{male}
 
-% Required data.
 \setaddress{Engilgasse 3a, 1160 Wien}
 \setregnumber{1127842}
 \setdate{31}{10}{2016} % Set date with 3 arguments: {day}{month}{year}.
@@ -71,6 +67,11 @@
 % Define convenience macros.
 \newcommand{\todo}[1]{{\color{red}\textbf{TODO: {#1}}}} % Comment for the final version, to raise errors.
 
+\newcommand{\mbt}{must-be-true}
+\newcommand{\negstrong}[1]{\overline{#1}^s}
+\newcommand{\negweak}[1]{\overline{#1}^w}
+
+\usepackage{csquotes}
 
 \begin{document}
 
@@ -78,8 +79,8 @@
 % The structure of the thesis has to conform to
 %  http://www.informatik.tuwien.ac.at/dekanat
 
-\addtitlepage{naustrian} % German title page (not for dissertations at the PhD School).
-\addtitlepage{english} % English title page.
+\addtitlepage{naustrian}
+\addtitlepage{english}
 \addstatementpage
 
 \begin{danksagung*}
@@ -98,22 +99,217 @@
 \todo{Enter your text here.}
 \end{abstract}
 
-% Select the language of the thesis, e.g., english or naustrian.
 \selectlanguage{english}
 
-% Add a table of contents (toc).
 \tableofcontents % Starred version, i.e., \tableofcontents*, removes the self-entry.
 
 % Switch to arabic numbering and start the enumeration of chapters in the table of content.
 \mainmatter
 
 \chapter{Introduction}
-\todo{Enter your text here.}
+
+\section{Motivation}
+
+\section{Problem Statement}
+
+\section{Aim of the Work}
+
+\section{Methodological Approach}
+
+\section{Structure of the Work} % 3 sentences
 
 This is just a test.\cite{Gebser:2012:CAS:2228640.2228952}
 
-\chapter{Additional Chapter}
+\chapter{Preliminaries}
+
+\section{Answer Set Programming}
+
+% TODO: Introduction to ASP and it's semantics.
+
+\section{State of the Art in ASP Solving}
+
+\subsection{Approaches based on Pre-Grounding}
+
+% TODO: Explain how a solver works and what has been done already (grounding on the fly, omiga, asperix).
+% TODO: What is a nogood? What is propagation?
+
+% Everything that later sections build up on. Quote a lot. This chapter can be long. Show understanding of the matter in own words (i.e. what is an answer set incl. example?).
+
+\subsection{Approaches based on Lazy Grounding}
+
+\section{Analysis}
+
+\section{Comparison and Summary of Existing Approaches}
+
 \todo{Enter your text here.}
+
+\chapter{Propagation for lazy-grounding Answer Set solving}
+
+A boolean \emph{assignment} $\mathbf{A}$ is a sequence $(\sigma_1, \ldots, \sigma_n)$ of signed literals $\sigma_i$ of the form $\mathbf{T}v_i$, $\mathbf{M}v_i$ or $\mathbf{F}v_i$ where $v_i \not = v_j$ for $i < j \leq n$, or \emph{conflict}.
+A literal $\mathbf{T}v$ expresses that $v$ is \emph{true}, $\mathbf{M}v$ that it \emph{must be true}, and $\mathbf{F}v$ that it is \emph{false}. Below, assignments are sometimes also used as sets, in which case the set represented by some assignment is simply the set of all signed literals it contains.
+
+Strong negation, denoted by $\negstrong{\sigma}$, and weak negation, $\negweak{\sigma}$, mapping $\mathbf{F}v$ to $\mathbf{T}v$ and $\mathbf{F}v$ to $\mathbf{W}v$ respectively, of a signed literal are defined by the following truth table:%equalities: $\negstrong{\mathbf{T}v} = \mathbf{F}v$, $\negstrong{\mathbf{M}v} = \mathbf{F}v$ and  $\negstrong{\mathbf{F}v} = \mathbf{T}v$, while $\negweak{\mathbf{T}v} = \mathbf{F}v$, $\negweak{\mathbf{M}v} = \mathbf{F}v$ and $\negweak{\mathbf{F}v} = \mathbf{M}v$.
+
+\begin{center}
+\begin{tabular}{|c|cc|}
+\hline
+$\sigma$&$\negstrong{\sigma}$&$\negweak{\sigma}$\\
+\hline
+\hline
+$\mathbf{T}v$&$\mathbf{F}v$&$\mathbf{F}v$\\
+$\mathbf{M}v$&$\mathbf{F}v$&$\mathbf{F}v$\\
+$\mathbf{F}v$&$\mathbf{T}v$&$\mathbf{M}v$\\
+\hline
+\end{tabular}
+\end{center}
+
+The sequence obtained by appending the literal $\sigma$ to $\mathbf{A}$ is denoted by $\mathbf{A} \circ \sigma$. In case $\negstrong{\sigma} \in \mathbf{A} \vee \negweak{\sigma} \in \mathbf{A}$ however, $\mathbf{A} \circ \sigma =$ \emph{conflict} to indicate that appending $\sigma$ conflicts with other literals in $\mathbf{A}$. Furthermore $\emph{conflict} \circ \sigma = \emph{conflict}$.
+
+A literal $\mathbf{X}v$ with $\mathbf{X} \in \{ \mathbf{T}, \mathbf{M}, \mathbf{F} \}$ is \emph{unassigned} with respect to some assignment $\mathbf{A}$ iff $\mathbf{T}v \not \in \mathbf{A} \wedge \mathbf{M}v \not \in \mathbf{A} \wedge \mathbf{F}v \not \in \mathbf{A}$.
+
+An atom $v$ is \emph{unassigned} with respect to some assignment $\mathbf{A}$ iff $\mathbf{T}v \not \in \mathbf{A} \wedge \mathbf{M}v \not \in \mathbf{A} \wedge \mathbf{F}v \not \in \mathbf{A}$.
+
+A nogood reflects a partial assignment that cannot be extended to a solution. Here, a \emph{nogood} is a set $\{ \sigma_1, \ldots, \sigma_n \}$ of signed literals. A nogood $\delta$ is \emph{violated} by an assignment $\mathbf{A}$ if $\delta \subseteq \mathbf{A}$.
+
+A nogood is \emph{strictly unit} with respect to some assignment $\mathbf{A}$ iff it contains exactly one \emph{unassigned} literal and all other literals are elements of $\mathbf{A}$.
+
+A nogood is \emph{weakly unit} with respect to some assignment $\mathbf{A}$ iff it contains exactly one \emph{unassigned} literal and all other literals are \emph{weak} elements of $\mathbf{A}$.
+
+%To efficiently retrieve the set of nogoods that need to be checked for unity, a data structure of watches was 
+
+Watches are triples of an atom and two \enquote{watch structures} $(v, W_{=2}, W_{>2})$, with $W_{=2}$ and $W_{>2}$ consisting of $(W_\mathbf{T}, W_\mathbf{M}, W_\mathbf{F})$,  three sets of nogoods that potentially propagate in case $v$ is assigned to $\mathbf{T}$, $\mathbf{M}$ or $\mathbf{F}$ respectively.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{watches}
+  \caption{The layout of the \emph{watches} data structure.}
+  \label{fig:watches} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
+\end{figure}
+
+\section{Unit Propagation}
+
+\begin{algorithm}
+  \SetKw{BreakFor}{break for}
+  \KwIn{An assignment $\mathbf{A} = (\sigma_1, \ldots, \sigma_n)$,
+        some~reference~to~an~element~$i$~with~$1 \leq i < n$ and
+        a~set~of~watched~nogoods~$\Delta$.}
+  \KwOut{The assignment $\mathbf{A}$, extended by means of unit propagation and $\Delta$ with updated watches.}
+  \While{$i \leq n$}
+  {
+    $\sigma_i \leftarrow \mathbf{A}[i]$\\
+    \uIf{$\sigma_i$ is of $\mathbf{M}v$ or $\sigma_i$ is of $\mathbf{F}v$}
+    {
+      $\mathbf{A} \ \circ$ \textsc{UnitPropagationMBT}($\mathbf{A}$, $\sigma_i$, $\Delta$)
+    }
+    \Else
+    {
+      $\mathbf{A} \ \circ$ \textsc{UnitPropagationMBT}($\mathbf{A}$, $\mathbf{M}v$, $\Delta$)\\
+      $\mathbf{A} \ \circ$ \textsc{UnitPropagationTrue}($\mathbf{A}$, $\sigma_i$, $\Delta$)
+    }
+    $i \leftarrow i + 1$
+  }
+  \Return{$(\mathbf{A}, \Delta)$}
+  \caption{\textsc{UnitPropagation}}
+  \label{alg:prop}
+\end{algorithm}
+
+\begin{algorithm}
+  \KwIn{An~assignment~$\mathbf{A}$,
+        a~literal~$\sigma \in \mathbf{A}$,~and
+        a~set~of~watched~nogoods~$\Delta$.}
+  \KwOut{$\mathbf{A}$ extended by means of nogood propagation and $\Delta$ with updated watches.}
+  \ForEach{$\delta \in w_{=2}(\Delta, \sigma)$ of form $\{ \sigma, \sigma' \}$}
+  {
+    \If{$\sigma'$ is unassigned in $\mathbf{A}$}
+    {
+      $\mathbf{A} \leftarrow \mathbf{A} \circ \negweak{\sigma'}$
+    }
+  }
+  \ForEach{$\delta \in w_{>2}(\Delta, \sigma)$}
+  {
+    \uIf{$\delta$ is weakly unit with $\sigma'$ unassigned}
+    {
+      $\mathbf{A} \leftarrow \mathbf{A} \circ \negweak{\sigma'}$
+    }
+    \uElseIf{$\delta$ is violated}
+    {
+      \Return{$(\text{conflict}, \Delta)$}
+    }
+    \Else%If{there is some unassigned $\sigma' \in \delta$}
+    {
+      Let $\sigma'$, $\sigma''$ be two unassigned literals in $\delta$.\\
+      Point watch pointers at $\sigma'$ and $\sigma''$\\
+      
+      $i \leftarrow $ index of $\sigma'$, the other watched literal\\
+      $j \leftarrow $ index of unassigned literal, s.t.~$i \not = j$\\
+      Repoint pointer pointing at $\sigma$ to $j$.\\
+
+      Remove $\delta$ from watchlist for $\sigma$ and
+      add it to watches for $\delta[j]$.
+    }
+  }
+  \Return{$(\mathbf{A}, \Delta)$}
+  \caption{\textsc{UnitPropagationMBT}}
+  \label{alg:prop-mbt}
+\end{algorithm}
+
+Algorithm \ref{alg:prop-mbt} exhibits how unit propagation is used to infer assignments (of either false or \mbt) from watched nogoods. In lines 1-4 propagation of binary nogoods are handled: For every nogood that contains $\sigma$ and exactly one other literal $\sigma'$, propagation is trivial. If $\sigma'$ is unassigned it is assigned to its weak-negated form.
+Lines 6-13 cover the more sophisticated general case for nogoods with more than two elements. The nogood is scanned for unassigned literals, as in this case (check in line 7) it cannot be unit, and the pointer pointing at $\sigma$ is moved to/pointed at the unassigned literal $\sigma'$ (line 8). Watches are readjusted to reflect pointer movement in line 9. If there is no unassigned literal (lines 10 to 12), the nogood propagates in case it is weakly unit. $\sigma'$ is assigned to it's weak-negated form.
+
+% TODO pointers need to be more explicit. E.g. where does \sigma' come from in line 11?!
+
+\begin{algorithm}
+  \KwIn{An assignment $\mathbf{A}$,
+        a literal $\sigma \in \mathbf{A}$, and
+        a set of watched nogoods~$\Delta$.}
+  \KwOut{$\mathbf{A}$ extended by means of nogood propagation.}
+  \ForEach{nogood $\delta \in w_{=2}(\Delta)$ of form $\{ \sigma, \sigma' \}$}
+  {
+    \If{$\sigma'$ is unassigned}
+    {
+      $\mathbf{A} \circ \negstrong{\sigma'}$
+    }
+  }
+  \ForEach{nogood $\delta \in w_{>2}(\Delta)$ with $\sigma \in \delta$}
+  {
+    $X \leftarrow \{ x \ | \ x \in \delta \wedge x \ \text{is of form} \ \mathbf{T}v \} \setminus \{ \sigma, \text{head}(\delta) \} \setminus \mathbf{A} $\\
+    \uIf{$X \not = \emptyset$}
+    {
+      Choose $\sigma'$ from $X$ by highest decision level.\\
+      Repoint pointer from $\sigma$ to $\sigma'$.\\
+      Remove $\delta$ from watches for $\sigma$ and add it to watches for $\sigma'$.\\
+    }
+    %\uElseIf{$\delta$ is violated}
+    %{
+    %  \Return{$(\text{conflict}, \Delta)$}
+    %}
+	\ElseIf{$\delta$ is strictly unit}
+	{
+	  $\mathbf{A} \circ \negstrong{\sigma'}$
+	}
+  }
+  \Return{$(\mathbf{A}, \Delta)$}
+  \caption{\textsc{UnitPropagationTrue}}
+  \label{alg:prop-true}
+\end{algorithm}
+
+In order to implement efficient propagation, a data
+
+% No Unfounded Set checks -> MBT.
+
+% Explain 2WL with MBT, propagation with MBT (pseudocode of propagation algorithm).
+
+\chapter{Implementation}
+
+\section{Benchmarks}
+
+\chapter{Conclusion}
+
+\section{Related Work}
+
+\section{Conclusion}
+
+\subsection{Related Work}
 
 \backmatter
 
