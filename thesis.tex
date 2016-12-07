@@ -8,6 +8,7 @@
 % Extended LaTeX functionality is enables by including packages with \usepackage{...}.
 \usepackage{fixltx2e}   % Provides fixes for several errors in LaTeX2e.
 \usepackage{amsmath}    % Extended typesetting of mathematical expression.
+\usepackage{amsthm}
 \usepackage{amssymb}    % Provides a multitude of mathematical symbols.
 \usepackage{mathtools}  % Further extensions of mathematical typesetting.
 \usepackage{microtype}  % Small-scale typographic enhancements.
@@ -20,6 +21,11 @@
 \usepackage{nag}       % Issues warnings when best practices in writing LaTeX documents are violated.
 \usepackage{hyperref}  % Enables cross linking in the electronic document version. This package has to be included second to last.
 \usepackage[acronym,toc]{glossaries} % Enables the generation of glossaries and lists fo acronyms. This package has to be included last.
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+\usetikzlibrary{shapes.multipart,calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{fit}
 
 % Define convenience functions to use the author name and the thesis title in the PDF document properties.
 \newcommand{\authorname}{Lorenz Leutgeb} % The author name without titles.
@@ -47,10 +53,10 @@
 %  {title before name}{name}{title after name}{gender}
 %  where both titles are optional (i.e. can be given as empty brackets {}).
 \setauthor{}{\authorname}{}{male}
-\setadvisor{Dr.}{Antonius Weinzierl}{}{male}
+\setadvisor{Prof.~Dr.}{Thomas Eiter}{}{male}
 
 % For bachelor and master theses:
-%\setfirstassistant{Pretitle}{Forename Surname}{Posttitle}{male}
+\setfirstassistant{Dr.}{Antonius Weinzierl}{}{male}
 %\setsecondassistant{Pretitle}{Forename Surname}{Posttitle}{male}
 %\setthirdassistant{Pretitle}{Forename Surname}{Posttitle}{male}
 
@@ -67,9 +73,43 @@
 % Define convenience macros.
 \newcommand{\todo}[1]{{\color{red}\textbf{TODO: {#1}}}} % Comment for the final version, to raise errors.
 
+\theoremstyle{example}
+\newtheorem{example}{Example}[section]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{theorem}
+\newtheorem{theorem}{Theorem}[section]
+
+\theoremstyle{lemma}
+\newtheorem{lemma}{Lemma}[theorem]
+
+\theoremstyle{corollary}
+\newtheorem{corollary}{Corollary}[theorem]
+
+\newtheorem*{remark}{Remark}
+
 \newcommand{\mbt}{must-be-true}
 \newcommand{\negstrong}[1]{\overline{#1}^s}
 \newcommand{\negweak}[1]{\overline{#1}^w}
+
+% Function B transforming an assignment into a boolean assignment.
+\newcommand{\bass}{\mathcal{B}}
+
+% An assignment A.
+\newcommand{\ass}{\mathbf{A}}
+
+% Herbrand Base function of some logic program.
+\newcommand{\hb}{\textit{HB}}
+
+\newcommand{\bT}{\mathbf{T}}
+\newcommand{\bM}{\mathbf{M}}
+\newcommand{\bF}{\mathbf{F}}
+
+\newcommand{\thrice}{{\{\bT, \bM, \bF \}}}
+
+\newcommand{\wkn}{\textit{weaken}}
 
 \usepackage{csquotes}
 
@@ -108,6 +148,8 @@
 
 \chapter{Introduction}
 
+Answer Set Programming (ASP) is a programming paradigm aimed at solving problems by means of declarative and logic programming based on Nonmonotonic Reasoning. 
+
 \section{Motivation}
 
 \section{Problem Statement}
@@ -121,6 +163,7 @@
 This is just a test.\cite{Gebser:2012:CAS:2228640.2228952}
 
 \chapter{Preliminaries}
+\label{chap:preliminaries}
 
 \section{Answer Set Programming}
 
@@ -145,10 +188,48 @@ This is just a test.\cite{Gebser:2012:CAS:2228640.2228952}
 
 \chapter{Propagation for lazy-grounding Answer Set solving}
 
-A boolean \emph{assignment} $\mathbf{A}$ is a sequence $(\sigma_1, \ldots, \sigma_n)$ of signed literals $\sigma_i$ of the form $\mathbf{T}v_i$, $\mathbf{M}v_i$ or $\mathbf{F}v_i$ where $v_i \not = v_j$ for $i < j \leq n$, or \emph{conflict}.
-A literal $\mathbf{T}v$ expresses that $v$ is \emph{true}, $\mathbf{M}v$ that it \emph{must be true}, and $\mathbf{F}v$ that it is \emph{false}. Below, assignments are sometimes also used as sets, in which case the set represented by some assignment is simply the set of all signed literals it contains.
+This chapter contextualizes propagation by providing definitions extending chapter \ref{chap:preliminaries}. It then presents and thoroughly explains the algorithms and data structures involved in propagation and concludes in a proof of soundness and completeness thereof.
 
-Strong negation, denoted by $\negstrong{\sigma}$, and weak negation, $\negweak{\sigma}$, mapping $\mathbf{F}v$ to $\mathbf{T}v$ and $\mathbf{F}v$ to $\mathbf{W}v$ respectively, of a signed literal are defined by the following truth table:%equalities: $\negstrong{\mathbf{T}v} = \mathbf{F}v$, $\negstrong{\mathbf{M}v} = \mathbf{F}v$ and  $\negstrong{\mathbf{F}v} = \mathbf{T}v$, while $\negweak{\mathbf{T}v} = \mathbf{F}v$, $\negweak{\mathbf{M}v} = \mathbf{F}v$ and $\negweak{\mathbf{F}v} = \mathbf{M}v$.
+\section{Definitions}
+
+% Signed literal vs. boolean signed literal.
+
+Following definitions lay out the vocabulary and concepts towards an explanation of unit propagation. Most of them fundamentally depend on \emph{atoms} (usually denoted $v$) but do not refer to neither a set of atoms nor their domain. This is because all definitions are bound to a logic program $P$ to be solved (i.e.~to find stable models for). The set of ground atoms wrt.~$P$, effectively its Herbrand Base $\textit{HB}(P)$, is obtained by the grounding process, which is not detailed in this work. What might seem to be lacking from the definitions therefore is the context of the input program $P$ and therefore the domain of atoms. This context is considered implicit in the following.
+
+% TODO: Where does v come from? Should be in some HB(P)?
+\begin{definition}
+A \emph{ground atom} (or simply \emph{atom}) wrt.~a logic program $P$ is an element of $\textit{HB}(P)$, usually denoted $v$.
+\end{definition}
+
+\begin{definition}
+A \emph{signed literal} $\sigma$ of the form $\mathbf{T}v$, $\mathbf{M}v$ or $\mathbf{F}v$ where $v$ is an atom and $\mathbf{T}v$ expresses that $v$ is \emph{true}, $\mathbf{M}v$ that it \emph{must be true}, and $\mathbf{F}v$ that it is \emph{false}.
+\end{definition}
+
+\begin{definition}
+A \emph{boolean signed literal} $\sigma$ of the form $\mathbf{T}v$ or $\mathbf{F}v$ where $v$ is an atom and  $\mathbf{T}v$ expresses that $v$ is \emph{true}, and $\mathbf{F}v$ that it is \emph{false}.
+\end{definition}
+
+\begin{definition}
+The function $\wkn(\sigma)$ takes a boolean signed literal $\sigma$ and transforms it into a signed literal referred to as its \emph{weak form}, meaning that while \emph{false} stays \emph{false}, e.g.~$\wkn(\bF v) = \bF v$, \emph{true} is mapped to \emph{\mbt}, e.g.~$\wkn(\bT v) = \bM v$.
+\end{definition}
+
+% TODO: Remark on boolean signed literal vs. signed literal with context of clasp?
+
+\begin{definition}
+An \emph{assignment} $\ass$ is a sequence $(\sigma_1, \ldots, \sigma_n)$ of signed literals $\sigma_i$ of the form $\star v_i$ with $\star \in \thrice$ where $v_i \not = v_j$ for $1 \leq i < j \leq n$, or \emph{conflict}.
+\end{definition}
+
+\begin{remark}
+Below, assignments are sometimes also used as sets, in which case the set represented by some assignment is simply the set of all signed literals contained in the sequence.
+\end{remark}
+
+\begin{definition}
+For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sigma \ | \ \sigma \in \ass, \sigma = \mathbf{T}v \textrm{ or } \sigma = \mathbf{F}v \} \cup \{ \sigma' \ | \ \sigma \in \ass, \sigma = \mathbf{M}v, \sigma' = \mathbf{T}v \}$$
+\end{definition}
+
+\begin{definition}
+Strong complement, denoted by $\negstrong{\sigma}$, and weak complement, $\negweak{\sigma}$, mapping $\mathbf{F}v$ to $\mathbf{T}v$ and $\mathbf{F}v$ to $\mathbf{M}v$ respectively, of a signed literal are defined by the following truth table:%equalities: $\negstrong{\mathbf{T}v} = \mathbf{F}v$, $\negstrong{\mathbf{M}v} = \mathbf{F}v$ and  $\negstrong{\mathbf{F}v} = \mathbf{T}v$, while $\negweak{\mathbf{T}v} = \mathbf{F}v$, $\negweak{\mathbf{M}v} = \mathbf{F}v$ and $\negweak{\mathbf{F}v} = \mathbf{M}v$.
+% "andere Richtung auch erklären"
 
 \begin{center}
 \begin{tabular}{|c|cc|}
@@ -162,26 +243,77 @@ $\mathbf{F}v$&$\mathbf{T}v$&$\mathbf{M}v$\\
 \hline
 \end{tabular}
 \end{center}
+\end{definition}
 
-The sequence obtained by appending the literal $\sigma$ to $\mathbf{A}$ is denoted by $\mathbf{A} \circ \sigma$. In case $\negstrong{\sigma} \in \mathbf{A} \vee \negweak{\sigma} \in \mathbf{A}$ however, $\mathbf{A} \circ \sigma =$ \emph{conflict} to indicate that appending $\sigma$ conflicts with other literals in $\mathbf{A}$. Furthermore $\emph{conflict} \circ \sigma = \emph{conflict}$.
+The assignment obtained by appending the literal $\sigma$ to $\ass$ is denoted by $\ass \circ \sigma$. In case $\negstrong{\sigma} \in \ass \vee \negweak{\sigma} \in \ass$ however, $\ass \circ \sigma =$ \emph{conflict} to indicate that appending $\sigma$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sigma = \emph{conflict}$. To ensure that the assignment contains at most one literal per atom $v$, in case $\mathbf{M}v \in \ass$, then $\mathbf{M}v$ is removed when before $\mathbf{T}v$.
 
-A literal $\mathbf{X}v$ with $\mathbf{X} \in \{ \mathbf{T}, \mathbf{M}, \mathbf{F} \}$ is \emph{unassigned} with respect to some assignment $\mathbf{A}$ iff $\mathbf{T}v \not \in \mathbf{A} \wedge \mathbf{M}v \not \in \mathbf{A} \wedge \mathbf{F}v \not \in \mathbf{A}$.
+\begin{definition}
+An atom $v$ is \emph{unassigned} with respect to some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} = \emptyset$$
+\end{definition}
 
-An atom $v$ is \emph{unassigned} with respect to some assignment $\mathbf{A}$ iff $\mathbf{T}v \not \in \mathbf{A} \wedge \mathbf{M}v \not \in \mathbf{A} \wedge \mathbf{F}v \not \in \mathbf{A}$.
+\begin{definition}
+A signed literal $\star v$ with $\star \in \thrice$ is \emph{unassigned} wrt.~$\ass$ if $v$ is unassigned wrt.~$\ass$.
+\end{definition}
 
-A nogood reflects a partial assignment that cannot be extended to a solution. Here, a \emph{nogood} is a set $\{ \sigma_1, \ldots, \sigma_n \}$ of signed literals. A nogood $\delta$ is \emph{violated} by an assignment $\mathbf{A}$ if $\delta \subseteq \mathbf{A}$.
+\begin{definition}
+A \emph{nogood} reflects a partial assignment that cannot be extended to a solution. Here, a \emph{nogood} is a set $\{ \sigma_1, \ldots, \sigma_n \}$ of signed literals.
+\end{definition}
 
+\begin{definition}
+A nogood $\delta$ is \emph{violated} by an assignment $\mathbf{A}$ if $\delta \subseteq \bass(\ass)$.
+\end{definition}
+
+\begin{definition}
+A nogood $\delta$ is \emph{satisfied} wrt.~some assignment $\ass$ iff there is no $\ass' \supseteq \ass$ s.t.~$\delta$ is violated under $\ass'$.
+\end{definition}
+
+\begin{definition}
 A nogood is \emph{strictly unit} with respect to some assignment $\mathbf{A}$ iff it contains exactly one \emph{unassigned} literal and all other literals are elements of $\mathbf{A}$.
+\end{definition}
 
+\begin{definition}
 A nogood is \emph{weakly unit} with respect to some assignment $\mathbf{A}$ iff it contains exactly one \emph{unassigned} literal and all other literals are \emph{weak} elements of $\mathbf{A}$.
+\end{definition}
 
 %To efficiently retrieve the set of nogoods that need to be checked for unity, a data structure of watches was 
 
-Watches are triples of an atom and two \enquote{watch structures} $(v, W_{=2}, W_{>2})$, with $W_{=2}$ and $W_{>2}$ consisting of $(W_\mathbf{T}, W_\mathbf{M}, W_\mathbf{F})$,  three sets of nogoods that potentially propagate in case $v$ is assigned to $\mathbf{T}$, $\mathbf{M}$ or $\mathbf{F}$ respectively.
+Watches are a set $\Delta = \{ (v_1, W_1), \ldots, (v_n, W_n) \}$ of pairs $(v_i, W_i)$, $1 \leq i \leq n$, containing an atom $v_i$ and a triple $W_i$, referred to as the \emph{watches for $v_i$}, consisting of $(W_i^\mathbf{T}, W_i^\mathbf{M}, W_i^\mathbf{F})$, three sets of nogoods that potentially propagate in case $v$ is assigned to $\mathbf{T}$, $\mathbf{M}$ or $\mathbf{F}$ respectively. Also there are no two pairs $(v, W), (v', W') \in \Delta$ s.t.~$v = v'$, i.e.~$\Delta$ is a function mapping an atom to a triple of its watches. We write $\Delta(v) = W$ to denote $(v, W) \in \Delta$. Furthermore, let $\Delta(v, \star) = W^\star$ for $\star \in \thrice$ and $\Delta(v) = (W^\mathbf{T}, W^\mathbf{M}, W^\mathbf{F})$ and let $\Delta(\sigma) = \Delta(v, \star)$ for a signed literal $\sigma = \star v$.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{watches}
+\begin{tikzpicture}[stack/.style={rectangle split, rectangle split parts=#1,draw, anchor=center},->]
+\node(s)[stack=4]  {
+                 Atom     % text
+\nodepart{two}   $v_1$     % two
+\nodepart{three} $v_2$      % three
+\nodepart{four}  \vdots % four
+};
+
+\node(v1t)[stack=3, rectangle split horizontal, above right=2cm and 3cm of s.two] {
+$\delta_1$     % two
+\nodepart{two} $\delta_2$      % three
+\nodepart{three}  \ldots % four
+};
+
+\node(v1m)[stack=3, rectangle split horizontal, above right=1cm and 3.5cm of s.two] {
+$\delta_1$     % two
+\nodepart{two} $\delta_2$      % three
+\nodepart{three}  \ldots % four
+};
+
+\node(v1f)[stack=3, rectangle split horizontal, above right=0cm and 4cm of s.two] {
+$\delta_1$     % two
+\nodepart{two} $\delta_2$      % three
+\nodepart{three}  \ldots % four
+};
+
+\path (s.two east)
+edge [out=east,in=west, left] node {$\bT$} (v1t)
+edge [out=east,in=west, above] node {$\bM$} (v1m)
+edge [out=east,in=west, above] node {$\bF$} (v1f)
+;
+
+\end{tikzpicture}
   \caption{The layout of the \emph{watches} data structure.}
   \label{fig:watches} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
@@ -203,7 +335,7 @@ Watches are triples of an atom and two \enquote{watch structures} $(v, W_{=2}, W
     }
     \Else
     {
-      $\mathbf{A} \ \circ$ \textsc{UnitPropagationMBT}($\mathbf{A}$, $\mathbf{M}v$, $\Delta$)\\
+      $\mathbf{A} \ \circ$ \textsc{UnitPropagationMBT}($\mathbf{A}$, $\wkn(\sigma_i)$, $\Delta$)\\
       $\mathbf{A} \ \circ$ \textsc{UnitPropagationTrue}($\mathbf{A}$, $\sigma_i$, $\Delta$)
     }
     $i \leftarrow i + 1$
@@ -218,34 +350,47 @@ Watches are triples of an atom and two \enquote{watch structures} $(v, W_{=2}, W
         a~literal~$\sigma \in \mathbf{A}$,~and
         a~set~of~watched~nogoods~$\Delta$.}
   \KwOut{$\mathbf{A}$ extended by means of nogood propagation and $\Delta$ with updated watches.}
-  \ForEach{$\delta \in w_{=2}(\Delta, \sigma)$ of form $\{ \sigma, \sigma' \}$}
+%  \ForEach{$\delta \in w_{=2}(\Delta, \sigma)$ of form $\{ \sigma, \sigma' \}$}
+%  {
+%    \If{$\sigma'$ is unassigned in $\mathbf{A}$}
+%    {
+%      $\mathbf{A} \leftarrow \mathbf{A} \circ \negweak{\sigma'}$
+%    }
+%  }
+  \ForEach{$\delta \in \Delta(\sigma)$}
   {
-    \If{$\sigma'$ is unassigned in $\mathbf{A}$}
-    {
-      $\mathbf{A} \leftarrow \mathbf{A} \circ \negweak{\sigma'}$
-    }
-  }
-  \ForEach{$\delta \in w_{>2}(\Delta, \sigma)$}
-  {
-    \uIf{$\delta$ is weakly unit with $\sigma'$ unassigned}
-    {
-      $\mathbf{A} \leftarrow \mathbf{A} \circ \negweak{\sigma'}$
-    }
-    \uElseIf{$\delta$ is violated}
+    \uIf{$\delta$ is violated}
     {
       \Return{$(\text{conflict}, \Delta)$}
     }
+    \uElseIf{$\delta$ is weakly unit with $\sigma'$ unassigned}
+    {
+      $\mathbf{A} \leftarrow \mathbf{A} \circ \negweak{\sigma'}$
+    }
     \Else%If{there is some unassigned $\sigma' \in \delta$}
     {
-      Let $\sigma'$, $\sigma''$ be two unassigned literals in $\delta$.\\
-      Point watch pointers at $\sigma'$ and $\sigma''$\\
-      
-      $i \leftarrow $ index of $\sigma'$, the other watched literal\\
-      $j \leftarrow $ index of unassigned literal, s.t.~$i \not = j$\\
-      Repoint pointer pointing at $\sigma$ to $j$.\\
-
-      Remove $\delta$ from watchlist for $\sigma$ and
-      add it to watches for $\delta[j]$.
+      $\Delta(\sigma) \leftarrow \Delta(\sigma) \setminus \{ \delta \}$\\
+%      Let $\sigma'$, $\sigma''$ be two unassigned literals in $\delta$.\\
+      \ForEach{$\sigma'$, one of two unassigned literals in $\delta$  }
+      {
+        $\Delta(\sigma') \leftarrow \Delta(\wkn(\sigma)) \cup \{ \delta \}$\\
+      }
+%      \uIf{$\sigma'$ is of $\mathbf{T}v$}
+%      {
+%        $\Delta(\sigma') \leftarrow \Delta(\mathbf{M}v) \cup \{ \delta \}$\\
+%      }
+%      \Else
+%      {
+%        $\Delta(\sigma') \leftarrow \Delta(\sigma') \cup \{ \delta \}$\\
+%      }
+%      \uIf{$\sigma''$ is of $\mathbf{T}v$}
+%      {
+%        $\Delta(\sigma'') \leftarrow \Delta(\mathbf{M}v) \cup \{ \delta \}$\\
+%      }
+%      \Else
+%      {
+%        $\Delta(\sigma'') \leftarrow \Delta(\sigma'') \cup \{ \delta \}$\\
+%      }
     }
   }
   \Return{$(\mathbf{A}, \Delta)$}
@@ -253,31 +398,44 @@ Watches are triples of an atom and two \enquote{watch structures} $(v, W_{=2}, W
   \label{alg:prop-mbt}
 \end{algorithm}
 
-Algorithm \ref{alg:prop-mbt} exhibits how unit propagation is used to infer assignments (of either false or \mbt) from watched nogoods. In lines 1-4 propagation of binary nogoods are handled: For every nogood that contains $\sigma$ and exactly one other literal $\sigma'$, propagation is trivial. If $\sigma'$ is unassigned it is assigned to its weak-negated form.
-Lines 6-13 cover the more sophisticated general case for nogoods with more than two elements. The nogood is scanned for unassigned literals, as in this case (check in line 7) it cannot be unit, and the pointer pointing at $\sigma$ is moved to/pointed at the unassigned literal $\sigma'$ (line 8). Watches are readjusted to reflect pointer movement in line 9. If there is no unassigned literal (lines 10 to 12), the nogood propagates in case it is weakly unit. $\sigma'$ is assigned to it's weak-negated form.
+Algorithm \ref{alg:prop-mbt} exhibits how unit propagation is used to infer assignments (of either false or \mbt) from watched nogoods. 
+In line 1, nogoods $\Delta(\sigma)$ that are watched for assignments of $\sigma$ are resolved and bound to $\delta$. Each of these nogoods can now be in one of three distinct states:
+\begin{enumerate}
+\item It could be violated, leading to a conflicting assignment, or
+\item it could be weakly unit, in which case a new assignment can be inferred from the nogood, or
+\item in any other case, there must be at least two unassigned literals in $\delta$, which are to be watched for changes in assignments.
+% TODO: Does not (1.) and not (2.) guarantee that there are two unassigned literals?! Nogood could be satisfied.
+\end{enumerate}
+
+For the possibility that with the assignment of $\sigma$ all literals in $\delta$ were assigned and the nogood is now violated (1.), the algorithm returns a conflicting assignment in line 3.
+
+In case (2.) handled in line 5, $\ass$ is updated by appending the weak complement of $\sigma$. All literals in $\delta$ are assigned and weakly contained in $\ass$, therefore the only way that $\delta$ cannot be violated under $\ass$ is by appending the (weak) complement of $\sigma$ to $\ass$.
+
+
 
 % TODO pointers need to be more explicit. E.g. where does \sigma' come from in line 11?!
 
 \begin{algorithm}
-  \KwIn{An assignment $\mathbf{A}$,
-        a literal $\sigma \in \mathbf{A}$, and
+  \KwIn{An assignment $\ass$,
+        a literal $\sigma \in \ass$, and
         a set of watched nogoods~$\Delta$.}
-  \KwOut{$\mathbf{A}$ extended by means of nogood propagation.}
-  \ForEach{nogood $\delta \in w_{=2}(\Delta)$ of form $\{ \sigma, \sigma' \}$}
+  \KwOut{$\ass$ extended by means of nogood propagation.}
+%  \ForEach{nogood $\delta \in w_{=2}(\Delta)$ of form $\{ \sigma, \sigma' \}$}
+%  {
+%    \If{$\sigma'$ is unassigned}
+%    {
+%      $\mathbf{A} \circ \negstrong{\sigma'}$
+%    }
+%  }
+  \ForEach{nogood $\delta \in w(\Delta)$}
   {
-    \If{$\sigma'$ is unassigned}
+  % L statt Theta
+    $L \leftarrow \{ \sigma \ | \ \sigma \in \delta, \sigma \not \in \ass \text{, and } \sigma \ \text{is of form} \ \mathbf{T}v \} \setminus \{ \sigma, \text{head}(\delta) \} $\\
+    \uIf{$L \not = \emptyset$}
     {
-      $\mathbf{A} \circ \negstrong{\sigma'}$
-    }
-  }
-  \ForEach{nogood $\delta \in w_{>2}(\Delta)$ with $\sigma \in \delta$}
-  {
-    $X \leftarrow \{ x \ | \ x \in \delta \wedge x \ \text{is of form} \ \mathbf{T}v \} \setminus \{ \sigma, \text{head}(\delta) \} \setminus \mathbf{A} $\\
-    \uIf{$X \not = \emptyset$}
-    {
-      Choose $\sigma'$ from $X$ by highest decision level.\\
-      Repoint pointer from $\sigma$ to $\sigma'$.\\
-      Remove $\delta$ from watches for $\sigma$ and add it to watches for $\sigma'$.\\
+      Choose $\sigma' \in L$ s.t.~there is no $\sigma'' \in L$ with $\ass = (\ldots, \sigma', \ldots, \sigma'', \ldots)$.\\
+      $\Delta(\sigma) \leftarrow \Delta(\sigma) \setminus \{ \delta \}$\\
+      $\Delta(\sigma') \leftarrow \Delta(\sigma') \cup \{ \delta \}$\\
     }
     %\uElseIf{$\delta$ is violated}
     %{
@@ -293,7 +451,7 @@ Lines 6-13 cover the more sophisticated general case for nogoods with more than 
   \label{alg:prop-true}
 \end{algorithm}
 
-In order to implement efficient propagation, a data
+%In order to implement efficient propagation, a data
 
 % No Unfounded Set checks -> MBT.
 
