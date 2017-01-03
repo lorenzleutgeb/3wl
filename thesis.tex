@@ -208,15 +208,15 @@ Following definitions lay out the vocabulary and concepts towards an explanation
 %\end{definition}
 
 %\begin{definition}
-A \emph{signed literal} $\sgl$ of the form $\mathbf{T}v$, $\mathbf{M}v$ or $\mathbf{F}v$ where $v$ is an atom and $\mathbf{T}v$ expresses that $v$ is \emph{true}, $\mathbf{M}v$ that it \emph{must be true}, and $\mathbf{F}v$ that it is \emph{false}.
+A \emph{signed literal} $\sgl$ of the form $\bT v$, $\bM v$ or $\bF v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, $\bM v$ that it \emph{must be true}, and $\bF v$ that it is \emph{false}.
 %\end{definition}
 
 %\begin{definition}
-A \emph{boolean signed literal} $\bsgl$ of the form $\mathbf{T}v$ or $\mathbf{F}v$ where $v$ is an atom and  $\mathbf{T}v$ expresses that $v$ is \emph{true}, and $\mathbf{F}v$ that it is \emph{false}.
+A \emph{boolean signed literal} $\bsgl$ of the form $\bT v$ or $\bF v$ where $v$ is an atom and  $\bT v$ expresses that $v$ is \emph{true}, and $\bF v$ that it is \emph{false}.
 %\end{definition}
 
 %\begin{definition}
-The function $\wkn(\bsgl)$ takes a boolean signed literal $\bsgl$ and transforms it into a signed literal referred to as its \emph{weak form}, meaning that while \emph{false} stays \emph{false}, e.g.~$\wkn(\bF v) = \bF v$, \emph{true} is mapped to \emph{\mbt}, e.g.~$\wkn(\bT v) = \bM v$.
+%The function $\wkn(\bsgl)$ takes a boolean signed literal $\bsgl$ and transforms it into a signed literal referred to as its \emph{weak form}, meaning that while \emph{false} stays \emph{false}, e.g.~$\wkn(\bF v) = \bF v$, \emph{true} is mapped to \emph{\mbt}, e.g.~$\wkn(\bT v) = \bM v$.
 %\end{definition}
 
 % TODO: Remark on boolean signed literal vs. signed literal with context of clasp?
@@ -226,7 +226,7 @@ An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed l
 %\end{definition}
 
 %\begin{definition}
-For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \ | \ \sgl \in \ass, \sgl = \mathbf{T}v \textrm{ or } \sgl = \mathbf{F}v \} \cup \{ \bsgl \ | \ \sgl \in \ass, \sgl = \mathbf{M}v, \bsgl = \mathbf{T}v \}$$
+For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bM v \ | \ \bT v \in \ass \}$$
 \end{definition}
 
 %\begin{remark}
@@ -234,7 +234,7 @@ Below, assignments are sometimes also used as sets, in which case the set repres
 %\end{remark}
 
 \begin{definition}
-Strong complement, denoted by $\negstrong{\sgl}$, and weak complement, $\negweak{\sgl}$, mapping $\mathbf{F}v$ to $\mathbf{T}v$ and $\mathbf{F}v$ to $\mathbf{M}v$ respectively, of a signed literal are defined by the following truth table:%equalities: $\negstrong{\mathbf{T}v} = \mathbf{F}v$, $\negstrong{\mathbf{M}v} = \mathbf{F}v$ and  $\negstrong{\mathbf{F}v} = \mathbf{T}v$, while $\negweak{\mathbf{T}v} = \mathbf{F}v$, $\negweak{\mathbf{M}v} = \mathbf{F}v$ and $\negweak{\mathbf{F}v} = \mathbf{M}v$.
+Strong complement, denoted by $\negstrong{\sgl}$, and weak complement, $\negweak{\sgl}$, mapping $\bF v$ to $\bT v$ and $\bF v$ to $\bM v$ respectively, of a signed literal are defined by the following truth table:%equalities: $\negstrong{\bT v} = \bF v$, $\negstrong{\bM v} = \bF v$ and  $\negstrong{\bF v} = \bT v$, while $\negweak{\bT v} = \bF v$, $\negweak{\bM v} = \bF v$ and $\negweak{\bF v} = \bM v$.
 % "andere Richtung auch erklären"
 
 \begin{center}
@@ -243,15 +243,15 @@ Strong complement, denoted by $\negstrong{\sgl}$, and weak complement, $\negweak
 $\sgl$&$\negstrong{\sgl}$&$\negweak{\sgl}$\\
 \hline
 \hline
-$\mathbf{T}v$&$\mathbf{F}v$&$\mathbf{F}v$\\
-$\mathbf{M}v$&$\mathbf{F}v$&$\mathbf{F}v$\\
-$\mathbf{F}v$&$\mathbf{T}v$&$\mathbf{M}v$\\
+$\bT v$&$\bF v$&$\bF v$\\
+$\bM v$&$\bF v$&$\bF v$\\
+$\bF v$&$\bT v$&$\bM v$\\
 \hline
 \end{tabular}
 \end{center}
 \end{definition}
 
-The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $\ass \circ \sigma$. In case $\negstrong{\sigma} \in \ass \vee \negweak{\sigma} \in \ass$ however, $\ass \circ \sigma =$ \emph{conflict} to indicate that appending $\sigma$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sigma = \emph{conflict}$. To ensure that the assignment contains at most one literal per atom $v$, in case $\mathbf{M}v \in \ass$, then $\mathbf{M}v$ is removed when before $\mathbf{T}v$.
+The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $\ass \circ \sigma$. In case $\negstrong{\sigma} \in \ass \vee \negweak{\sigma} \in \ass$ however, $\ass \circ \sigma =$ \emph{conflict} to indicate that appending $\sigma$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sigma = \emph{conflict}$. To ensure that the assignment contains at most one literal per atom $v$, in case $\bM v \in \ass$, then $\bM v$ is removed when before $\bT v$.
 
 \begin{definition}
 An atom $v$ is \emph{unassigned} with respect to some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} = \emptyset$$
@@ -283,7 +283,7 @@ A nogood is \emph{weakly unit} with respect to some assignment $\ass$ iff it con
 
 %To efficiently retrieve the set of nogoods that need to be checked for unity, a data structure of watches was 
 
-Watch structures are sets $\Delta = \{ (v_1, W_1), \ldots, (v_n, W_n) \}$ of pairs $(v_i, W_i)$, $1 \leq i \leq n$, containing an atom $v_i$ and a triple $W_i$, referred to as the \emph{watches for $v_i$}, consisting of $(W_i^+, W_i^-, W_i^\alpha)$, three sets of nogoods that potentially propagate in case the assignment of $v$ changes from \emph{unassigned} to \emph{true} or \emph{\mbt} ($W^+$) or from \emph{unassigned} to \emph{false} ($W^-$), or from \emph{\mbt} to \emph{true} ($W^\alpha$). Also there are no two pairs $(v, W), (v', W') \in \Delta$ s.t.~$v = v'$, i.e.~$\Delta$ is a function mapping an atom to a triple of its watches. We write $\Delta(v) = W$ to denote $(v, W) \in \Delta$. Furthermore, let $\Delta(\sgl) = W^+$ for $\sgl$ of $\bT v$ or $\bM v$ and $\Delta(\sgl) = W^-$ for $\sgl$ of $\bF v$ with $W^+$ and $W^-$ from $\Delta(v)$, i.e.~for signed literals, $\Delta$ is a function that yields the watches according polarity of the literal. Lastly, for some $\sgl = \bX v$ or an atom $v$, let $\Delta^\alpha(v) = W^\alpha$ with $W^\alpha$ via $\Delta(v)$.
+A watch structure is a set $\Delta = \{ (v_1, W_1), \ldots, (v_n, W_n) \}$ of pairs $(v_i, W_i)$, $1 \leq i \leq n$, containing an atom $v_i$ and a triple $W_i = (W_i^+, W_i^-, W_i^\alpha)$, referred to as the \emph{watches for $v_i$}, consisting of three sets of nogoods that potentially propagate in case the assignment of $v$ changes from \emph{unassigned} to \emph{true} or \emph{\mbt} ($W_i^+$) or from \emph{unassigned} to \emph{false} ($W_i^-$), or from \emph{\mbt} to \emph{true} ($W_i^\alpha$). Also there are no two pairs $(v, W), (v', W') \in \Delta$ s.t.~$v = v'$, i.e.~$\Delta$ is a function mapping an atom to a triple of its watches. We write $\Delta(v) = W$ to denote $(v, W) \in \Delta$. Furthermore, let $\Delta^\pm(\sgl) = W^+$ for $\sgl$ of $\bT v$ or $\bM v$ and $\Delta^\pm(\sgl) = W^-$ for $\sgl$ of $\bF v$ with $W^+$ and $W^-$ from $\Delta(v)$, i.e.~for signed literals, $\Delta^\pm$ is a function that yields the watches according polarity of the literal. Lastly, for some $\sgl = \bX v$ or an atom $v$, let $\Delta^\alpha(v) = W^\alpha$ with $W^\alpha$ via $\Delta(v)$.
 
 \begin{figure}[h]
   \centering
@@ -324,6 +324,10 @@ edge [out=east,in=west, above] node {$-$} (v1f)
   \label{fig:watches} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
 
+A watch structure is said to be \emph{well formed} wrt.~some assignment $\ass$ and a set of nogoods $\nabla$ in case:
+
+For every nogood $\delta \in \nabla$ with more than one unassigned literal $\bsgl_1, \bsgl_2, \ldots \in \delta$ wrt.~some assignment $\ass$, $\delta$ is contained in exactly two watches, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
+
 \section{Unit Propagation}
 
 \begin{algorithm}
@@ -334,7 +338,7 @@ edge [out=east,in=west, above] node {$-$} (v1f)
   \KwOut{The assignment $\ass$, extended by means of unit propagation and $\Delta$ with updated watches.}
   $\ass \leftarrow \ass \circ \sgl$\\
   $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationUnassigned}($\ass$, $\sgl$, $\Delta$)\\
-  \If{$\sigma$ is of $\mathbf{T}v$}
+  \If{$\sigma$ is of form $\bT v$}
   {
     $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationAssigned}($\ass$, $\sgl$, $\Delta$)
   }
@@ -355,7 +359,7 @@ edge [out=east,in=west, above] node {$-$} (v1f)
 %      $\mathbf{A} \leftarrow \mathbf{A} \circ \negweak{\sigma'}$
 %    }
 %  }
-  \ForEach{$\delta \in \Delta(\sgl)$}
+  \ForEach{$\delta \in \Delta^\pm(\sgl)$}
   {
     \uIf{$\delta$ is violated}
     {
@@ -367,10 +371,10 @@ edge [out=east,in=west, above] node {$-$} (v1f)
     }
     \Else%If{there is some unassigned $\sigma' \in \delta$}
     {
-      $\Delta(\sgl) \leftarrow \Delta(\sgl) \setminus \{ \delta \}$\\
+      $\Delta^\pm(\sgl) \leftarrow \Delta^\pm(\sgl) \setminus \{ \delta \}$\\
       Let $\bsgl$, $\bsgl'$ be two unassigned literals in $\delta$.\\
-      $\Delta(\bsgl) \leftarrow \Delta(\bsgl) \cup \{ \delta \}$\\
-      $\Delta(\bsgl') \leftarrow \Delta(\bsgl') \cup \{ \delta \}$\\
+      $\Delta^\pm(\bsgl) \leftarrow \Delta^\pm(\bsgl) \cup \{ \delta \}$\\
+      $\Delta^\pm(\bsgl') \leftarrow \Delta^\pm(\bsgl') \cup \{ \delta \}$\\
     }
   }
   \Return{$(\ass, \Delta)$}
@@ -404,13 +408,13 @@ In case (3.), $\Delta$ is modified in lines 8-11. As $\sgl$ is now assigned, it 
 %  }
   \ForEach{nogood $\delta \in \Delta^\alpha(\sgl)$}
   {
-  % L statt Theta
-    $L \leftarrow \{ \bsgl \ | \ \bsgl \in \delta, \bsgl \not \in \ass \text{, and } \bsgl \ \text{is of form} \ \mathbf{T}v \} \setminus \{ \sgl, \text{head}(\delta) \} $\\
+    $L \leftarrow \{ \bT v \in \delta \ | \ \bT v \not \in \ass \} \setminus \{ \sgl, \text{head}(\delta) \} $\\
+%     $L \leftarrow \{ \bsgl \ | \ \bsgl \in \delta, \bsgl \not \in \ass \text{, and } \bsgl \ \text{is of form} \ \bT v \} \setminus \{ \sgl, \text{head}(\delta) \} $\\
     \uIf{$L \not = \emptyset$}
     {
       $\Delta^\alpha(\sgl) \leftarrow \Delta^\alpha(\sgl) \setminus \{ \delta \}$\\
-      Choose $\bsgl \in L$ s.t.~there is no $\bsgl' \in L$ with $\ass = (\ldots, \bsgl, \ldots, \bsgl', \ldots)$.\\
-      $\Delta^\alpha(\bsgl) \leftarrow \Delta^\alpha(\bsgl) \cup \{ \delta \}$\\
+      % Choose $\bsgl \in L$ s.t.~there is no $\bsgl' \in L$ with $\ass = (\ldots, \bsgl, \ldots, \bsgl', \ldots)$.\\
+      $\Delta^\alpha(\bsgl) \leftarrow \Delta^\alpha(\bsgl) \cup \{ \delta \}$ for some $\sigma \in L$\\
     }
 	\ElseIf{$\delta$ is strictly unit}
 	{
@@ -431,6 +435,42 @@ In case (3.), $\Delta$ is modified in lines 8-11. As $\sgl$ is now assigned, it 
 % Invariant
 For every nogood $\delta \in \Delta$, if $\delta$ contains at least two atoms unassigned under $\ass$, then $\delta$ is contained in exactly two watch lists.
 %TODO define watch list!
+
+\begin{theorem}
+Algorithm \ref{alg:up} is sound.
+\end{theorem}
+
+\begin{proof}
+We show that:
+
+\begin{enumerate}
+\item in case $\sgl$ conflicts with $\ass$, the algorithm will return the assignment \emph{conflict} and $\Delta$ is not guaranteed to be well formed,
+\item otherwise, the resulting watch structure $\Delta$ will be well formed wrt. the resulting assignment $\ass$.
+\end{enumerate}
+
+(1.) is trivial, as $\ass$ will be assigned \emph{conflict} in line 1 of the algorithm in case $\sgl$ conflicts with any other assignment in $\ass$.
+
+We show that for a watch structure $\Delta$ that is well formed wrt.~an assignment $\ass$, the watch structure $\Delta'$ and assignment $\ass'$ returned from Algorithm \ref{alg:up} is well formed as well.
+
+In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \Delta^\pm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
+Show that the algorithm infers a non-conflicting assignment from a non-conflicting assignment.
+\end{proof}
+
+\begin{theorem}
+Algorithm \ref{alg:up} is complete.
+\end{theorem}
+
+\begin{proof}
+Indirect proof, showing that if there is an assignment that results from propagation it will be generated.
+\end{proof}
+
+\begin{theorem}
+Algorithm \ref{alg:up} is sound and complete.
+\end{theorem}
+
+\begin{proof}
+
+\end{proof}
 
 \chapter{Implementation}
 
