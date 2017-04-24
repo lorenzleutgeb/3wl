@@ -115,7 +115,7 @@
 \newcommand{\dbef}{\Delta_{i}}
 \newcommand{\daf}{\Delta_{i+1}}
 \newcommand{\welf}{well formed\xspace}
-\newcommand{\upinv}{stable\xspace}
+\newcommand{\upinv}{quiet\xspace}
 \newcommand{\lowinv}{watches\xspace}
 \newcommand{\stbl}{stable\xspace}
 
@@ -253,6 +253,10 @@ $\bF v$&$\bT v$&$\bM v$\\
 \end{center}
 \end{definition}
 
+\begin{definition}
+Two literals $\sgl_1, \sgl_2$ are said to \emph{conflict} in case $\sgl_1 = \negweak{\sgl_2}$ or $\negweak{\sgl_1} = \sgl_2$.
+\end{definition}
+
 Occasionally the notation $\sgl = \bX v$ will be used to express that $\sgl$ is a literal of $v$ where $\bX \in \thrice$, i.e.~$\sgl$ is \enquote{bound} to $v$, but the sign is not important.
 
 \subsection{Assignments}
@@ -267,19 +271,33 @@ Below, assignments are sometimes also used as sets, in which case the set repres
 
 The number of elements in an assignment $|\ass|$ is intuitive, with $|\emph{conflict}| := 0$.
 
-The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $\ass' = \ass \circ \sgl$. In case $\negstrong{\sgl} \in \ass$ or $\negweak{\sgl} \in \ass$ however, $\ass \circ \sgl := \emph{conflict}$ to indicate that appending $\sgl$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sgl := \emph{conflict}$ for any $\sgl$. Appending preserves that for any atom $v$ there is at most one literal in the assignment: With $\sgl = \bT v$ and $\bM v \in \ass$, for $\ass' = \ass \circ \sgl$ it holds that $\bM v \not \in \ass'$ (and $|\ass'| = |\ass|$).
+The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $$\ass' = \ass \circ \sgl = \left\{\begin{array}{ll}
+        
+        \emph{conflict} & \text{if } \{ \negstrong{\sgl}, \negweak{\sgl} \} \cap \ass \not = \emptyset \\
+        (\sgl_1, \ldots, \sgl_{n-1}, \sgl) & \text{otherwise} \\
+        \end{array}\right\}.$$
 
-Partial assignments are denoted as $A^{k} = (\sgl_1, \ldots, \sgl_k)$ where $A = (\sgl_1, \ldots, \sgl_n$ and $1 \leq k \leq n$.
+Furthermore $\emph{conflict} \circ \sgl := \emph{conflict}$ for any $\sgl$. Appending preserves that for any atom $v$ there is at most one literal in the assignment: With $\sgl = \bT v$ and $\bM v \in \ass$, for $\ass' = \ass \circ \sgl$ it holds that $\bM v \not \in \ass'$ (and $|\ass'| = |\ass|$).
+
+Partial assignments are denoted as $A^{k} = (\sgl_1, \ldots, \sgl_n \ldots, \sgl_k)$ where $A = (\sgl_1, \ldots, \sgl_n$ and $1 \leq k \leq n$.
 
 %\begin{definition}
 For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$$
 
 \begin{definition}
-An atom $v$ is \emph{unassigned} under some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} = \emptyset$$
+An atom $v$ is \emph{assigned} under some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} \not = \emptyset$$
 \end{definition}
+
+%\begin{definition}
+%An atom $v$ is \emph{unassigned} under some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} = \emptyset$$
+%\end{definition}
 
 \begin{definition}
 A signed literal $\bX v$ with $\bX \in \thrice$ is \emph{unassigned} under $\ass$ iff $v$ is unassigned under $\ass$.
+\end{definition}
+
+\begin{definition}
+A literal $\sgl_1$ is said to conflict with $\ass$ in case it conflicts with any $\sgl_2 \in \ass$.
 \end{definition}
 
 \subsection{Nogoods}
@@ -299,14 +317,14 @@ A nogood $\delta$ is \emph{strongly unit} under an assignment $\ass$ iff $\delta
 Note that, as the names suggest, any nogood that is strictly unit under some assignment is also weakly unit, but not the other way round. Below, nogoods are sometimes referred to be \emph{unit} which amounts to stating that they are weakly unit. Also, when clear from context, reference to a particular assignment is omitted.
 
 \begin{definition}
+A nogood $\delta$ is \emph{violated} under an assignment $\ass$ iff $\delta \subseteq \bass(\ass)$.
+\end{definition}
+
+\begin{definition}
 A nogood $\delta$ is \emph{satisfied} under an assignment $\ass$ iff there is no $\ass' \supseteq \ass$ s.t.~$\delta$ is violated under $\ass'$.
 \end{definition}
 
 For the purpose of unit propagation, it is important to see that because a satisfied nogood will never be unit, therefore never yield a new assignment using unit propagation.
-
-\begin{definition}
-A nogood $\delta$ is \emph{violated} under an assignment $\ass$ iff $\delta \subseteq \bass(\ass)$.
-\end{definition}
 
 \begin{definition}
 A nogood $\delta$ is \emph{\upinv} under some assignment $\ass$ iff $\delta$ is not violated by $\ass$ and $\delta$ is not unit wrt.~$\ass$.
