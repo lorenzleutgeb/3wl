@@ -21,6 +21,7 @@
 \usepackage{nag}       % Issues warnings when best practices in writing LaTeX documents are violated.
 \usepackage{hyperref}  % Enables cross linking in the electronic document version. This package has to be included second to last.
 \usepackage[acronym,toc]{glossaries} % Enables the generation of glossaries and lists fo acronyms. This package has to be included last.
+\usepackage{xspace}
 \usepackage{tikz}
 \usetikzlibrary{matrix}
 \usetikzlibrary{shapes.multipart,calc}
@@ -107,6 +108,7 @@
 \newcommand{\bM}{\mathbf{M}}
 \newcommand{\bF}{\mathbf{F}}
 \newcommand{\bX}{\mathbf{X}}
+\newcommand{\welf}{well formed\xspace}
 
 \newcommand{\sgl}{\mu}
 \newcommand{\bsgl}{\sigma}
@@ -308,8 +310,8 @@ $\delta_3$     % two
 };
 
 \node(v1f)[stack=3, rectangle split horizontal, above right=0cm and 4cm of s.two] {
-$\delta_4$     % two
-\nodepart{two} $\delta_5$      % three
+$\delta_5$     % two
+\nodepart{two} $\delta_6$      % three
 \nodepart{three}  \ldots % four
 };
 
@@ -320,13 +322,20 @@ edge [out=east,in=west, above] node {$-$} (v1f)
 ;
 
 \end{tikzpicture}
-  \caption{The layout of the \emph{watches} data structure $\Delta$.}
+  \caption{Example layout of a \emph{watch structure}.}
   \label{fig:watches} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
 
-A watch structure is said to be \emph{well formed} wrt.~some assignment $\ass$ and a set of nogoods $\nabla$ in case:
+A nogood $\delta$ is said to be \welf wrt.~some watch structure $\Delta$ and an assignment $\ass$ if the following four statements hold:
 
-For every nogood $\delta \in \nabla$ with more than one unassigned literal $\bsgl_1, \bsgl_2, \ldots \in \delta$ wrt.~some assignment $\ass$, $\delta$ is contained in exactly two watches, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
+\begin{enumerate}
+\item $\delta$ is not violated by $\ass$.
+\item $\delta$ is not unit wrt.~$\ass$.
+\item If $\delta$ is not satisfied and contains at least two unassigned literals $\bsgl_1, \bsgl_2, \ldots \in \delta$, then $\delta$ is contained in exactly two watches, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
+\item Let $L_\delta = \{ \bT v \in \text{body}(\delta) \ | \ \bT v \not \in \ass \}$. If $L_\delta \not = \emptyset$, then there is exactly one $\bsgl \in L_\delta$ with $\delta \in \Delta^\alpha(\bsgl)$.
+\end{enumerate}
+
+A watch structure $\Delta$ is said to be \welf wrt.~some assignment $\ass$ in case all nogoods $\delta \in \Delta$ are well formed wrt.~$\Delta$ and $\ass$.
 
 \section{Unit Propagation}
 
@@ -437,7 +446,12 @@ For every nogood $\delta \in \Delta$, if $\delta$ contains at least two atoms un
 %TODO define watch list!
 
 \begin{theorem}
-Algorithm \ref{alg:up} is sound.
+Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$ \welf wrt.~$\ass$ and a new assignment $\sgl$, the following three statements hold:
+\begin{enumerate}
+\item If $\sgl$ does not conflict with $\ass$ and there are any assignments that can be inferred by unit propagation, these assignments are generated and the return value is an extended assignment $\ass' = \ass \circ \sgl$ and a watch structure $\Delta'$ \welf under $\ass'$.
+\item If $\sgl$ conflicts with $\ass$, the conflicting assignment is returned and the returned watch structure is $\Delta$.
+\item 
+\end{enumerate}
 \end{theorem}
 
 \begin{proof}
@@ -450,10 +464,37 @@ We show that:
 
 (1.) is trivial, as $\ass$ will be assigned \emph{conflict} in line 1 of the algorithm in case $\sgl$ conflicts with any other assignment in $\ass$.
 
-We show that for a watch structure $\Delta$ that is well formed wrt.~an assignment $\ass$, the watch structure $\Delta'$ and assignment $\ass'$ returned from Algorithm \ref{alg:up} is well formed as well.
+We show that for a watch structure $\Delta$ that is \welf wrt.~an assignment $\ass$, the watch structure $\Delta'$ and assignment $\ass'$ returned from Algorithm \ref{alg:up} is well formed as well.
 
 In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \Delta^\pm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
 Show that the algorithm infers a non-conflicting assignment from a non-conflicting assignment.
+
+We show that every nogood $\delta \in \Delta'$ is \welf wrt.~$\Delta'$ and $\ass'$, i.e.~$\Delta'$ is \welf wrt.~$\ass'$, by using that $\Delta$ is \welf wrt.~$\ass$ and the definition of the algorithm.
+
+For every nogood $\delta \in \Delta$:
+\begin{enumerate}
+\item If $\sgl \not \in \delta$, then:
+\begin{enumerate}
+\item $\delta$ is not violated by $\ass'$ because it is not violated by $\ass$ and the nogood cannot be violated by assigning $\sgl$ as $\sgl \not \in \delta$.
+\item $\delta$ is not unit, analogous to (b): $\delta$ is not unit wrt.~$\ass$ and it is not unit wrt.~$\ass'$ because $\ass' = \ass \circ \sgl$ and $\sgl \not \in \delta$.
+\item If $\delta$ contains at least two unassigned literals $\bsgl_1, \bsgl_2, \ldots$ wrt.~$\ass$ it will contain at least two unassigned literals wrt.~$\ass'$ as well, because $\sgl \not \in \delta$. The algorithm does neither modify $\Delta^\pm(\bsgl_1)$ nor $\Delta^\pm(\bsgl_2)$ (it only modifies $\Delta(\sgl)$), so the same $\bsgl_1, \bsgl_2$ satisfy $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$ for $\ass$ and $\ass'$.
+\item Analogous to (c), if $\delta$ has any triggers, their assignment does not change, as $\sgl \not \in \delta$, and no watches $\delta \in \Delta^\alpha(\bsgl)$ are changed. The same $\bsgl$ will satisfy $\delta \in \Delta^\alpha(\bsgl)$ for $\ass$ and $\ass'$.
+\end{enumerate}
+\item Else:
+\begin{enumerate}
+\item If $\delta \not \in \Delta^\pm(\sgl)$, i.e.~$\delta$ was not watched on $\sgl$, then
+\begin{enumerate}
+\item $\delta$ is not violated, because there must be some 
+\item $\Delta^\pm(\sgl)$ is unchanged
+\end{enumerate}
+\item Else:
+\begin{enumerate}
+\item violated $\to$ conflict
+\item weakly unit $\to$ satisfied
+\item pointer move $\to$ two unassigned literals
+\end{enumerate}
+\end{enumerate}
+\end{enumerate}
 \end{proof}
 
 \begin{theorem}
