@@ -110,8 +110,8 @@
 \newcommand{\bX}{\mathbf{X}}
 \newcommand{\fabef}{\ass_{i}}
 \newcommand{\faaf}{\ass_{i + 1}}
-\newcommand{\abef}{\fabef[\ldots, k + i]}
-\newcommand{\aaf}{\faaf[\ldots, k + i + 1]}
+\newcommand{\abef}{\fabef^{k + i}}
+\newcommand{\aaf}{\faaf^{k + i + 1}}
 \newcommand{\dbef}{\Delta_{i}}
 \newcommand{\daf}{\Delta_{i+1}}
 \newcommand{\welf}{well formed\xspace}
@@ -268,6 +268,8 @@ Below, assignments are sometimes also used as sets, in which case the set repres
 The number of elements in an assignment $|\ass|$ is intuitive, with $|\emph{conflict}| := 0$.
 
 The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $\ass' = \ass \circ \sgl$. In case $\negstrong{\sgl} \in \ass$ or $\negweak{\sgl} \in \ass$ however, $\ass \circ \sgl := \emph{conflict}$ to indicate that appending $\sgl$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sgl := \emph{conflict}$ for any $\sgl$. Appending preserves that for any atom $v$ there is at most one literal in the assignment: With $\sgl = \bT v$ and $\bM v \in \ass$, for $\ass' = \ass \circ \sgl$ it holds that $\bM v \not \in \ass'$ (and $|\ass'| = |\ass|$).
+
+Partial assignments are denoted as $A^{k} = (\sgl_1, \ldots, \sgl_k)$ where $A = (\sgl_1, \ldots, \sgl_n$ and $1 \leq k \leq n$.
 
 %\begin{definition}
 For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$$
@@ -545,7 +547,7 @@ Now, assume that $\sgl$ does not conflict with $\ass$ and show (2.) and (3.) are
 
 Let $\mathcal{P}(i)$ denote that $\dbef$ is \upinv wrt.~$\ass_i$ and $\dbef$ is \lowinv by $\abef$.
 
-\emph{Base Case}: For the base case, concerning the input assignment $\ass$ and $\Delta$, $\mathcal{P}(0)$ is trivially true because $\ass_0 = \ass$ and $\Delta_0 = \Delta$ is \welf wrt.~$\ass$ (precondition).
+\emph{Base Case}: For the base case, concerning the input assignment $\ass$ and $\Delta$, $\mathcal{P}(1)$ is trivially true because $\ass_1 = \ass$ and $\Delta_1 = \Delta$ is \welf wrt.~$\ass$ (precondition).
 
 % TODO Hypothesis is different for cases 1 and 2?!
 \emph{Induction Hypothesis}: Assume $\mathcal{P}(i)$ holds for some $i$.
