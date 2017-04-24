@@ -116,7 +116,7 @@
 \newcommand{\daf}{\Delta_{i+1}}
 \newcommand{\welf}{well formed\xspace}
 \newcommand{\upinv}{stable\xspace}
-\newcommand{\lowinv}{watched\xspace}
+\newcommand{\lowinv}{watches\xspace}
 \newcommand{\stbl}{stable\xspace}
 
 
@@ -214,13 +214,11 @@ This chapter contextualizes propagation by providing definitions extending chapt
 
 Following definitions lay out the vocabulary and concepts towards an explanation of unit propagation. Most of them fundamentally depend on \emph{atoms} (usually denoted $v$) but do not refer to neither a set of atoms nor their domain. This is because all definitions are bound to a logic program $P$ to be solved (i.e.~to find answer sets for). The set of ground atoms wrt.~$P$, effectively its Herbrand Base $\textit{HB}(P)$, is obtained by the grounding process, which is not detailed in this work. What might seem to be lacking from the definitions therefore is the context of the input program $P$ and therefore the domain of atoms. $P$ and its context is omitted in the following.
 
+\subsection{Literals}
+
 % TODO: Where does v come from? Should be in some HB(P)?
 %\begin{definition}
 %A \emph{ground atom} (or simply \emph{atom}) wrt.~a logic program $P$ is an element of $\textit{HB}(P)$, usually denoted $v$.
-%\end{definition}
-
-%\begin{definition}
-A \emph{signed literal} $\sgl$ of the form $\bT v$, $\bM v$ or $\bF v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, $\bM v$ that it \emph{must be true}, and $\bF v$ that it is \emph{false}.
 %\end{definition}
 
 %\begin{definition}
@@ -228,22 +226,14 @@ A \emph{boolean signed literal} $\bsgl$ of the form $\bT v$ or $\bF v$ where $v$
 %\end{definition}
 
 %\begin{definition}
+From boolean signed literals, generalize to $\sgl$ called a \emph{signed literal} of the form $\bT v$, $\bM v$ or $\bF v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, $\bM v$ that it \emph{must be true}, and $\bF v$ that it is \emph{false}.
+%\end{definition}
+
+%\begin{definition}
 %The function $\wkn(\bsgl)$ takes a boolean signed literal $\bsgl$ and transforms it into a signed literal referred to as its \emph{weak form}, meaning that while \emph{false} stays \emph{false}, e.g.~$\wkn(\bF v) = \bF v$, \emph{true} is mapped to \emph{\mbt}, e.g.~$\wkn(\bT v) = \bM v$.
 %\end{definition}
 
 % TODO: Remark on boolean signed literal vs. signed literal with context of clasp?
-
-\begin{definition}
-An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i$ of the form $\bX v_i$ with $\bX \in \thrice$ where $v_i \not = v_j$ for $1 \leq i < j \leq n$, or \emph{conflict}.
-%\end{definition}
-
-%\begin{definition}
-For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$$
-\end{definition}
-
-%\begin{remark}
-Below, assignments are sometimes also used as sets, in which case the set represented by some assignment is simply the set of all signed literals contained in the sequence.
-%\end{remark}
 
 \begin{definition}
 Strong complement, denoted by $\negstrong{\sgl}$, and weak complement, $\negweak{\sgl}$, mapping $\bF v$ to $\bT v$ and $\bF v$ to $\bM v$ respectively, of a signed literal are defined by the following truth table:%equalities: $\negstrong{\bT v} = \bF v$, $\negstrong{\bM v} = \bF v$ and  $\negstrong{\bF v} = \bT v$, while $\negweak{\bT v} = \bF v$, $\negweak{\bM v} = \bF v$ and $\negweak{\bF v} = \bM v$.
@@ -263,39 +253,85 @@ $\bF v$&$\bT v$&$\bM v$\\
 \end{center}
 \end{definition}
 
-The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $\ass \circ \sigma$. In case $\negstrong{\sigma} \in \ass \vee \negweak{\sigma} \in \ass$ however, $\ass \circ \sigma =$ \emph{conflict} to indicate that appending $\sigma$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sigma = \emph{conflict}$ and $|\emph{conflict}| := 0$. To ensure that the assignment contains at most one literal per atom $v$, in case $\bM v \in \ass$, then $\bM v$ is removed when before $\bT v$.
+Occasionally the notation $\sgl = \bX v$ will be used to express that $\sgl$ is a literal of $v$ where $\bX \in \thrice$, i.e.~$\sgl$ is \enquote{bound} to $v$, but the sign is not important.
+
+\subsection{Assignments}
 
 \begin{definition}
-An atom $v$ is \emph{unassigned} with respect to some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} = \emptyset$$
+An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i = \bX v_i$ where $v_i \not = v_j$ for $1 \leq i < j \leq n$, or \emph{conflict}.
+\end{definition}
+
+%\begin{remark}
+Below, assignments are sometimes also used as sets, in which case the set represented by some assignment is simply the set of all signed literals contained in the sequence.
+%\end{remark}
+
+The number of elements in an assignment $|\ass|$ is intuitive, with $|\emph{conflict}| := 0$.
+
+The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $\ass' = \ass \circ \sgl$. In case $\negstrong{\sgl} \in \ass$ or $\negweak{\sgl} \in \ass$ however, $\ass \circ \sgl := \emph{conflict}$ to indicate that appending $\sgl$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sgl := \emph{conflict}$ for any $\sgl$. Appending preserves that for any atom $v$ there is at most one literal in the assignment: With $\sgl = \bT v$ and $\bM v \in \ass$, for $\ass' = \ass \circ \sgl$ it holds that $\bM v \not \in \ass'$ (and $|\ass'| = |\ass|$).
+
+%\begin{definition}
+For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$$
+
+\begin{definition}
+An atom $v$ is \emph{unassigned} under some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} = \emptyset$$
 \end{definition}
 
 \begin{definition}
-A signed literal $\bX v$ with $\bX \in \thrice$ is \emph{unassigned} wrt.~$\ass$ if $v$ is unassigned wrt.~$\ass$.
+A signed literal $\bX v$ with $\bX \in \thrice$ is \emph{unassigned} under $\ass$ iff $v$ is unassigned under $\ass$.
+\end{definition}
+
+\subsection{Nogoods}
+
+\begin{definition}
+A \emph{nogood} reflects a partial assignment that cannot be extended to a solution. Here, a \emph{nogood} is a set $\{ \bsgl_1, \ldots, \bsgl_n \}$ of boolean signed literals.
 \end{definition}
 
 \begin{definition}
-A \emph{nogood} reflects a partial assignment that cannot be extended to a solution. Here, a \emph{nogood} is a set $\{ \bsgl_1, \ldots, \bsgl_n \}$ of signed literals.
+A nogood $\delta$ is \emph{weakly unit} under an assignment $\ass$ iff $\delta \cap \bass(\ass) = \{ \bsgl \}$
 \end{definition}
 
 \begin{definition}
-A nogood $\delta$ is \emph{violated} by an assignment $\ass$ if $\delta \subseteq \bass(\ass)$.
+A nogood $\delta$ is \emph{strongly unit} under an assignment $\ass$ iff $\delta \cap \ass = \{ \bsgl \}$
+\end{definition}
+
+Note that, as the names suggest, any nogood that is strictly unit under some assignment is also weakly unit, but not the other way round. Below, nogoods are sometimes referred to be \emph{unit} which amounts to stating that they are weakly unit. Also, when clear from context, reference to a particular assignment is omitted.
+
+\begin{definition}
+A nogood $\delta$ is \emph{satisfied} under an assignment $\ass$ iff there is no $\ass' \supseteq \ass$ s.t.~$\delta$ is violated under $\ass'$.
+\end{definition}
+
+For the purpose of unit propagation, it is important to see that because a satisfied nogood will never be unit, therefore never yield a new assignment using unit propagation.
+
+\begin{definition}
+A nogood $\delta$ is \emph{violated} under an assignment $\ass$ iff $\delta \subseteq \bass(\ass)$.
 \end{definition}
 
 \begin{definition}
-A nogood $\delta$ is \emph{satisfied} wrt.~some assignment $\ass$ iff there is no $\ass' \supseteq \ass$ s.t.~$\delta$ is violated under $\ass'$.
+A nogood $\delta$ is \emph{\upinv} under some assignment $\ass$ iff $\delta$ is not violated by $\ass$ and $\delta$ is not unit wrt.~$\ass$.
 \end{definition}
+
+Note the difference between some $\delta$ being \upinv vs.~satisfied under an assignment: With $\delta$ being \upinv under $\ass_1$, there might well be some $\ass_1' \supset \ass_1$ under which $\delta$ is unit or violated. However $\delta$ satisfied under $\ass_2$ is stronger and implies that there is no \enquote{larger} assignment $\ass_2' \supset \ass_2$ such that $\delta$ is not satisfied under $\ass_2'$ by definition. It follows that $\delta$ can neither be unit nor violated under $\ass_2'$.
+
+When implementing propagation, na{\"i}vely obtaining checking a large set of nogoods that represents an ASP program for unity is infeasible. Sophisticated data structures are needed to make propagation sufficiently fast.
+
+\subsection{Watch structures}
 
 \begin{definition}
-A nogood is \emph{strictly unit} with respect to some assignment $\ass$ iff it contains exactly one \emph{unassigned} literal and all other literals are elements of $\ass$.
+% ASK: Why not define watch structure as a function/relation mapping from atom to watch sets? Structure is irrelevant, and mapping function is closer to a map in code.
+% ASK: How to omit irrelevant elements of a tuple?
+A \emph{watch structure} is a function that maps atoms $v$ to triples containing sets of nogoods, the so called \emph{watch sets} of $v$: $$\Delta(v) = \langle W^+, W^-, W^\alpha \rangle .$$
+
+%For any watch set $W$ in $\Delta(v)$ and nogood $\delta \in W$ it follows that $\bX v \in \delta$.
+
+For some signed literal $\sgl = \bX v$ let $$\Delta^\pm(\sgl) = \left\{\begin{array}{ll}
+        W^+ & \text{if } \sgl = \bT v \ \text{or } \sgl = \bM v\\
+        W^- & \text{if } \sgl = \bF v \\
+        \end{array}\right\} \text{with } \Delta(v) = \langle W^+, W^-, W^\alpha \rangle .$$
+
+For some signed literal $\sgl = \bX v$ or an atom $v$ let $$\Delta^\alpha(\sgl) = \Delta^\alpha(v) = W_i^\alpha \ \text{with } \Delta(v) = \langle W^+, W^-, W^\alpha \rangle .$$
 \end{definition}
 
-\begin{definition}
-A nogood is \emph{weakly unit} with respect to some assignment $\ass$ iff it contains exactly one \emph{unassigned} literal and all other literals are \emph{weak} elements of $\ass$.
-\end{definition}
-
-%To efficiently retrieve the set of nogoods that need to be checked for unity, a data structure of watches was 
-
-A watch structure is a set $\Delta = \{ (v_1, W_1), \ldots, (v_n, W_n) \}$ of pairs $(v_i, W_i)$, $1 \leq i \leq n$, containing an atom $v_i$ and a triple $W_i = (W_i^+, W_i^-, W_i^\alpha)$, referred to as the \emph{watches for $v_i$}, consisting of three sets of nogoods that potentially propagate in case the assignment of $v$ changes from \emph{unassigned} to \emph{true} or \emph{\mbt} ($W_i^+$) or from \emph{unassigned} to \emph{false} ($W_i^-$), or from \emph{\mbt} to \emph{true} ($W_i^\alpha$). Also there are no two pairs $(v, W), (v', W') \in \Delta$ s.t.~$v = v'$, i.e.~$\Delta$ is a function mapping an atom to a triple of its watches. We write $\Delta(v) = W$ to denote $(v, W) \in \Delta$. Furthermore, let $\Delta^\pm(\sgl) = W^+$ for $\sgl$ of $\bT v$ or $\bM v$ and $\Delta^\pm(\sgl) = W^-$ for $\sgl$ of $\bF v$ with $W^+$ and $W^-$ from $\Delta(v)$, i.e.~for signed literals, $\Delta^\pm$ is a function that yields the watches according polarity of the literal. Lastly, for some $\sgl = \bX v$ or an atom $v$, let $\Delta^\alpha(v) = W^\alpha$ with $W^\alpha$ via $\Delta(v)$.
+Interpretation as a set $\Delta = \{(v_i, (W_i^+, W_i^-, W_i^\alpha)\}$ for $1 \leq i \leq n$ where $i \not = j \to v_i \not = v_j$ for $1 \leq j \leq n$ reveals how such a mapping can be stored or visualized (see figure~\ref{fig:watches}).
 
 \begin{figure}[h]
   \centering
@@ -326,9 +362,9 @@ $\delta_5$     % two
 };
 
 \path (s.two east)
-edge [out=east,in=west, left] node {$\alpha$} (v1t)
-edge [out=east,in=west, above] node {$+$} (v1m)
-edge [out=east,in=west, above] node {$-$} (v1f)
+edge [out=east,in=west, left] node {$+$} (v1t)
+edge [out=east,in=west, above] node {$-$} (v1m)
+edge [out=east,in=west, above] node {$\alpha$} (v1f)
 ;
 
 \end{tikzpicture}
@@ -337,30 +373,24 @@ edge [out=east,in=west, above] node {$-$} (v1f)
 \end{figure}
 
 \begin{definition}
-A nogood $\delta$ is said to be \emph{\upinv} wrt.~some assignment $\ass$ if the following two statements hold:
+
+A watch structure $\Delta$ \emph{\lowinv} an assignment $\ass$ iff for every nogood $\delta \in \Delta$ holds:
 
 \begin{enumerate}
-\item $\delta$ is not violated by $\ass$.
-\item $\delta$ is not unit wrt.~$\ass$.
-\end{enumerate}
-
-\end{definition}
-
-\begin{definition}
-
-A nogood $\delta$ is said to be \emph{\lowinv} wrt.~some watch structure $\Delta$ and an assignment $\ass$ if the following four statements hold:
-
-\begin{enumerate}
-\item If $\delta$ is not satisfied under $\ass$ and contains at least two literals $\bsgl_1, \bsgl_2, \ldots \in \delta$ unassigned under $\ass$, then $\delta$ is contained in exactly two watches, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
+\item If $\delta$ is not satisfied under $\ass$ and contains at least two literals $\bsgl_1, \bsgl_2, \ldots \in \delta$ unassigned under $\ass$, then $\delta$ is contained in exactly two distinct watch sets, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
 \item Let $L_\delta = \{ \bT v \in \text{body}(\delta) \ | \ \bT v \not \in \ass \}$. If $L_\delta \not = \emptyset$, then there is exactly one $\bsgl \in L_\delta$ with $\delta \in \Delta^\alpha(\bsgl)$.
 \end{enumerate}
 \end{definition}
 
+Using watch structures that watch assignments, propagation can be implemented efficiently: Given $\Delta$ watching $\ass$ and a new assignment for some atom $\sgl = \bX v$ the nogoods that are candidates for propagation are those in $\Delta^\pm(\sgl)$ (in case $\sgl \not \in A$, thus $\sgl$ changes from \emph{unassigned} to \emph{true}, \emph{\mbt} or \emph{false}) and $\Delta^\alpha(\sgl)$ (in case $\sgl \in A$, thus $\sgl$ changes from \emph{\mbt} to \emph{true}).
+
+However, with $\Delta$ watching $\ass$ and extending the assignment $\ass' = \ass \circ \sgl$, now $\Delta$ does not trivially watch $\ass'$.
+
 \begin{definition}
-A nogood $\delta$ is said to be \emph{\welf} wrt.~some watch structure $\Delta$ and an assignment $\ass$ iff it is \upinv wrt.~$\ass$ and \lowinv wrt. $\ass$ and $\Delta$.
+A watch structure $\Delta$ is said to be \welf under some assignment $\ass$ in case all nogoods $\delta \in \Delta$ are \upinv under $\ass$ and $\Delta$ \lowinv $\ass$.
 \end{definition}
 
-A watch structure $\Delta$ is said to be \welf wrt.~some assignment $\ass$ in case all nogoods $\delta \in \Delta$ are well formed wrt.~$\Delta$ and $\ass$.
+In the next section, a closer look at propagation will reveal that when transitioning from an assignment to the next one, watch sets can be altered efficiently to obtain a well formed watch structure for the extended assignment.
 
 \section{Unit Propagation}
 
@@ -371,7 +401,7 @@ A watch structure $\Delta$ is said to be \welf wrt.~some assignment $\ass$ in ca
         a~watch~structure~$\Delta$.}
   \KwOut{The assignment $\ass$, extended by means of unit propagation and $\Delta$ with updated watches.}
   $k \leftarrow |\ass|$ \label{alg:up:k}\\
-  $i \leftarrow 1$\\
+  $i \leftarrow 1$ \label{alg:up:i}\\
   $\ass \leftarrow \ass \circ \sgl$ \label{alg:up:circ}\\
   \While{$k + i \leq |\ass|$ \label{alg:up:loop:begin}} 
   {
@@ -498,21 +528,21 @@ Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch struct
 
 To show (1.) rather trivially: Assume $\sgl$ conflicts with $\ass$. Then, on line~\ref{alg:up:circ} of the algorithm $\ass$ will be assigned \emph{conflict}. Consequently, the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} is not executed as $|\emph{conflict}| = \infty$ and $k + i$ must be finite. $(\ass, \Delta)$ is returned.
 
-To show (2.) and (3.) assume that $\sgl$ does not conflict with $\ass$.
-
-Let $k$ be the size of the input assignment $\ass$ (see line~\ref{alg:up:k}), which serves as a reference point of size of the assignment before propagation is performed.
-
 %In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \Delta^\pm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
 
-For every iteration of the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end}, let the triple $S_i = (\sgl_i, \ass_i,  \Delta_i)$ denote that in the iteration represented by $S_i$, propagation on literal $\sgl_i$ resulted is performed on the assignment $A_i$ and watch structure $\Delta_i$.
+Before establishing a proof for (2.) and (3.) observe what the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} achieves.
 
-Further, this means that for two steps: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$, $\ass_i$ is the result of performing propagation on $\sgl_{i-1}$ on $\ass_{i-1}$ using $\Delta_{i-1}$. The difference between $\Delta_{i-1}$ and $\Delta_i$ is what resembles the proof below.
+\paragraph{Initialization} Let $k$ be the size of the input assignment $\ass$ (see line~\ref{alg:up:k}), which serves as a reference point of the size of the assignment before propagation is performed and $i$ some loop counter (see line~\ref{alg:up:i}).
 
-The loop ends when no new assignment can be inferred: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$ with $\ass_{i-1} = \ass_i$. If the loop ends, $\ass_i$ and $\Delta_i$ are returned, so $\ass_i = \ass'$ and $\Delta_i = \Delta'$. Also, note that $\ass_i = \ass_i[\ldots, k+i]$ because $|\ass_i| = k+i$.
+\paragraph{Representing iterations} For every iteration let the triple $S_i = (\sgl_i, \ass_i,  \Delta_i)$ denote that in the iteration represented by $S_i$, propagation on literal $\sgl_i$ is performed on the assignment $A_i$ and watch structure $\Delta_i$.
 
-(2.) and (3.) are shown by induction over iteration steps $S_i$.
+\paragraph{Semantics of an iteration} Further, this means that for two steps: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$, $\ass_i$ is the result of performing propagation with $\sgl_{i-1}$ on $\ass_{i-1}$ using $\Delta_{i-1}$. Analysis of the difference between $\Delta_{i-1}$ and $\Delta_i$ is what resembles the proof below.
 
-%We show that $\Delta'$ is \welf wrt.~$\ass' $ by induction.
+\paragraph{Termination of the loop} The loop ends when no new assignment can be inferred, i.e.~$S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$ with $\ass_{i-1} = \ass_i$, and all nogoods in $\Delta_i$ are \lowinv wrt.~$A_i$, which follows from $k + i = |\ass_i|$ and thus $\ass_i = \ass_i[\ldots, k+i]$ (shown below).
+If the loop ends, $\ass_i$ and $\Delta_i$ are returned, so $\ass_i = \ass'$ and $\Delta_i = \Delta'$.
+
+Now, assume that $\sgl$ does not conflict with $\ass$ and show (2.) and (3.) are by induction on iteration steps $i$:
+
 Let $\mathcal{P}(i)$ denote that $\dbef$ is \upinv wrt.~$\ass_i$ and $\dbef$ is \lowinv by $\abef$.
 
 \emph{Base Case}: For the base case, concerning the input assignment $\ass$ and $\Delta$, $\mathcal{P}(0)$ is trivially true because $\ass_0 = \ass$ and $\Delta_0 = \Delta$ is \welf wrt.~$\ass$ (precondition).
