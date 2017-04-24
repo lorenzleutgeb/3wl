@@ -99,7 +99,7 @@
 \newcommand{\bass}{\mathcal{B}}
 
 % An assignment A.
-\newcommand{\ass}{\mathbf{A}}
+\newcommand{\ass}{A}
 
 % Herbrand Base function of some logic program.
 \newcommand{\hb}{\textit{HB}}
@@ -108,11 +108,16 @@
 \newcommand{\bM}{\mathbf{M}}
 \newcommand{\bF}{\mathbf{F}}
 \newcommand{\bX}{\mathbf{X}}
-\newcommand{\abef}{\ass_{i}[\ldots, k + i]}
-\newcommand{\aaf}{\ass_{i + 1}[\ldots, k + i + 1]}
+\newcommand{\fabef}{\ass_{i}}
+\newcommand{\faaf}{\ass_{i + 1}}
+\newcommand{\abef}{\fabef[\ldots, k + i]}
+\newcommand{\aaf}{\faaf[\ldots, k + i + 1]}
 \newcommand{\dbef}{\Delta_{i}}
 \newcommand{\daf}{\Delta_{i+1}}
 \newcommand{\welf}{well formed\xspace}
+\newcommand{\upinv}{stable\xspace}
+\newcommand{\lowinv}{watched\xspace}
+\newcommand{\stbl}{stable\xspace}
 
 
 \newcommand{\sgl}{\mu}
@@ -332,14 +337,27 @@ edge [out=east,in=west, above] node {$-$} (v1f)
 \end{figure}
 
 \begin{definition}
-A nogood $\delta$ is said to be \emph{\welf} wrt.~some watch structure $\Delta$ and an assignment $\ass$ if the following four statements hold:
+A nogood $\delta$ is said to be \emph{\upinv} wrt.~some assignment $\ass$ if the following two statements hold:
 
 \begin{enumerate}
 \item $\delta$ is not violated by $\ass$.
 \item $\delta$ is not unit wrt.~$\ass$.
-\item If $\delta$ is not satisfied and contains at least two unassigned literals $\bsgl_1, \bsgl_2, \ldots \in \delta$, then $\delta$ is contained in exactly two watches, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
+\end{enumerate}
+
+\end{definition}
+
+\begin{definition}
+
+A nogood $\delta$ is said to be \emph{\lowinv} wrt.~some watch structure $\Delta$ and an assignment $\ass$ if the following four statements hold:
+
+\begin{enumerate}
+\item If $\delta$ is not satisfied under $\ass$ and contains at least two literals $\bsgl_1, \bsgl_2, \ldots \in \delta$ unassigned under $\ass$, then $\delta$ is contained in exactly two watches, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
 \item Let $L_\delta = \{ \bT v \in \text{body}(\delta) \ | \ \bT v \not \in \ass \}$. If $L_\delta \not = \emptyset$, then there is exactly one $\bsgl \in L_\delta$ with $\delta \in \Delta^\alpha(\bsgl)$.
 \end{enumerate}
+\end{definition}
+
+\begin{definition}
+A nogood $\delta$ is said to be \emph{\welf} wrt.~some watch structure $\Delta$ and an assignment $\ass$ iff it is \upinv wrt.~$\ass$ and \lowinv wrt. $\ass$ and $\Delta$.
 \end{definition}
 
 A watch structure $\Delta$ is said to be \welf wrt.~some assignment $\ass$ in case all nogoods $\delta \in \Delta$ are well formed wrt.~$\Delta$ and $\ass$.
@@ -352,10 +370,10 @@ A watch structure $\Delta$ is said to be \welf wrt.~some assignment $\ass$ in ca
         a~signed~literal~$\sgl$,
         a~watch~structure~$\Delta$.}
   \KwOut{The assignment $\ass$, extended by means of unit propagation and $\Delta$ with updated watches.}
-  $\ass \leftarrow \ass \circ \sgl$\\
-  $k \leftarrow |\ass|$\\
-  $i \leftarrow 0$\\
-  \While{$k + i \leq |\ass|$}
+  $k \leftarrow |\ass|$ \label{alg:up:k}\\
+  $i \leftarrow 1$\\
+  $\ass \leftarrow \ass \circ \sgl$ \label{alg:up:circ}\\
+  \While{$k + i \leq |\ass|$ \label{alg:up:loop:begin}} 
   {
     $\sgl_i \leftarrow \ass[k + i]$\\
   $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationUnassigned}($\ass$, $\sgl_i$, $\Delta$)\\
@@ -364,7 +382,7 @@ A watch structure $\Delta$ is said to be \welf wrt.~some assignment $\ass$ in ca
     $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationAssigned}($\ass$, $\sgl_i$, $\Delta$)
   }
     $i \leftarrow i + 1$
-  }
+  } \label{alg:up:loop:end}
   \Return{$(\ass, \Delta)$}
   \caption{\textsc{UnitPropagation}}
   \label{alg:up}
@@ -460,11 +478,13 @@ For every nogood $\delta \in \Delta$, if $\delta$ contains at least two atoms un
 %TODO define watch list!
 
 \begin{theorem}
-Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$ \welf wrt.~$\ass$ and a new assignment $\sgl$ resulting in a new assignment $\ass'$ and a watch structure $\Delta'$, the following three statements hold:
+Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$ \welf wrt.~$\ass$ and a literal $\sgl$, it results in a new assignment $\ass'$ such that:
 \begin{enumerate}
-\item If $\sgl$ does not conflict with $\ass$ and there are any assignments that can be inferred by unit propagation, these assignments are generated ($\ass \subset \ass'$) and $\Delta'$ is \welf wrt.~$\ass'$.
-\item If an assignment inferred from a nogood in $\Delta$ with $\sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$.
-\item If $\sgl$ conflicts with $\ass$, then $\ass'$ is the conflicting assignment and  $\Delta' = \Delta$.
+\item If $\sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$ and $\Delta' = \Delta$. % Trivial case.
+
+\item If $\sgl$ does not conflict with $\ass$ and there are assignments that can be inferred by means of unit propagation, then these assignments are in $\ass'$ ($\ass \subset \ass'$) and $\Delta'$ is \welf wrt.~$\ass'$.
+
+\item If a literal inferred from $\Delta$ and $\ass \circ \sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$.
 \end{enumerate}
 \end{theorem}
 
@@ -476,21 +496,24 @@ Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch struct
 %\item otherwise, the resulting watch structure $\Delta$ will be well formed wrt. the resulting assignment $\ass$.
 %\end{enumerate}
 
-(3.) is trivial, as $\ass$ will be assigned \emph{conflict} in line 1 of the algorithm in case $\sgl$ conflicts with any other assignment in $\ass$.
+To show (1.) rather trivially: Assume $\sgl$ conflicts with $\ass$. Then, on line~\ref{alg:up:circ} of the algorithm $\ass$ will be assigned \emph{conflict}. Consequently, the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} is not executed as $|\emph{conflict}| = \infty$ and $k + i$ must be finite. $(\ass, \Delta)$ is returned.
 
-Let $k$ be the size of the input assignment $\ass$ (see line 2).
+To show (2.) and (3.) assume that $\sgl$ does not conflict with $\ass$.
+
+Let $k$ be the size of the input assignment $\ass$ (see line~\ref{alg:up:k}), which serves as a reference point of size of the assignment before propagation is performed.
+
 %In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \Delta^\pm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
 
-For every iteration of the loop in lines 4-11, let the triple $S_i = (\sgl_i, \ass_i,  \Delta_i)$ denote that in the iteration represented by $S_i$, propagation on literal $\sgl_i$ resulted is performed on the assignment $A_i$ and watch structure $\Delta_i$.
+For every iteration of the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end}, let the triple $S_i = (\sgl_i, \ass_i,  \Delta_i)$ denote that in the iteration represented by $S_i$, propagation on literal $\sgl_i$ resulted is performed on the assignment $A_i$ and watch structure $\Delta_i$.
 
-Further, this means that for two steps: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$, $\ass_i$ is the result of performing propagation on $\sgl_{i-1}$ on $\ass_{i-1}$ using $\Delta_{i-1}$. As a side-effect of propagation, $\Delta_{i-1}$ changes to $\Delta_i$.
+Further, this means that for two steps: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$, $\ass_i$ is the result of performing propagation on $\sgl_{i-1}$ on $\ass_{i-1}$ using $\Delta_{i-1}$. The difference between $\Delta_{i-1}$ and $\Delta_i$ is what resembles the proof below.
 
 The loop ends when no new assignment can be inferred: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$ with $\ass_{i-1} = \ass_i$. If the loop ends, $\ass_i$ and $\Delta_i$ are returned, so $\ass_i = \ass'$ and $\Delta_i = \Delta'$. Also, note that $\ass_i = \ass_i[\ldots, k+i]$ because $|\ass_i| = k+i$.
 
-(1.) and (2.) are shown by induction over iteration steps $S_i$.
+(2.) and (3.) are shown by induction over iteration steps $S_i$.
 
 %We show that $\Delta'$ is \welf wrt.~$\ass' $ by induction.
-Let $\mathcal{P}(i)$ denote that $\dbef$ is \welf wrt.~$\abef$.
+Let $\mathcal{P}(i)$ denote that $\dbef$ is \upinv wrt.~$\ass_i$ and $\dbef$ is \lowinv by $\abef$.
 
 \emph{Base Case}: For the base case, concerning the input assignment $\ass$ and $\Delta$, $\mathcal{P}(0)$ is trivially true because $\ass_0 = \ass$ and $\Delta_0 = \Delta$ is \welf wrt.~$\ass$ (precondition).
 
