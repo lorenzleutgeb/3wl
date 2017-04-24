@@ -21,7 +21,9 @@
 \usepackage{nag}       % Issues warnings when best practices in writing LaTeX documents are violated.
 \usepackage{hyperref}  % Enables cross linking in the electronic document version. This package has to be included second to last.
 \usepackage[acronym,toc]{glossaries} % Enables the generation of glossaries and lists fo acronyms. This package has to be included last.
+\usepackage{lmodern}% http://ctan.org/pkg/lmodern
 \usepackage{xspace}
+\usepackage{marvosym}
 \usepackage{tikz}
 \usetikzlibrary{matrix}
 \usetikzlibrary{shapes.multipart,calc}
@@ -34,7 +36,7 @@
 
 \hypersetup{
     pdfpagelayout   = TwoPageRight,
-    linkbordercolor = {Melon},
+    linkbordercolor = {1 0.8 0.8}, %TODO change this to Melon when finished.
     pdfauthor       = {\authorname},
     pdftitle        = {\thesistitle},
     pdfsubject      = {Subject},              % The document's subject in the document properties (optional).
@@ -110,14 +112,26 @@
 \newcommand{\bX}{\mathbf{X}}
 \newcommand{\fabef}{\ass_{i}}
 \newcommand{\faaf}{\ass_{i + 1}}
-\newcommand{\abef}{\fabef^{k + i}}
+\newcommand{\abef}{\fabef{k + i}}
 \newcommand{\aaf}{\faaf^{k + i + 1}}
 \newcommand{\dbef}{\Delta_{i}}
 \newcommand{\daf}{\Delta_{i+1}}
+\newcommand{\contradiction}{\Lightning}
+\newcommand{\cdpm}{C_\pm}
+\newcommand{\cdal}{C_\alpha}
+\newcommand{\dpm}{\Delta^\pm}
+\newcommand{\dal}{\Delta^\alpha}
+
+\newcommand{\righta}[1]{\ass_{#1}[{#1}, |\ass_{#1}|]}
+\newcommand{\lefta}[1]{\ass_{#1}[0, {#1-1}]}
+
 \newcommand{\welf}{well formed\xspace}
-\newcommand{\upinv}{quiet\xspace}
+\newcommand{\upinv}{silent\xspace}
 \newcommand{\lowinv}{watches\xspace}
 \newcommand{\stbl}{stable\xspace}
+
+\newcommand{\headf}{\mathrm{head}}
+\newcommand{\bodyf}{\mathrm{body}}
 
 
 \newcommand{\sgl}{\mu}
@@ -144,7 +158,7 @@
 \end{danksagung*}
 
 \begin{acknowledgements*}
-\todo{Enter your text here.}
+I would like to thank Antonius Weinzierl for his consistent and continuous efforts in supporting me writing this thesis through numerous meetings, openness in discussion and acceptance of my contributions to the Alpha system and finding the right balance between pushing me to finish and letting me slack off to think freely.
 \end{acknowledgements*}
 
 \begin{kurzfassung}
@@ -164,7 +178,10 @@
 
 \chapter{Introduction}
 
-Answer Set Programming (ASP) is a programming paradigm aimed at solving problems by means of declarative and logic programming based on Nonmonotonic Reasoning. 
+Since the inception of computer programming, different ways of encoding algorithms, structuring data and modeling the real world in computer programs have led to the development of various, conceptually diverse, programming languages. Families of programming languages that share some of the above properties are usually referred to abide a so called \enquote{programming paradigm}.
+Such paradigms describe the common, most important concepts and lay a stylistic framework for a family of languages.
+
+While the most widely used languages follow the \enquote{imperative} programming paradigm (some more strict, some less), this work focuses on Answer Set Programming (ASP), a declarative programming language that roots in Nonmonotonic Reasoning.
 
 \section{Motivation}
 
@@ -176,25 +193,41 @@ Answer Set Programming (ASP) is a programming paradigm aimed at solving problems
 
 \section{Structure of the Work} % 3 sentences
 
-This is just a test.\cite{Gebser:2012:CAS:2228640.2228952}
+Chapter \ref{chap:preliminaries} equips the reader with formal foundations (syntax and semantics) of ASP and stable models. Also, a selection of state-of-the-art ASP systems is discussed.
+
+In chapter \ref{chap:prop} efficient propagation for lazy-grounding Answer Set solving is presented.
+
+\todo{Expand to include later chapters.}
 
 \chapter{Preliminaries}
 \label{chap:preliminaries}
 
+This chapter revisits definitions of syntax and semantics of answer set programs. Models and answer sets of such programs are defined.
+
+Apart from these formal foundations, a brief overview of state-of-the-art ASP systems is given and systems that implement grounding-on-the-fly are observed in detail.
+
+Basic knowledge in theoretical computer science are assumed.
+
 \section{Answer Set Programming}
 
-% TODO: Introduction to ASP and it's semantics.
+\todo{Introduction to ASP and its semantics.}
+
+\subsection{Programs}
+
+\begin{definition}[{\cite[p.~12]{DBLP:conf/rweb/EiterIK09}}]
+A \emph{normal logic program} is a set of clauses having the form $$a \leftarrow b_1, \ldots , b_m, \text{not } c_1, \ldots , \text{not } c_n \qquad (n, m \geq 0)$$ where all $a, b_i$ and $c_j$ ($1 \leq i \leq n$ and $a \leq j \leq m$) are atoms of a first order language $L$. Expressions $\text{not } c_1, \ldots , \text{not } c_n$ are called the \emph{(default) negated literals} and consist of atoms $c_j$ preceded by the negation modifier $\text{not}$. Accordingly the atoms $a_i$ are called \emph{positive literals}.
+\end{definition}
 
 \section{State of the Art in ASP Solving}
 
-% Two Watched Literals?
+\todo{Two Watched Literals?}
 
 \subsection{Approaches based on Pre-Grounding}
 
-% TODO: Explain how a solver works and what has been done already (grounding on the fly, omiga, asperix).
-% TODO: What is a nogood? What is propagation?
+\todo{Explain how a solver works and what has been done already (grounding on the fly, omiga, asperix).}
+\todo{What is a nogood? What is propagation?}
 
-% Everything that later sections build up on. Quote a lot. This chapter can be long. Show understanding of the matter in own words (i.e. what is an answer set incl. example?).
+\todo{Everything that later sections build up on. Quote a lot. This chapter can be long. Show understanding of the matter in own words (i.e. what is an answer set incl. example?).}
 
 \subsection{Approaches based on Lazy Grounding}
 
@@ -202,9 +235,8 @@ This is just a test.\cite{Gebser:2012:CAS:2228640.2228952}
 
 \section{Comparison and Summary of Existing Approaches}
 
-\todo{Enter your text here.}
-
 \chapter{Propagation for lazy-grounding Answer Set solving}
+\label{chap:prop}
 
 This chapter contextualizes propagation by providing definitions extending chapter \ref{chap:preliminaries}. It then presents and thoroughly explains the algorithms and data structures involved in propagation and concludes in a proof of soundness and completeness thereof.
 
@@ -221,13 +253,13 @@ Following definitions lay out the vocabulary and concepts towards an explanation
 %A \emph{ground atom} (or simply \emph{atom}) wrt.~a logic program $P$ is an element of $\textit{HB}(P)$, usually denoted $v$.
 %\end{definition}
 
-%\begin{definition}
+\begin{definition}
 A \emph{boolean signed literal} $\bsgl$ of the form $\bT v$ or $\bF v$ where $v$ is an atom and  $\bT v$ expresses that $v$ is \emph{true}, and $\bF v$ that it is \emph{false}.
-%\end{definition}
+\end{definition}
 
-%\begin{definition}
-From boolean signed literals, generalize to $\sgl$ called a \emph{signed literal} of the form $\bT v$, $\bM v$ or $\bF v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, $\bM v$ that it \emph{must be true}, and $\bF v$ that it is \emph{false}.
-%\end{definition}
+\begin{definition}
+A generalization of boolean signed literal, called a \emph{signed literal} $\sgl$ is of the form $\bT v$, $\bF v$, or $\bM v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, $\bF v$ that it is \emph{false} (equivalent to the semantics of boolean signed literals) and $\bM v$ that it \emph{must be true}.
+\end{definition}
 
 %\begin{definition}
 %The function $\wkn(\bsgl)$ takes a boolean signed literal $\bsgl$ and transforms it into a signed literal referred to as its \emph{weak form}, meaning that while \emph{false} stays \emph{false}, e.g.~$\wkn(\bF v) = \bF v$, \emph{true} is mapped to \emph{\mbt}, e.g.~$\wkn(\bT v) = \bM v$.
@@ -261,28 +293,36 @@ Occasionally the notation $\sgl = \bX v$ will be used to express that $\sgl$ is 
 
 \subsection{Assignments}
 
+Similar to \cite[section 2, p.~3]{DBLP:journals/ai/GebserKS12} we define assignments. However, here assignments contain not only boolean signed literals, but also signed literals and the notation for expressing a partial assignment differs.
+
 \begin{definition}
-An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i = \bX v_i$ where $v_i \not = v_j$ for $1 \leq i < j \leq n$, or \emph{conflict}.
+An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i = \bX v_i$, or \emph{conflict}.
 \end{definition}
 
 %\begin{remark}
 Below, assignments are sometimes also used as sets, in which case the set represented by some assignment is simply the set of all signed literals contained in the sequence.
 %\end{remark}
 
-The number of elements in an assignment $|\ass|$ is intuitive, with $|\emph{conflict}| := 0$.
+The number of elements in an assignment $|\ass|$ is intuitive, with $|\emph{conflict}| = 0$.
 
-The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $$\ass' = \ass \circ \sgl = \left\{\begin{array}{ll}
+A partial assignment is a sub-sequence constructed from an assignment denoted as $\ass[i,j] = (\sgl_i, \ldots, \sgl_j)$ where $\ass = (\sgl_1, \ldots, \sgl_i, \ldots, \sgl_j, \ldots, \sgl_n)$ and $1 \leq i < j \leq n$.
+
+A single literal is referenced using $A[i] = \sgl_i$ for $1 \leq i \leq |A|$.
+
+The assignment obtained by appending the literal $\sgl$ to $\ass = (\sgl_1, \ldots, \sgl_n)$ is denoted by $$\ass \circ \sgl = \left\{\begin{array}{ll}
         
-        \emph{conflict} & \text{if } \{ \negstrong{\sgl}, \negweak{\sgl} \} \cap \ass \not = \emptyset \\
-        (\sgl_1, \ldots, \sgl_{n-1}, \sgl) & \text{otherwise} \\
-        \end{array}\right\}.$$
+        \emph{conflict} & \text{if } \{ \negstrong{\sgl}, \negweak{\sgl} \} \cap \ass \not = \emptyset \text{ or } \ass = \emph{conflict}\\
+        %(\sgl_1, \ldots, \sgl_{n-1}, \sgl) & \text{if } \sgl = \bT v \text{ and } \bM v \in \ass \text{, i.e. appending } \bT v \text{ removes } \bM v\\
+        (\sgl_1, \ldots, \sgl_{n}, \sgl) & \text{otherwise} \\
+        \end{array}\right.$$
 
-Furthermore $\emph{conflict} \circ \sgl := \emph{conflict}$ for any $\sgl$. Appending preserves that for any atom $v$ there is at most one literal in the assignment: With $\sgl = \bT v$ and $\bM v \in \ass$, for $\ass' = \ass \circ \sgl$ it holds that $\bM v \not \in \ass'$ (and $|\ass'| = |\ass|$).
+%Appending preserves that for any atom $v$ there is at most one literal in the assignment: With $\sgl = \bT v$ and $\bM v \in \ass$, for $\ass' = \ass \circ \sgl$ it holds that $\bM v \not \in \ass'$ (and $|\ass'| = |\ass|$).
 
-Partial assignments are denoted as $A^{k} = (\sgl_1, \ldots, \sgl_n \ldots, \sgl_k)$ where $A = (\sgl_1, \ldots, \sgl_n$ and $1 \leq k \leq n$.
+%Furthermore $\emph{conflict} \circ \sgl = \emph{conflict}$ for any $\sgl$. 
 
-%\begin{definition}
+\begin{definition}
 For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$$
+\end{definition}
 
 \begin{definition}
 An atom $v$ is \emph{assigned} under some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} \not = \emptyset$$
@@ -293,8 +333,10 @@ An atom $v$ is \emph{assigned} under some assignment $\ass$ iff $$\ass \cap \{\b
 %\end{definition}
 
 \begin{definition}
-A signed literal $\bX v$ with $\bX \in \thrice$ is \emph{unassigned} under $\ass$ iff $v$ is unassigned under $\ass$.
+A signed literal $\bX v$ is \emph{assigned} under $\ass$ iff $v$ is assigned under $\ass$.
 \end{definition}
+
+Intuitively, atoms and literals are \emph{unassigned} under $\ass$ iff the are not assigned under $\ass$.
 
 \begin{definition}
 A literal $\sgl_1$ is said to conflict with $\ass$ in case it conflicts with any $\sgl_2 \in \ass$.
@@ -307,14 +349,24 @@ A \emph{nogood} reflects a partial assignment that cannot be extended to a solut
 \end{definition}
 
 \begin{definition}
-A nogood $\delta$ is \emph{weakly unit} under an assignment $\ass$ iff $\delta \cap \bass(\ass) = \{ \bsgl \}$
+At most one of the boolean signed literals inside a nogood might be qualified as head. The head literal $\bsgl$ of $\delta$ denoted $\headf(\delta) = \bsgl$.
+\end{definition}
+
+Note that $\headf(\delta)$ is always of the form $\bF v$. % TODO why?
+
+\begin{definition}
+Any literal in a nogood $\delta$ that is not it's head is element of the so called \emph{body} of the nogood: $\bodyf(\delta) = \{ \bsgl \in \delta \ | \ \bsgl \not = \headf(\delta) \}$.
 \end{definition}
 
 \begin{definition}
-A nogood $\delta$ is \emph{strongly unit} under an assignment $\ass$ iff $\delta \cap \ass = \{ \bsgl \}$
+A nogood $\delta$ is \emph{weakly unit} under an assignment $\ass$ iff $\delta \setminus \bass(\ass) = \{ \bsgl \}$
 \end{definition}
 
-Note that, as the names suggest, any nogood that is strictly unit under some assignment is also weakly unit, but not the other way round. Below, nogoods are sometimes referred to be \emph{unit} which amounts to stating that they are weakly unit. Also, when clear from context, reference to a particular assignment is omitted.
+\begin{definition}
+A nogood $\delta$ is \emph{strongly unit} under an assignment $\ass$ iff $\delta \setminus \ass = \{ \headf(\delta) \}$
+\end{definition}
+
+Note that, as the names suggest, any nogood that is strongly unit under some assignment is also weakly unit, but not the other way round. Below, nogoods are sometimes referred to be \emph{unit} which amounts to stating that they are weakly unit. Also, when clear from context, reference to a particular assignment is omitted.
 
 \begin{definition}
 A nogood $\delta$ is \emph{violated} under an assignment $\ass$ iff $\delta \subseteq \bass(\ass)$.
@@ -343,12 +395,12 @@ A \emph{watch structure} is a function that maps atoms $v$ to triples containing
 
 %For any watch set $W$ in $\Delta(v)$ and nogood $\delta \in W$ it follows that $\bX v \in \delta$.
 
-For some signed literal $\sgl = \bX v$ let $$\Delta^\pm(\sgl) = \left\{\begin{array}{ll}
+For some signed literal $\sgl = \bX v$ let $$\dpm(\sgl) = \left\{\begin{array}{ll}
         W^+ & \text{if } \sgl = \bT v \ \text{or } \sgl = \bM v\\
         W^- & \text{if } \sgl = \bF v \\
         \end{array}\right\} \text{with } \Delta(v) = \langle W^+, W^-, W^\alpha \rangle .$$
 
-For some signed literal $\sgl = \bX v$ or an atom $v$ let $$\Delta^\alpha(\sgl) = \Delta^\alpha(v) = W_i^\alpha \ \text{with } \Delta(v) = \langle W^+, W^-, W^\alpha \rangle .$$
+For some signed literal $\sgl = \bX v$ or an atom $v$ let $$\dal(\sgl) = \dal(v) = W_i^\alpha \ \text{with } \Delta(v) = \langle W^+, W^-, W^\alpha \rangle .$$
 \end{definition}
 
 Interpretation as a set $\Delta = \{(v_i, (W_i^+, W_i^-, W_i^\alpha)\}$ for $1 \leq i \leq n$ where $i \not = j \to v_i \not = v_j$ for $1 \leq j \leq n$ reveals how such a mapping can be stored or visualized (see figure~\ref{fig:watches}).
@@ -393,16 +445,27 @@ edge [out=east,in=west, above] node {$\alpha$} (v1f)
 \end{figure}
 
 \begin{definition}
+The \emph{candidate sets} of a nogood $\delta$ under an assignment $A$ are subsets of the nogood  and defined as follows:
+
+$$\cdpm(\delta, A) = \{\bsgl \in \delta \ | \ \bsgl \not \in \bass(\ass)\}$$
+
+$$\cdal(\delta, A) = \{ \bT v \in \bodyf(\delta) \ | \ \bT v \not \in \ass \}$$
+
+Intuitively, $C_\alpha(\delta, A)$ is the set of positive body literals in $\delta$ that are not assigned to be $\emph{true}$.
+\end{definition}
+
+\begin{definition}
 
 A watch structure $\Delta$ \emph{\lowinv} an assignment $\ass$ iff for every nogood $\delta \in \Delta$ holds:
 
 \begin{enumerate}
-\item If $\delta$ is not satisfied under $\ass$ and contains at least two literals $\bsgl_1, \bsgl_2, \ldots \in \delta$ unassigned under $\ass$, then $\delta$ is contained in exactly two distinct watch sets, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
-\item Let $L_\delta = \{ \bT v \in \text{body}(\delta) \ | \ \bT v \not \in \ass \}$. If $L_\delta \not = \emptyset$, then there is exactly one $\bsgl \in L_\delta$ with $\delta \in \Delta^\alpha(\bsgl)$.
+\item If $|\cdpm(\delta, A)| \geq 2$, then $\exists \bsgl_1, \bsgl_2 \in \cdpm(\delta, A) : \bsgl_1 \not = \bsgl_2 \wedge \delta \in \dpm(\bsgl_1) \wedge \delta \in \dpm(\bsgl_2)$.
+%Older version: \item If $\delta$ is not satisfied under $\ass$ and contains at least two literals $\bsgl_1, \bsgl_2, \ldots \in \delta$ unassigned under $\ass$, then $\delta$ is contained in exactly two distinct watch sets, e.g. $\delta \in \dpm(\bsgl_1)$ and $\delta \in \dpm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
+\item If $\cdal(\delta, A) \not = \emptyset$, then there is exactly one $\bsgl \in \cdal(\delta, A)$ with $\delta \in \dal(\bsgl)$.
 \end{enumerate}
 \end{definition}
 
-Using watch structures that watch assignments, propagation can be implemented efficiently: Given $\Delta$ watching $\ass$ and a new assignment for some atom $\sgl = \bX v$ the nogoods that are candidates for propagation are those in $\Delta^\pm(\sgl)$ (in case $\sgl \not \in A$, thus $\sgl$ changes from \emph{unassigned} to \emph{true}, \emph{\mbt} or \emph{false}) and $\Delta^\alpha(\sgl)$ (in case $\sgl \in A$, thus $\sgl$ changes from \emph{\mbt} to \emph{true}).
+Using watch structures that watch assignments, propagation can be implemented efficiently: Given $\Delta$ watching $\ass$ and a new assignment for some atom $\sgl = \bX v$ the nogoods that are candidates for propagation are those in $\dpm(\sgl)$ (in case $\sgl \not \in A$, thus $\sgl$ changes from \emph{unassigned} to \emph{true}, \emph{\mbt} or \emph{false}) and $\dal(\sgl)$ (in case $\sgl \in A$, thus $\sgl$ changes from \emph{\mbt} to \emph{true}).
 
 However, with $\Delta$ watching $\ass$ and extending the assignment $\ass' = \ass \circ \sgl$, now $\Delta$ does not trivially watch $\ass'$.
 
@@ -417,31 +480,43 @@ In the next section, a closer look at propagation will reveal that when transiti
 \begin{algorithm}
   \SetKw{BreakFor}{break for}
   \KwIn{An assignment $\ass$,
-        a~signed~literal~$\sgl$,
-        a~watch~structure~$\Delta$.}
-  \KwOut{The assignment $\ass$, extended by means of unit propagation and $\Delta$ with updated watches.}
-  $k \leftarrow |\ass|$ \label{alg:up:k}\\
+        a~watch~structure~$\Delta$,
+		a~signed~literal~$\sgl$.}
+  \KwOut{The assignment $\ass$, extended by means of unit propagation with literal $A[j]$ and $\Delta$ with updated watches.}
+  $\langle \ass_1, \Delta_1 \rangle \leftarrow \langle \ass \circ \sgl, \Delta \rangle$ \label{alg:up:circ}\\
   $i \leftarrow 1$ \label{alg:up:i}\\
-  $\ass \leftarrow \ass \circ \sgl$ \label{alg:up:circ}\\
-  \While{$k + i \leq |\ass|$ \label{alg:up:loop:begin}} 
-  {
-    $\sgl_i \leftarrow \ass[k + i]$\\
-  $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationUnassigned}($\ass$, $\sgl_i$, $\Delta$)\\
-  \If{$\sgl_i$ is of form $\bT v$}
-  {
-    $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationAssigned}($\ass$, $\sgl_i$, $\Delta$)
-  }
-    $i \leftarrow i + 1$
+  \While{$|\ass_i| \geq |A| + i$\label{alg:up:loop:begin}}{
+  $\langle \ass_{i+1}, \Delta_{i+1} \rangle \leftarrow$ \textsc{UnitPropagate}($\ass_{i}$, $\Delta_{i}$, $|A| + i$) \label{alg:up:loop:prop}\\
+    $i \leftarrow i + 1$ \label{alg:up:loop:incr}
   } \label{alg:up:loop:end}
-  \Return{$(\ass, \Delta)$}
-  \caption{\textsc{UnitPropagation}}
+  \Return{$\langle \ass_i, \Delta_i \rangle$} \label{alg:up:ret}
+  \caption{\textsc{UnitPropagateAll}($\ass$, $\Delta$, $\sgl$)}
   \label{alg:up}
 \end{algorithm}
 
 \begin{algorithm}
+  \SetKw{BreakFor}{break for}
+  \KwIn{An assignment $\ass$,
+        a~watch~structure~$\Delta$,
+		an~index~$j$.}
+  \KwOut{The assignment $\ass$, extended by means of unit propagation and $\Delta$ with updated watches.}
+%  \If{$|A| < j$}{\Return{$\langle \ass, \Delta \rangle$}}
+  $\sgl \leftarrow \ass[j]$ \label{alg:up:loop:lit}\\
+  $\langle \ass', \Delta' \rangle \leftarrow$ \textsc{UnitPropagationUnassigned}($\ass$, $\Delta$, $\sgl$)\\
+  \If{$\sgl$ is of form $\bT v$}
+  {
+    $\langle \ass'', \Delta'' \rangle \leftarrow$ \textsc{UnitPropagationAssigned}($\ass'$, $\Delta'$, $\sgl_i$)\\
+    \Return{$\langle \ass'', \Delta'' \rangle$}
+  }
+  \Return{$\langle \ass', \Delta' \rangle$}
+  \caption{\textsc{UnitPropagate}($\ass$, $\Delta$, $j$)}
+  \label{alg:upsingle}
+\end{algorithm}
+
+\begin{algorithm}
   \KwIn{An~assignment~$\ass$,
-        a~literal~$\sgl \in \ass$,~and
-        a~set~of~watched~nogoods~$\Delta$.}
+        a~set~of~watched~nogoods~$\Delta$,~and
+        a~literal~$\sgl \in \ass$.}
   \KwOut{$\ass$ extended by means of nogood propagation and $\Delta$ with updated watches.}
 %  \ForEach{$\delta \in w_{=2}(\Delta, \sigma)$ of form $\{ \sigma, \sigma' \}$}
 %  {
@@ -450,26 +525,33 @@ In the next section, a closer look at propagation will reveal that when transiti
 %      $\mathbf{A} \leftarrow \mathbf{A} \circ \negweak{\sigma'}$
 %    }
 %  }
-  \ForEach{$\delta \in \Delta^\pm(\sgl)$}
+  \ForEach{$\delta \in \dpm(\sgl)$ \label{alg:upu:it}}
   {
-    \uIf{$\delta$ is violated}
+    \uIf{$\delta$ is violated \label{alg:upu:vio}}
     {
-      \Return{$(\text{conflict}, \Delta)$}
+      \Return{$\langle \emph{conflict}, \Delta \rangle$ \label{alg:upu:conflict}}
     }
-    \uElseIf{$\delta$ is weakly unit with $\sgl'$ unassigned}
+    \uElseIf{$\delta$ is strongly unit \label{alg:upu:su}}
     {
-      $\ass \leftarrow \ass \circ \negweak{\sgl'}$
+      $\ass \leftarrow \ass \circ \negstrong{\headf(\delta)}$ \label{alg:upu:su:circ}
+    }
+    \uElseIf{$\delta$ is weakly unit with $\bsgl$ unassigned \label{alg:upu:wu}}
+    {
+      $\ass \leftarrow \ass \circ \negweak{\bsgl}$ \label{alg:upu:wu:circ}
     }
     \Else%If{there is some unassigned $\sigma' \in \delta$}
-    {
-      $\Delta^\pm(\sgl) \leftarrow \Delta^\pm(\sgl) \setminus \{ \delta \}$\\
-      Let $\bsgl$, $\bsgl'$ be two unassigned literals in $\delta$.\\
-      $\Delta^\pm(\bsgl) \leftarrow \Delta^\pm(\bsgl) \cup \{ \delta \}$\\
-      $\Delta^\pm(\bsgl') \leftarrow \Delta^\pm(\bsgl') \cup \{ \delta \}$\\
+    { \label{alg:upu:else}
+      \ForEach{$\bsgl \in \delta$}
+      {
+      	$\dpm(\bsgl) \leftarrow \dpm(\bsgl) \setminus \{ \delta \}$ \label{alg:upu:rm}
+ 	  }\label{alg:upu:move:start}
+      Let $\bsgl_1, \bsgl_2 \in C_\pm(\delta, A)$ be arbitrary\\
+      $\dpm(\bsgl_1) \leftarrow \dpm(\bsgl_1) \cup \{ \delta \}$\\
+      $\dpm(\bsgl_2) \leftarrow \dpm(\bsgl_2) \cup \{ \delta \}$ \label{alg:upu:move:end}\\
     }
   }
-  \Return{$(\ass, \Delta)$}
-  \caption{\textsc{UnitPropagationUnassigned}}
+  \Return{$\langle \ass, \Delta \rangle$}
+  \caption{\textsc{UnitPropagateUnassigned}($\ass$, $\Delta$, $\sgl$)}
   \label{alg:upu}
 \end{algorithm}
 
@@ -487,8 +569,8 @@ In case (3.), $\Delta$ is modified in lines 8-11. As $\sgl$ is now assigned, it 
 
 \begin{algorithm}
   \KwIn{An~assignment~$\ass$,
-        a~literal~$\sgl \in \ass$, and
-        a~watch~structure~$\Delta$.}
+        a~watch~structure~$\Delta$, and
+        a~literal~$\sgl \in \ass$.}
   \KwOut{$\ass$ extended by means of nogood propagation.}
 %  \ForEach{nogood $\delta \in w_{=2}(\Delta)$ of form $\{ \sigma, \sigma' \}$}
 %  {
@@ -497,23 +579,22 @@ In case (3.), $\Delta$ is modified in lines 8-11. As $\sgl$ is now assigned, it 
 %      $\mathbf{A} \circ \negstrong{\sigma'}$
 %    }
 %  }
-  \ForEach{$\delta \in \Delta^\alpha(\sgl)$}
+  \ForEach{$\delta \in \dal(\sgl)$}
   {
-    $L \leftarrow \{ \bT v \in \delta \ | \ \bT v \not \in \ass \} \setminus \{ \sgl, \text{head}(\delta) \} $\\
-%     $L \leftarrow \{ \bsgl \ | \ \bsgl \in \delta, \bsgl \not \in \ass \text{, and } \bsgl \ \text{is of form} \ \bT v \} \setminus \{ \sgl, \text{head}(\delta) \} $\\
-    \uIf{$L \not = \emptyset$}
-    {
-      $\Delta^\alpha(\sgl) \leftarrow \Delta^\alpha(\sgl) \setminus \{ \delta \}$\\
-      % Choose $\bsgl \in L$ s.t.~there is no $\bsgl' \in L$ with $\ass = (\ldots, \bsgl, \ldots, \bsgl', \ldots)$.\\
-      $\Delta^\alpha(\bsgl) \leftarrow \Delta^\alpha(\bsgl) \cup \{ \delta \}$ for some $\sigma \in L$\\
-    }
-	\ElseIf{$\delta$ is strictly unit}
+	\uIf{$\delta$ is strongly unit}
 	{
-	  $\ass \leftarrow \ass \circ \negstrong{\bsgl}$
+	  $\ass \leftarrow \ass \circ \negstrong{\headf(\delta)}$ \label{alg:upa:su:circ}
 	}
+    \ElseIf{$C_\alpha(\delta, A) \not = \emptyset$}
+    {
+      $\dal(\sgl) \leftarrow \dal(\sgl) \setminus \{ \delta \}$\\
+      % Choose $\bsgl \in L$ s.t.~there is no $\bsgl' \in L$ with $\ass = (\ldots, \bsgl, \ldots, \bsgl', \ldots)$.\\
+      Let $\sigma \in C_\alpha(\delta, A)$ be arbitrary\\
+      $\dal(\bsgl) \leftarrow \dal(\bsgl) \cup \{ \delta \}$\\
+    }
   }
-  \Return{$(\mathbf{A}, \Delta)$}
-  \caption{\textsc{UnitPropagationAssigned}}
+  \Return{$\langle \ass, \Delta \rangle$}
+  \caption{\textsc{UnitPropagateAssigned}($\ass$, $\Delta$, $\sgl$)}
   \label{alg:upa}
 \end{algorithm}
 
@@ -528,13 +609,21 @@ For every nogood $\delta \in \Delta$, if $\delta$ contains at least two atoms un
 %TODO define watch list!
 
 \begin{theorem}
-Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$ \welf wrt.~$\ass$ and a literal $\sgl$, it results in a new assignment $\ass'$ such that:
-\begin{enumerate}
-\item If $\sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$ and $\Delta' = \Delta$. % Trivial case.
+Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$, a literal $\sgl$, and the following preconditions, it results in a new assignment $\ass'$ and a new watch structure $\Delta'$ such that all following postconditions hold:
 
-\item If $\sgl$ does not conflict with $\ass$ and there are assignments that can be inferred by means of unit propagation, then these assignments are in $\ass'$ ($\ass \subset \ass'$) and $\Delta'$ is \welf wrt.~$\ass'$.
+\begin{enumerate}[label={\normalfont (\textsc{Pre}\arabic*)},ref=(\textsc{Pre}\arabic*)]
+\item $\Delta$ \lowinv $A$. \label{up:sound:pre2}
+\item All nogoods $\delta \in \Delta$ are silent under $\ass$. \label{up:sound:pre1}
+\end{enumerate}
 
-\item If a literal inferred from $\Delta$ and $\ass \circ \sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$.
+\begin{enumerate}[label={\normalfont (\textsc{Post}\arabic*)},ref=(\textsc{Post}\arabic*)]
+\item If $\sgl$ does not conflict with $\ass$ and there are assignments that can be inferred by means of unit propagation, then: \label{up:sound:post2}
+\begin{enumerate}[label={\normalfont (\alph*)},ref=\theenumi(\alph*)]
+\item $\Delta'$ \lowinv $\ass'$. \label{up:sound:post2b}
+\item All nogoods $\delta \in \Delta'$ are silent under $\ass'$. \label{up:sound:post2a}
+\end{enumerate}
+\item If a literal inferred from $\Delta$ and $\ass \circ \sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$. \label{up:sound:post3}
+\item If $\sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$ and $\Delta' = \Delta$. \label{up:sound:post1}% Trivial case.
 \end{enumerate}
 \end{theorem}
 
@@ -546,36 +635,156 @@ Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch struct
 %\item otherwise, the resulting watch structure $\Delta$ will be well formed wrt. the resulting assignment $\ass$.
 %\end{enumerate}
 
-To show (1.) rather trivially: Assume $\sgl$ conflicts with $\ass$. Then, on line~\ref{alg:up:circ} of the algorithm $\ass$ will be assigned \emph{conflict}. Consequently, the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} is not executed as $|\emph{conflict}| = \infty$ and $k + i$ must be finite. $(\ass, \Delta)$ is returned.
+%In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \dpm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
 
-%In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \Delta^\pm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
+Before establishing a proof for \ref{up:sound:post2} and \ref{up:sound:post3} observe the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} closely:
 
-Before establishing a proof for (2.) and (3.) observe what the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} achieves.
+\begin{description}
+\item[Initialization] Construct $A_1$ by appending $\sgl$ to $\ass$ (ln.~\ref{alg:up:circ}). Initialize some loop counter $i = 1$ (ln.~\ref{alg:up:i}). It points at the next literal on which propagation should be performed, i.e.~initially $\sgl = \ass_1[|\ass| + 1]$. 
 
-\paragraph{Initialization} Let $k$ be the size of the input assignment $\ass$ (see line~\ref{alg:up:k}), which serves as a reference point of the size of the assignment before propagation is performed and $i$ some loop counter (see line~\ref{alg:up:i}).
+\item[Iteration] Let the pair $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle = \textsc{UnitPropagate}(\ass_i, \Delta_i, \ass_i[|A| + i])$ (ln.~\ref{alg:up:loop:prop}) denote the output of the $i$-th iteration which performs propagation on assignment $\ass_i$, watch structure $\Delta_i$ and literal $\ass_i[|A| + i]$ (ln.~\ref{alg:up:loop:lit}). Conversely $S_i$ can be interpreted as the input for the $i$-th iteration. Analysis of the difference between $\Delta_{i}$ and $\Delta_{i+1}$ is what resembles soundness below.
 
-\paragraph{Representing iterations} For every iteration let the triple $S_i = (\sgl_i, \ass_i,  \Delta_i)$ denote that in the iteration represented by $S_i$, propagation on literal $\sgl_i$ is performed on the assignment $A_i$ and watch structure $\Delta_i$.
+\item[Termination] Because the number of literals in all nogoods $\delta \in \Delta$ is finite, for some $i = k$ the loop invariant (ln.~\ref{alg:up:loop:begin}) is violated, i.e.~$|A| + i > |\ass_{i}|$. Intuitively, this is the case if no new assignment can be inferred ($S_{k-1} = \langle \ass_{k-1}, \Delta_{k-1} \rangle$ and $S_k = \langle \ass_k, \Delta_k \rangle$ with $\ass_{k-1} = \ass_k$) or a conflict is reached ($\ass_k = \emph{conflict}$). When the loop terminates, $\langle \ass', \Delta' \rangle = S_k$ is returned (ln.~\ref{alg:up:ret}).
+\end{description}
 
-\paragraph{Semantics of an iteration} Further, this means that for two steps: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$, $\ass_i$ is the result of performing propagation with $\sgl_{i-1}$ on $\ass_{i-1}$ using $\Delta_{i-1}$. Analysis of the difference between $\Delta_{i-1}$ and $\Delta_i$ is what resembles the proof below.
+Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} by induction, assume that $\sgl$ does not conflict with $\ass$ and let $\mathcal{P}(n) = \textrm{\ref{up:sound:ind:noconflict}} \vee \textrm{\ref{up:sound:ind:conflict}}$ where
 
-\paragraph{Termination of the loop} The loop ends when no new assignment can be inferred, i.e.~$S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$ with $\ass_{i-1} = \ass_i$, and all nogoods in $\Delta_i$ are \lowinv wrt.~$A_i$, which follows from $k + i = |\ass_i|$ and thus $\ass_i = \ass_i[\ldots, k+i]$ (shown below).
-If the loop ends, $\ass_i$ and $\Delta_i$ are returned, so $\ass_i = \ass'$ and $\Delta_i = \Delta'$.
+\begin{enumerate}[label=(\Roman*)]
+	\item Let $\ass_n^L = \ass_n[1, |A| + n - 1], \ass_n^R = \ass_n[|A| + n, |\ass_n|]$. For each $\delta$ in $\Delta$: \label{up:sound:ind:noconflict}
+		\begin{enumerate}[label=(\alph*),ref=\theenumi(\alph*)]
+			\item $\Delta_n$ watches $\ass^L_n$. \label{up:sound:ind:watches} % Or watches \ass^L_n?
+			\item If $\delta$ is weakly unit under $\ass_n$, then $\exists \sgl \in A_n^R : \delta \in \Delta_n^\pm(\sgl)$. \label{up:sound:ind:wu}
+			\item If $\delta$ is strongly unit under $\ass_n$, then $\exists {\bT v_1} \in A_n^R : \delta \in \Delta_n^\alpha(v_1)$ or $\exists {\bF v_2} \in A_n^R : \delta \in \Delta_n^\pm({\bF v_2})$. \label{up:sound:ind:su}
+			\item If $\delta$ is violated under $\ass_n$, then $\exists \sgl \in A_n^R : \delta \in \Delta_n^\pm(\sgl)$. \label{up:sound:ind:vio}
+		\end{enumerate}
+	\item $\ass_n = \emph{conflict}$ \label{up:sound:ind:conflict}
+\end{enumerate}
 
-Now, assume that $\sgl$ does not conflict with $\ass$ and show (2.) and (3.) are by induction on iteration steps $i$:
+\paragraph{Base Case} Concerning the input assignment $\ass_0 = \ass$ and $\Delta_0 = \Delta$, $\mathcal{P}(0)$ is trivially true because \ref{up:sound:ind:watches} amounts to \ref{up:sound:pre2}, and \ref{up:sound:ind:wu}, \ref{up:sound:ind:su}, \ref{up:sound:ind:vio} follow from \ref{up:sound:pre1}.
 
-Let $\mathcal{P}(i)$ denote that $\dbef$ is \upinv wrt.~$\ass_i$ and $\dbef$ is \lowinv by $\abef$.
-
-\emph{Base Case}: For the base case, concerning the input assignment $\ass$ and $\Delta$, $\mathcal{P}(1)$ is trivially true because $\ass_1 = \ass$ and $\Delta_1 = \Delta$ is \welf wrt.~$\ass$ (precondition).
-
-% TODO Hypothesis is different for cases 1 and 2?!
-\emph{Induction Hypothesis}: Assume $\mathcal{P}(i)$ holds for some $i$.
-
-\emph{Induction Step}: The induction step now consists of observing that the loop in lines 3-10 \enquote{preserves} properties (1.) and (2.) of soundness, i.e.~it argues the transitivity of those properties for iteration steps $S_{i}$ to $S_{i+1}$.
+%The induction step now consists of observing that the loop in lines 3-10 \enquote{preserves} properties (1.) and (2.) of soundness, i.e.~it argues the transitivity of those properties for iteration steps $S_{i}$ to $S_{i+1}$.
 
 %We show that every nogood $\delta \in \Delta'$ is \welf wrt.~$\Delta'$ and $\ass'$, i.e.~$\Delta'$ is \welf wrt.~$\ass'$, by using that $\Delta$ is \welf wrt.~$\ass$ and the definition of the algorithm.
 
-Given two consecutive iteration steps $S_{i} = (\sgl_{i}, \ass_{i}, \Delta_{i})$ and $S_{i+1} = (\sgl_{i+1}, \ass_{i+1}, \Delta_{i+1})$, assume $\mathcal{P}(i)$ by the induction hypothesis, i.e.~$\dbef$ is \welf wrt.~$\abef$. Now for every nogood $\delta \in \daf$:
+\paragraph{Induction Step} For two consecutive iteration steps $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(n)$ for $n = i$. For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$, $\sgl_{i+1} = A_{i+1}[j+1]$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:
 
+\paragraph{Intuition} Note that $\sgl_i \not \in \ass_i^L$, $\sgl_i \in \ass_i^R$ and $\sgl_i \in \ass_{i+1}^L$, $\sgl_i \not \in \ass_{i+1}^R$, intuitively in the $i$-th iteration, $\sgl_i$ \enquote{moves} from the \enquote{right} subsequence of the assignment to its \enquote{left} subsequence. As expected, the two subsequences united add up to the full sequence $A_i = A_i^L \cup A_i^R$. Further the \enquote{right} subsequence \enquote{grows} (with the exception of $\sgl_i$), i.e.~$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$. Also, $\ass_{i+1}^L = \ass_{i}^L \cup \{ \sgl_i \}$ is useful.
+
+\todo{Show \ref{up:sound:ind:watches}; $\Delta$ as the set of all nogoods in the program?}
+
+To show \ref{up:sound:ind:wu}, let $\delta \in \Delta$ and assume $\delta$ is weakly unit under $\ass_{i+1}$ (else, \ref{up:sound:ind:wu} trivially holds):
+\begin{enumerate}
+	\item Assume $\delta$ is weakly unit under $\ass_i$.
+	
+	Then $\exists \sgl \in \ass_i^R : \delta \in \Delta_i^\pm(\sgl)$ (ind.~hyp.). 
+	\begin{enumerate}
+		\item Assume $\sgl = \sgl_i$ towards contradiction.
+		
+		As $\delta \in \dpm_i(\sgl)$, the weak complement of $\sgl$ is appended to the assignment (algorithm \ref{alg:upu}, line \ref{alg:upu:wu:circ}), thus $\negweak{\sgl} \in A_{i+1}$. Then $\delta$ is not weakly unit under $A_{i+1}$. \contradiction
+		\item Assume $\sgl \not = \sgl_i$.
+
+		%\begin{enumerate}
+			%\item Assume $\delta \in \dpm_i(\sgl_i)$. Then $\sgl = \sgl_i$. \contradiction
+			%\item Assume $\delta \not \in \dpm_i(\sgl_i)$.
+
+% We know that there is exactly one $\bsgl \in \delta$ which is not in $\bass(\ass_i)$ (by definition of weakly unit). This implies that $\cdpm(\delta, \ass_{i}) = \{\bsgl\}$. 
+			
+			From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$. Further $\delta \in \dpm_{i}(\sgl) \to \delta \in \Delta_{i+1}^\pm(\sgl)$ follows from $\sgl \not = \sgl_i$ and $\delta$ weakly unit under $\ass_i$ (see algorithm \ref{alg:upu}, line \ref{alg:upu:it} iterating over $\sgl_i$). Thus we have $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:wu} holds.
+%\end{enumerate}
+	\end{enumerate}
+	\item Assume $\delta$ is not weakly unit under $A_i$.
+	
+	Then $\cdpm(\delta, \ass_{i}) \geq 2$ and because $\Delta_i$ watches $A_i$ (ind.~hyp.), we have $\exists \bsgl_1, \bsgl_2 \in \delta : \bsgl_1 \not = \bsgl_2 \wedge \delta \in \Delta_i^\pm(\bsgl_1) \wedge \delta \in \Delta_i^\pm(\bsgl_2)$.
+
+	\begin{enumerate}
+		%\item Assume $\sgl_i \not = \bsgl_1$ and $\sgl_i \not = \bsgl_2$ towards a contradiction. As $\bsgl_1, \bsgl_2 \in \cdpm(\delta, \ass_i)$, both $\bsgl_1, \bsgl_2$ are unassigned under $\ass_i$ by definition of $\cdpm$. For $\delta$ to be weakly unit under $\ass_{i+1}$, there must be exactly one $\bsgl' \in \delta$ unassigned under $\ass_{i+1}$.
+		\item Case $\sgl_i \not = \bsgl_1 \wedge \sgl_i \not = \bsgl_2$.
+		
+		$\Delta_i^\pm(\bsgl_1) = \Delta_{i+1}^\pm(\bsgl_1)$ and $\Delta_i^\pm(\bsgl_2) = \Delta_{i+1}^\pm(\bsgl_2)$, as watch sets are only modified in case $\bsgl_1 = \sgl_i$ and respectively $\bsgl_2 = \sgl_i$ (see algorithm \ref{alg:upu}: only nogoods that are being iterated over in line \ref{alg:upu:it} are being removed from any watch sets in line \ref{alg:upu:rm}). Both $\bsgl_1$ and $\bsgl_2$ are in $A_{i+1}^R$, because $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, thus we have \ref{up:sound:ind:wu}.
+		
+		\item Case either $\sgl_i = \bsgl_1$ or $\sgl_i = \bsgl_2$.
+		
+		Without loss of generality ($\bsgl_1$ and $\bsgl_2$ arbitrary in $\cdpm(\delta, \ass_i)$), assume $\sgl = \bsgl_1$. $\bsgl_1 \not \in A_{i+1}^R$ and $\bsgl_2 \in A_{i+1}^R$. While processing $\delta$, algorithm \ref{alg:upu}, the branch in line \ref{alg:upu:else} is taken (otherwise $\delta$ cannot be unit under $\ass_{i+1}$. All candidates $\cdpm(\delta, \ass_i)$ except $\bsgl_1$, and therefore any literals $\bsgl_1', \bsgl_2'$ (arbitrarily) chosen in the algorithm, are either unassigned under $\ass_{i+1}$ or in $\ass_{i+1}^R$. As $\delta$ is unit under $\ass_{i+1}$, exactly one of these must be unassigned. Assume (w.l.o.g., symmetric) $\bsgl_1'$ unassigned under $A_{i+1}$ and $\bsgl_2' \in \ass_{i+1}^R$. Then \ref{up:sound:ind:wu} holds for $\bsgl_2'$.
+		
+		\item Case $\bsgl_1 = \sgl_i \wedge \bsgl_2 = \sgl_i$ contradicts $\bsgl_1 \not = \bsgl_2$. \contradiction
+		\end{enumerate}
+\end{enumerate}
+
+To show \ref{up:sound:ind:su}, let $\delta \in \Delta$ and assume $\delta$ is strongly unit (and therefore also weakly unit) under $\ass_{i+1}$ (else, \ref{up:sound:ind:su} trivially holds):
+\begin{enumerate}
+	\item Case $\delta$ is strongly unit under $\ass_i$. Then $\exists {\bT v_1} \in \ass_i^R : \delta \in \dal_i(v_1)$ or $\exists {\bF v_2} \in \ass_i^R : \delta \in \dpm_i({\bF v_2})$ via induction hypothesis.
+	\begin{enumerate}
+		\item Case $\sgl_i = {\bT v_1} \vee \sgl_i = {\bF v_2}$.
+		\begin{enumerate}
+			\item Case $\sgl_i = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$. Then $\negstrong{\headf(\delta)} \in A_{i+1}^R$: Algorithm \ref{alg:upa} performs appending (ln.~\ref{alg:upa:su:circ}). $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
+			\item Case $\sgl_i \not = {\bT v_1} \wedge \sgl_i = {\bF v_2}$. Then $\negstrong{\headf(\delta)} \in A_{i+1}^R$: Algorithm \ref{alg:upu} performs appending (line\ref{alg:upu:su:circ}). $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
+			\item Case $\sgl_i = {\bT v_1} \wedge \sgl_i = {\bF v_2}$ is contradictory. \contradiction % Amounts to the case where $\sgl_i = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$ because algorithm \ref{alg:upu} is executed before algorithm \ref{alg:upa}, which degrades to a no-operation, because $\delta$ is neither strongly unit, nor is $C_\alpha(\delta, A)$ (where $A$ is defined in the scope of the algorithm, a hybrid state between $A_i$ and $A_{i+1}$) non-empty when it is executed.
+		\end{enumerate}
+		\item Case $\sgl_i \not = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$.
+		From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that if ${\bT v_1}, {\bF v_2}$ exist, they are in $\ass_{i+1}^R$. Also, $\delta \in \dal_i(v_1) \to \delta \in \dal_{i+1}(v_1)$ and $\delta \in  \dpm_i({\bF v_2}) \to \delta \in \dpm_{i+1}({\bF v_2})$ because $\delta$ is strongly unit and $\sgl_i \not \in \delta$. So we have $\exists {\bT v_1} \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v_1)$ or $\exists {\bF v_2} \in \ass_{i+1}^R : \delta \in \dpm_{i+1}({\bF v_2})$, i.e.~\ref{up:sound:ind:su}. % TODO: \sgl might actually change (pointer move) which is not mentioned here. If this does not get mentioned in the watches section of the proof, add a remark here explaining that \sgl might change in the course of algorithm 3.3 but only in a way that fulfills above criteria.
+	\end{enumerate}
+	
+	
+	\item Case $\delta$ is not strongly unit under $A_i$. Then, $\bodyf(\delta) \setminus A_i \not = \emptyset$.
+
+
+	\begin{enumerate}
+		\item Case ${\bT v} \in \bodyf(\delta) \setminus A_i$.
+		
+		Then, $C^\alpha(\delta, A_{i}) \not = \emptyset$. Because $\Delta_i$ watches $\ass_i$ it follows that $\exists \bsgl \in C_\alpha(\delta, A_i): \delta \in \dal(\sigma)$.
+		
+		\begin{enumerate}
+			\item Case $\sgl_i = \bsgl$.
+			
+			leads to a contradiction ($\delta$ not strongly unit under $A_{i+1}$)
+			
+			\item Case $\sgl_i \not = \bsgl$.
+			
+			$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, we have $\bsgl \in \ass_{i+1}^R$, thus $\exists \bsgl \in \ass_{i+1}^R : \delta \in \dal_{i+1}(\bsgl)$, i.e.~\ref{up:sound:ind:su}. \todo{Why $\delta \in \dal_{i+1}(\bsgl)$?}
+		\end{enumerate}			
+			
+		\item Case ${\bT v} \not \in \bodyf(\delta) \setminus A_i$.
+			\begin{enumerate}
+				\item Case $\negweak{\headf(\delta)} \not \in A_{i} \wedge \negstrong{\headf(\delta)} \not \in A_{i}$, i.e.~the head is unassigned. Then there are at least two literals in $\delta$ unassigned under $A_i$ (one in the body and the head). From \ref{up:sound:ind:watches} we have $\bsgl_1, \bsgl $
+				\item Case $\negweak{\headf(\delta)} \in A_{i}$.
+				\begin{enumerate}
+					\item Case $|\bodyf(\delta) \setminus A_i| \geq 2$. Then there are at least two unassigned literals.
+					\item Case $\bodyf(\delta) \setminus A_i = \{ {\bF v} \}$. Then $\delta$ is weakly unit.
+				\end{enumerate}
+			\end{enumerate}
+	\end{enumerate}
+
+
+%	\begin{enumerate}
+%		\item Case $\bT v \in \bodyf(\delta) \setminus A_i$. If $\headf(\delta) \not \in A_i$ then there are at least two distinct literals $\bsgl_1, \bsgl_2 \in \delta$ (one in the body, and the head) that are unassigned unter  $A_i$ and \ref{up:sound:ind:su} holds for $A_{i+1}$ according to \ref{up:sound:ind:watches} for $A_i$. Else, i.e.~$\headf(\delta) \in A_i$, then $|\bodyf(\delta) \setminus A_i| \geq 2$, thus \ref{up:sound:ind:su} holds for $A_{i+1}$ according to \ref{up:sound:ind:watches} for $A_i$.
+%		\item Case $\bodyf(\delta) \setminus A_i = \{ \bF v' \}$, i.e.~$\delta$ is weakly unit under $A_i$, then according to \ref{up:sound:ind:wu}, $\exists \ \bsgl \in \bass(A_i^R) : \delta \in \Delta_i^\pm(\bsgl)$. From $A_i^R \cap \delta \subseteq \{ \bF v' \}$ follows that $v = v'$ and thus \ref{up:sound:ind:su}.
+%	\end{enumerate}
+\end{enumerate}
+
+To show \ref{up:sound:ind:vio}, let $\delta \in \Delta$ and assume $\delta$ is violated under $A_{i+1}$ (else \ref{up:sound:ind:vio} trivially holds).
+\begin{enumerate}
+\item Assume $\delta$ is violated under $A_i$.
+
+Then $\exists \sgl \in \ass_i^R : \delta \in \dpm_i(\sgl)$ via induction hypothesis.
+\begin{enumerate}
+\item Case $\sgl = \sgl_i$.
+
+Then, according to line \ref{alg:upu:conflict} $A_{i+1}$ is \emph{conflict}, so \ref{up:sound:ind:conflict} holds.
+
+\item Case $\sgl \not = \sgl_i$.
+
+Then, from $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$, thus $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$. Also $\delta \in \dpm_i(\sgl) \to \delta \in \dpm_{i+1}(\sgl)$, as watch sets are only modified for nogoods that are watched by $\sgl_i$. So we have $\exists \sgl \in \ass_i^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:vio} holds.
+\end{enumerate}
+\item Ass: $\delta$ is not violated under $A_i$. Then $|\bass(A_i) \setminus \delta| \geq 1$  holds by definition of a nogood being violated under an assignment.
+
+\begin{enumerate}
+\item Ass $|\bass(A_i) \setminus \delta| \geq 2$. Then because $\Delta_i$ watches $A_i$ it follows that $\exists \bsgl_1, \bsgl_2 : \delta \in \Delta_i^\pm(\bsgl_1), \Delta_i^\pm(\bsgl_2)$. Further $\bsgl_1 \not = \sgl_i$ or $\bsgl_2 \not = \sgl_i$, so w.l.o.g.~$\bsgl_1 \not = \sgl_i$, so $\exists \ {\bX v} \in X : \delta \in \Delta_{i+1}^\pm(v)$ for $\bX v = \bsgl_1$.
+\item Ass $|\bass(A_i) \setminus \delta| = 1$ analogous to 2) case 1.
+\end{enumerate}
+
+\end{enumerate}
+
+\begin{comment}
 \begin{enumerate}
 \item If $\sgl_i \not \in \delta$, then: % A nogood only contains boolean signed literals, so dies this even make sense? \sgl is a signed literal, not a boolean signed literal, so how can it be element of delta? Needs clarification.
 \begin{enumerate}
@@ -613,6 +822,15 @@ Therefore $\delta$ is not unit, because $\bsgl_1, \bsgl_2 \in \delta$ are unassi
 \end{enumerate}
 \end{enumerate}
 \end{enumerate}
+\end{comment}
+
+Above induction step serves as an explanation on how execution of the loop affects the assignment and especially the watch structure. By using induction, $\mathcal{P}(i)$ was shown for any $i \geq 0$, and therefore for any iteration of the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} as well. Specifically $\mathcal{P}(i)$ holds for the last iteration $i = k$ represented by $S_k = \langle \ass_k, \Delta_k \rangle$.
+
+For cases without conflict and the loop terminating at $S_k$, \ref{up:sound:post2b} is obvious from \ref{up:sound:ind:watches} as $\ass' = \ass_k$ and $\Delta' = \Delta_k$. From termination follows $A_k^R = \emptyset$, i.e.~there are no nogoods $\delta \in \Delta'$ that are weakly unit, strongly unit or violated under $\ass'$, thus all $\delta$ are silent under $\ass'$ which amounts to \ref{up:sound:post2a}.
+
+Cases in the induction step leading to show \ref{up:sound:ind:conflict} map to \ref{up:sound:post3}.
+
+To show \ref{up:sound:post1} rather trivially: Assume $\sgl$ conflicts with $\ass$. Then, on line~\ref{alg:up:circ} of the algorithm $\ass$ will be assigned \emph{conflict}. Consequently, the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} is not executed as $|\emph{conflict}| = 0$ and $i$ must be at least 1, as it is assigned 1 on line \ref{alg:up:i}. $\langle \ass, \Delta \rangle$ is returned.
 \end{proof}
 
 \begin{theorem}
