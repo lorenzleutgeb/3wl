@@ -108,7 +108,12 @@
 \newcommand{\bM}{\mathbf{M}}
 \newcommand{\bF}{\mathbf{F}}
 \newcommand{\bX}{\mathbf{X}}
+\newcommand{\abef}{\ass_{i}[\ldots, k + i]}
+\newcommand{\aaf}{\ass_{i + 1}[\ldots, k + i + 1]}
+\newcommand{\dbef}{\Delta_{i}}
+\newcommand{\daf}{\Delta_{i+1}}
 \newcommand{\welf}{well formed\xspace}
+
 
 \newcommand{\sgl}{\mu}
 \newcommand{\bsgl}{\sigma}
@@ -228,7 +233,7 @@ An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed l
 %\end{definition}
 
 %\begin{definition}
-For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bM v \ | \ \bT v \in \ass \}$$
+For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$$
 \end{definition}
 
 %\begin{remark}
@@ -253,7 +258,7 @@ $\bF v$&$\bT v$&$\bM v$\\
 \end{center}
 \end{definition}
 
-The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $\ass \circ \sigma$. In case $\negstrong{\sigma} \in \ass \vee \negweak{\sigma} \in \ass$ however, $\ass \circ \sigma =$ \emph{conflict} to indicate that appending $\sigma$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sigma = \emph{conflict}$. To ensure that the assignment contains at most one literal per atom $v$, in case $\bM v \in \ass$, then $\bM v$ is removed when before $\bT v$.
+The assignment obtained by appending the literal $\sgl$ to $\ass$ is denoted by $\ass \circ \sigma$. In case $\negstrong{\sigma} \in \ass \vee \negweak{\sigma} \in \ass$ however, $\ass \circ \sigma =$ \emph{conflict} to indicate that appending $\sigma$ conflicts with other literals in $\ass$. Furthermore $\emph{conflict} \circ \sigma = \emph{conflict}$ and $|\emph{conflict}| := 0$. To ensure that the assignment contains at most one literal per atom $v$, in case $\bM v \in \ass$, then $\bM v$ is removed when before $\bT v$.
 
 \begin{definition}
 An atom $v$ is \emph{unassigned} with respect to some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} = \emptyset$$
@@ -326,7 +331,8 @@ edge [out=east,in=west, above] node {$-$} (v1f)
   \label{fig:watches} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
 
-A nogood $\delta$ is said to be \welf wrt.~some watch structure $\Delta$ and an assignment $\ass$ if the following four statements hold:
+\begin{definition}
+A nogood $\delta$ is said to be \emph{\welf} wrt.~some watch structure $\Delta$ and an assignment $\ass$ if the following four statements hold:
 
 \begin{enumerate}
 \item $\delta$ is not violated by $\ass$.
@@ -334,6 +340,7 @@ A nogood $\delta$ is said to be \welf wrt.~some watch structure $\Delta$ and an 
 \item If $\delta$ is not satisfied and contains at least two unassigned literals $\bsgl_1, \bsgl_2, \ldots \in \delta$, then $\delta$ is contained in exactly two watches, e.g. $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
 \item Let $L_\delta = \{ \bT v \in \text{body}(\delta) \ | \ \bT v \not \in \ass \}$. If $L_\delta \not = \emptyset$, then there is exactly one $\bsgl \in L_\delta$ with $\delta \in \Delta^\alpha(\bsgl)$.
 \end{enumerate}
+\end{definition}
 
 A watch structure $\Delta$ is said to be \welf wrt.~some assignment $\ass$ in case all nogoods $\delta \in \Delta$ are well formed wrt.~$\Delta$ and $\ass$.
 
@@ -346,10 +353,17 @@ A watch structure $\Delta$ is said to be \welf wrt.~some assignment $\ass$ in ca
         a~watch~structure~$\Delta$.}
   \KwOut{The assignment $\ass$, extended by means of unit propagation and $\Delta$ with updated watches.}
   $\ass \leftarrow \ass \circ \sgl$\\
-  $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationUnassigned}($\ass$, $\sgl$, $\Delta$)\\
-  \If{$\sigma$ is of form $\bT v$}
+  $k \leftarrow |\ass|$\\
+  $i \leftarrow 0$\\
+  \While{$k + i \leq |\ass|$}
   {
-    $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationAssigned}($\ass$, $\sgl$, $\Delta$)
+    $\sgl_i \leftarrow \ass[k + i]$\\
+  $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationUnassigned}($\ass$, $\sgl_i$, $\Delta$)\\
+  \If{$\sgl_i$ is of form $\bT v$}
+  {
+    $(\ass, \Delta) \leftarrow$ \textsc{UnitPropagationAssigned}($\ass$, $\sgl_i$, $\Delta$)
+  }
+    $i \leftarrow i + 1$
   }
   \Return{$(\ass, \Delta)$}
   \caption{\textsc{UnitPropagation}}
@@ -415,7 +429,7 @@ In case (3.), $\Delta$ is modified in lines 8-11. As $\sgl$ is now assigned, it 
 %      $\mathbf{A} \circ \negstrong{\sigma'}$
 %    }
 %  }
-  \ForEach{nogood $\delta \in \Delta^\alpha(\sgl)$}
+  \ForEach{$\delta \in \Delta^\alpha(\sgl)$}
   {
     $L \leftarrow \{ \bT v \in \delta \ | \ \bT v \not \in \ass \} \setminus \{ \sgl, \text{head}(\delta) \} $\\
 %     $L \leftarrow \{ \bsgl \ | \ \bsgl \in \delta, \bsgl \not \in \ass \text{, and } \bsgl \ \text{is of form} \ \bT v \} \setminus \{ \sgl, \text{head}(\delta) \} $\\
@@ -446,52 +460,83 @@ For every nogood $\delta \in \Delta$, if $\delta$ contains at least two atoms un
 %TODO define watch list!
 
 \begin{theorem}
-Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$ \welf wrt.~$\ass$ and a new assignment $\sgl$, the following three statements hold:
+Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$ \welf wrt.~$\ass$ and a new assignment $\sgl$ resulting in a new assignment $\ass'$ and a watch structure $\Delta'$, the following three statements hold:
 \begin{enumerate}
-\item If $\sgl$ does not conflict with $\ass$ and there are any assignments that can be inferred by unit propagation, these assignments are generated and the return value is an extended assignment $\ass' = \ass \circ \sgl$ and a watch structure $\Delta'$ \welf under $\ass'$.
-\item If $\sgl$ conflicts with $\ass$, the conflicting assignment is returned and the returned watch structure is $\Delta$.
-\item 
+\item If $\sgl$ does not conflict with $\ass$ and there are any assignments that can be inferred by unit propagation, these assignments are generated ($\ass \subset \ass'$) and $\Delta'$ is \welf wrt.~$\ass'$.
+\item If an assignment inferred from a nogood in $\Delta$ with $\sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$.
+\item If $\sgl$ conflicts with $\ass$, then $\ass'$ is the conflicting assignment and  $\Delta' = \Delta$.
 \end{enumerate}
 \end{theorem}
 
 \begin{proof}
-We show that:
+%We show that:
+
+%\begin{enumerate}
+%\item in case $\sgl$ conflicts with $\ass$, the algorithm will return the assignment \emph{conflict} and $\Delta$ is not guaranteed to be well formed,
+%\item otherwise, the resulting watch structure $\Delta$ will be well formed wrt. the resulting assignment $\ass$.
+%\end{enumerate}
+
+(3.) is trivial, as $\ass$ will be assigned \emph{conflict} in line 1 of the algorithm in case $\sgl$ conflicts with any other assignment in $\ass$.
+
+Let $k$ be the size of the input assignment $\ass$ (see line 2).
+%In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \Delta^\pm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
+
+For every iteration of the loop in lines 4-11, let the triple $S_i = (\sgl_i, \ass_i,  \Delta_i)$ denote that in the iteration represented by $S_i$, propagation on literal $\sgl_i$ resulted is performed on the assignment $A_i$ and watch structure $\Delta_i$.
+
+Further, this means that for two steps: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$, $\ass_i$ is the result of performing propagation on $\sgl_{i-1}$ on $\ass_{i-1}$ using $\Delta_{i-1}$. As a side-effect of propagation, $\Delta_{i-1}$ changes to $\Delta_i$.
+
+The loop ends when no new assignment can be inferred: $S_{i-1} = (\sgl_{i-1}, \ass_{i-1}, \Delta_{i-1})$ and $S_i = (\sgl_i, \ass_i, \Delta_i)$ with $\ass_{i-1} = \ass_i$. If the loop ends, $\ass_i$ and $\Delta_i$ are returned, so $\ass_i = \ass'$ and $\Delta_i = \Delta'$. Also, note that $\ass_i = \ass_i[\ldots, k+i]$ because $|\ass_i| = k+i$.
+
+(1.) and (2.) are shown by induction over iteration steps $S_i$.
+
+%We show that $\Delta'$ is \welf wrt.~$\ass' $ by induction.
+Let $\mathcal{P}(i)$ denote that $\dbef$ is \welf wrt.~$\abef$.
+
+\emph{Base Case}: For the base case, concerning the input assignment $\ass$ and $\Delta$, $\mathcal{P}(0)$ is trivially true because $\ass_0 = \ass$ and $\Delta_0 = \Delta$ is \welf wrt.~$\ass$ (precondition).
+
+% TODO Hypothesis is different for cases 1 and 2?!
+\emph{Induction Hypothesis}: Assume $\mathcal{P}(i)$ holds for some $i$.
+
+\emph{Induction Step}: The induction step now consists of observing that the loop in lines 3-10 \enquote{preserves} properties (1.) and (2.) of soundness, i.e.~it argues the transitivity of those properties for iteration steps $S_{i}$ to $S_{i+1}$.
+
+%We show that every nogood $\delta \in \Delta'$ is \welf wrt.~$\Delta'$ and $\ass'$, i.e.~$\Delta'$ is \welf wrt.~$\ass'$, by using that $\Delta$ is \welf wrt.~$\ass$ and the definition of the algorithm.
+
+Given two consecutive iteration steps $S_{i} = (\sgl_{i}, \ass_{i}, \Delta_{i})$ and $S_{i+1} = (\sgl_{i+1}, \ass_{i+1}, \Delta_{i+1})$, assume $\mathcal{P}(i)$ by the induction hypothesis, i.e.~$\dbef$ is \welf wrt.~$\abef$. Now for every nogood $\delta \in \daf$:
 
 \begin{enumerate}
-\item in case $\sgl$ conflicts with $\ass$, the algorithm will return the assignment \emph{conflict} and $\Delta$ is not guaranteed to be well formed,
-\item otherwise, the resulting watch structure $\Delta$ will be well formed wrt. the resulting assignment $\ass$.
+\item If $\sgl_i \not \in \delta$, then: % A nogood only contains boolean signed literals, so dies this even make sense? \sgl is a signed literal, not a boolean signed literal, so how can it be element of delta? Needs clarification.
+\begin{enumerate}
+\item $\delta$ is not violated under $\abef$ (inv1). Therefore, $\delta$ is not violated under $\aaf = \abef \circ \sgl_i$ because $\sgl_i \not \in \delta$.
+\item $\delta$ is not unit wrt.~$\abef$ (inv2). Therefore, $\delta$ is not unit wrt.~$\aaf = \abef \circ \sgl_i$ because $\sgl_i \not \in \delta$.
+\item Assume $\delta$ is not satisfied under $\aaf$ and contains at least two literals $\bsgl_1, \bsgl_2, \ldots$ unassigned wrt.~$\aaf$. Then $\bsgl_1$ and $\bsgl_2$ are unassigned wrt.~$\abef$ and $\delta$ is not satisfied under $\abef$, because $\abef \subset \aaf = \abef \circ \sgl_i$ and $\sgl_i \not \in \delta$. Therefore, $\delta \in \dbef^\pm(\bsgl_1)$ and $\delta \in \dbef^\pm(\bsgl_2)$ must hold (inv3). For the same two literals, $\delta \in \daf^\pm(\bsgl_1)$ and $\delta \in \daf^\pm(\bsgl_2)$ holds. % Needs clarification. Reference the loop that the nogood is certainly not part of.
+\item Analogous to (c), if $\delta$ has any triggers, their assignment does not change, as $\sgl_i \not \in \delta$, and no watches $\delta \in \dbef^\alpha(\bsgl)$ are changed. The same $\bsgl$ will satisfy $\delta \in \dbef^\alpha(\bsgl)$ for $\abef$ and $\aaf$.
 \end{enumerate}
-
-(1.) is trivial, as $\ass$ will be assigned \emph{conflict} in line 1 of the algorithm in case $\sgl$ conflicts with any other assignment in $\ass$.
-
-We show that for a watch structure $\Delta$ that is \welf wrt.~an assignment $\ass$, the watch structure $\Delta'$ and assignment $\ass'$ returned from Algorithm \ref{alg:up} is well formed as well.
-
-In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \Delta^\pm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
-Show that the algorithm infers a non-conflicting assignment from a non-conflicting assignment.
-
-We show that every nogood $\delta \in \Delta'$ is \welf wrt.~$\Delta'$ and $\ass'$, i.e.~$\Delta'$ is \welf wrt.~$\ass'$, by using that $\Delta$ is \welf wrt.~$\ass$ and the definition of the algorithm.
-
-For every nogood $\delta \in \Delta$:
+\item Else ($\sgl_i \in \delta$):
 \begin{enumerate}
-\item If $\sgl \not \in \delta$, then:
+\item If $\delta \not \in \dbef^\pm(\sgl_i)$, i.e.~$\delta$ was not watched on $\sgl_i$, then
 \begin{enumerate}
-\item $\delta$ is not violated by $\ass'$ because it is not violated by $\ass$ and the nogood cannot be violated by assigning $\sgl$ as $\sgl \not \in \delta$.
-\item $\delta$ is not unit, analogous to (b): $\delta$ is not unit wrt.~$\ass$ and it is not unit wrt.~$\ass'$ because $\ass' = \ass \circ \sgl$ and $\sgl \not \in \delta$.
-\item If $\delta$ contains at least two unassigned literals $\bsgl_1, \bsgl_2, \ldots$ wrt.~$\ass$ it will contain at least two unassigned literals wrt.~$\ass'$ as well, because $\sgl \not \in \delta$. The algorithm does neither modify $\Delta^\pm(\bsgl_1)$ nor $\Delta^\pm(\bsgl_2)$ (it only modifies $\Delta(\sgl)$), so the same $\bsgl_1, \bsgl_2$ satisfy $\delta \in \Delta^\pm(\bsgl_1)$ and $\delta \in \Delta^\pm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$ for $\ass$ and $\ass'$.
-\item Analogous to (c), if $\delta$ has any triggers, their assignment does not change, as $\sgl \not \in \delta$, and no watches $\delta \in \Delta^\alpha(\bsgl)$ are changed. The same $\bsgl$ will satisfy $\delta \in \Delta^\alpha(\bsgl)$ for $\ass$ and $\ass'$.
+\item To show that $\delta$ is not violated by $\aaf$:
+\begin{enumerate}
+\item Assume $\delta$ is satisfied under $\abef$. Then $\delta$ is not violated under $\aaf$ as $\delta$ is not violated by $\abef$ (inv1) and $\abef \subset \aaf$.
+\item Assume $\delta$ is not satisfied under $\abef$. Then there are at least two literals in $\delta$ unassigned wrt.~$\abef$ as $\delta$ is not unit wrt.~$\abef$ (inv2). From $|\aaf| = |\abef| + 1$ if follows that there must be at least one literal in $\delta$ which is unassigned wrt.~$\aaf$, therefore $\delta$ cannot be violated under $\aaf$.
 \end{enumerate}
-\item Else:
+\item To show that $\delta$ is not unit under $\aaf$:
 \begin{enumerate}
-\item If $\delta \not \in \Delta^\pm(\sgl)$, i.e.~$\delta$ was not watched on $\sgl$, then
-\begin{enumerate}
-\item $\delta$ is not violated, because there must be some 
-\item $\Delta^\pm(\sgl)$ is unchanged
+\item Assume $\delta$ is satisfied under $\abef$. Then $\delta$ is not unit under $\aaf$ because $\abef \subset \aaf$.
+\item Assume $\delta$ is not satisfied under $\abef$. Then there are at least two literals $\bsgl_1, \bsgl_2, \ldots \in \delta$ that are unassigned wrt.~$\abef$, as $\delta$ is not unit under $\abef$ (inv2). Further, $\delta \in \dbef^\pm(\bsgl_1)$ and $\delta \in \dbef^\pm(\bsgl_2)$ (inv3). From $\delta \not \in \dbef^\pm(\sgl_i)$ it follows that $\sgl_i \not = \bsgl_1$ and $\sgl_i \not = \bsgl_2$. % How are binary signed literals and signed literals compared?
+Therefore $\delta$ is not unit, because $\bsgl_1, \bsgl_2 \in \delta$ are unassigned wrt.~$\aaf$.
 \end{enumerate}
-\item Else:
+\item Assume $\delta$ is not satisfied under $\aaf$ and contains at least two literals $\bsgl_1, \bsgl_2, \ldots$ unassigned under $\aaf$. Then $\bsgl_1, \bsgl_2$ are unassigned wrt.~$\abef$ and $\delta$ is not satisfied wrt.~$\abef$ because $\abef \subset \aaf$ and $\delta \not \in \dbef^\pm(\sgl_i)$ and $\delta$ is not unit wrt.~$\abef$.
+\item Same as 1.d ...
+\end{enumerate}
+\item Else ($\delta \in \dbef^\pm(\sgl_i)$), i.e.~$\delta$ was watched on $\sgl_i$.
 \begin{enumerate}
+\item If $\delta$ is weakly unit under $\aaf$ with $\bsgl$ unassigned, then the algorithm generates the assignment $\negweak{\bsgl}$.
+\item Else
+\item If there are two unassigned pointer move $\to$ two unassigned literals
+\item pointer move $\to$ two unassigned literals
 \item violated $\to$ conflict
 \item weakly unit $\to$ satisfied
-\item pointer move $\to$ two unassigned literals
 \end{enumerate}
 \end{enumerate}
 \end{enumerate}
