@@ -1,4 +1,4 @@
-\documentclass{vutinfth} % Remove option 'final' to obtain debug information.
+s\documentclass{vutinfth} % Remove option 'final' to obtain debug information.
 
 % Load packages to allow in- and output of non-ASCII characters.
 \usepackage{lmodern}        % Use an extension of the original Computer Modern font to minimize the use of bitmapped letters.
@@ -369,6 +369,7 @@ A nogood $\delta$ is \emph{strongly unit} under an assignment $\ass$ iff $\delta
 Note that, as the names suggest, any nogood that is strongly unit under some assignment is also weakly unit, but not the other way round. Below, nogoods are sometimes referred to be \emph{unit} which amounts to stating that they are weakly unit. Also, when clear from context, reference to a particular assignment is omitted.
 
 \begin{definition}
+\label{def:vio}
 A nogood $\delta$ is \emph{violated} under an assignment $\ass$ iff $\delta \subseteq \bass(\ass)$.
 \end{definition}
 
@@ -459,9 +460,9 @@ Intuitively, $C_\alpha(\delta, A)$ is the set of positive body literals in $\del
 A watch structure $\Delta$ \emph{\lowinv} an assignment $\ass$ iff for every nogood $\delta \in \Delta$ holds:
 
 \begin{enumerate}
-\item If $|\cdpm(\delta, A)| \geq 2$, then $\exists \bsgl_1, \bsgl_2 \in \cdpm(\delta, A) : \bsgl_1 \not = \bsgl_2 \wedge \delta \in \dpm(\bsgl_1) \wedge \delta \in \dpm(\bsgl_2)$.
+\item $|\cdpm(\delta, A)| \geq 2$ implies there exist $\bsgl_1, \bsgl_2 \in \cdpm(\delta, A)$ such that $\bsgl_1 \not = \bsgl_2$ and $\delta \in \dpm(\bsgl_1)$ and $\delta \in \dpm(\bsgl_2)$, and
 %Older version: \item If $\delta$ is not satisfied under $\ass$ and contains at least two literals $\bsgl_1, \bsgl_2, \ldots \in \delta$ unassigned under $\ass$, then $\delta$ is contained in exactly two distinct watch sets, e.g. $\delta \in \dpm(\bsgl_1)$ and $\delta \in \dpm(\bsgl_2)$ with $\bsgl_1 \not = \bsgl_2$.
-\item If $\cdal(\delta, A) \not = \emptyset$, then there is exactly one $\bsgl \in \cdal(\delta, A)$ with $\delta \in \dal(\bsgl)$.
+\item $\cdal(\delta, A) \not = \emptyset$ implies that there is exactly one $\bsgl \in \cdal(\delta, A)$ with $\delta \in \dal(\bsgl)$.
 \end{enumerate}
 \end{definition}
 
@@ -637,7 +638,7 @@ Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch struct
 
 %In line 1 of algorithm \ref{alg:up}, $\ass$ is altered by appending the given signed literal $\sgl$. Now, $\Delta$ might not be well formed wrt.~the altered assignment $\ass'$ anymore, because there might be some nogood $\delta \in \dpm(\sgl)$. By executing algorithm \ref{alg:upu}, $\Delta$ is transformed into a well formed watch structure $\Delta'$.
 
-Before establishing a proof for \ref{up:sound:post2} and \ref{up:sound:post3} observe the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} closely:
+Before establishing a proof for \ref{up:sound:post2} and \ref{up:sound:post3} observe the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} of Algorithm \ref{alg:up} closely:
 
 \begin{description}
 \item[Initialization] Construct $A_1$ by appending $\sgl$ to $\ass$ (ln.~\ref{alg:up:circ}). Initialize some loop counter $i = 1$ (ln.~\ref{alg:up:i}). It points at the next literal on which propagation should be performed, i.e.~initially $\sgl = \ass_1[|\ass| + 1]$. 
@@ -660,68 +661,59 @@ Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} by induction, assu
 	\item $\ass_n = \emph{conflict}$ \label{up:sound:ind:conflict}
 \end{enumerate}
 
-\paragraph{Base Case} Concerning the input assignment $\ass_0 = \ass$ and $\Delta_0 = \Delta$, $\mathcal{P}(0)$ is trivially true because \ref{up:sound:ind:watches} amounts to \ref{up:sound:pre2}, and \ref{up:sound:ind:wu}, \ref{up:sound:ind:su}, \ref{up:sound:ind:vio} follow from \ref{up:sound:pre1}.
+\paragraph{Base Case} Concerning the input assignment $\ass_0 = \ass$ and $\Delta_0 = \Delta$, $\mathcal{P}(0)$ directly follows, because \ref{up:sound:ind:watches} amounts to \ref{up:sound:pre2}, and \ref{up:sound:pre1} implies that the antecedents of \ref{up:sound:ind:wu}, \ref{up:sound:ind:su}, \ref{up:sound:ind:vio} are false.
 
 %The induction step now consists of observing that the loop in lines 3-10 \enquote{preserves} properties (1.) and (2.) of soundness, i.e.~it argues the transitivity of those properties for iteration steps $S_{i}$ to $S_{i+1}$.
 
 %We show that every nogood $\delta \in \Delta'$ is \welf wrt.~$\Delta'$ and $\ass'$, i.e.~$\Delta'$ is \welf wrt.~$\ass'$, by using that $\Delta$ is \welf wrt.~$\ass$ and the definition of the algorithm.
 
-\paragraph{Induction Step} For two consecutive iteration steps $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(n)$ for $n = i$. For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$, $\sgl_{i+1} = A_{i+1}[j+1]$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:
+\paragraph{Induction Step} For two consecutive iteration steps $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(i)$. For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$, $\sgl_{i+1} = A_{i+1}[j+1]$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:
 
 \paragraph{Intuition} Note that $\sgl_i \not \in \ass_i^L$, $\sgl_i \in \ass_i^R$ and $\sgl_i \in \ass_{i+1}^L$, $\sgl_i \not \in \ass_{i+1}^R$, intuitively in the $i$-th iteration, $\sgl_i$ \enquote{moves} from the \enquote{right} subsequence of the assignment to its \enquote{left} subsequence. As expected, the two subsequences united add up to the full sequence $A_i = A_i^L \cup A_i^R$. Further the \enquote{right} subsequence \enquote{grows} (with the exception of $\sgl_i$), i.e.~$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$. Also, $\ass_{i+1}^L = \ass_{i}^L \cup \{ \sgl_i \}$ is useful.
 
-\todo{Show \ref{up:sound:ind:watches}; $\Delta$ as the set of all nogoods in the program?}
+\todo{$\Delta$ as the set of all nogoods in the program?}
 
-To show \ref{up:sound:ind:wu}, let $\delta \in \Delta$ and assume $\delta$ is weakly unit under $\ass_{i+1}$ (else, \ref{up:sound:ind:wu} trivially holds):
 \begin{enumerate}
-	\item Assume $\delta$ is weakly unit under $\ass_i$.
+\item \todo{Show \ref{up:sound:ind:watches}}
+\item To show \ref{up:sound:ind:wu}, let $\delta \in \Delta$ and assume $\delta$ is weakly unit under $\ass_{i+1}$ (else, \ref{up:sound:ind:wu} trivially holds):
+\begin{enumerate}
+	\item Assume $\delta$ is weakly unit under $\ass_i$. \label{pr:corr:wu:wu}
 	
-	Then $\exists \sgl \in \ass_i^R : \delta \in \Delta_i^\pm(\sgl)$ (ind.~hyp.). 
-	\begin{enumerate}
-		\item Assume $\sgl = \sgl_i$ towards contradiction.
-		
-		As $\delta \in \dpm_i(\sgl)$, the weak complement of $\sgl$ is appended to the assignment (algorithm \ref{alg:upu}, line \ref{alg:upu:wu:circ}), thus $\negweak{\sgl} \in A_{i+1}$. Then $\delta$ is not weakly unit under $A_{i+1}$. \contradiction
-		\item Assume $\sgl \not = \sgl_i$.
-
-		%\begin{enumerate}
-			%\item Assume $\delta \in \dpm_i(\sgl_i)$. Then $\sgl = \sgl_i$. \contradiction
-			%\item Assume $\delta \not \in \dpm_i(\sgl_i)$.
-
-% We know that there is exactly one $\bsgl \in \delta$ which is not in $\bass(\ass_i)$ (by definition of weakly unit). This implies that $\cdpm(\delta, \ass_{i}) = \{\bsgl\}$. 
-			
-			From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$. Further $\delta \in \dpm_{i}(\sgl) \to \delta \in \Delta_{i+1}^\pm(\sgl)$ follows from $\sgl \not = \sgl_i$ and $\delta$ weakly unit under $\ass_i$ (see algorithm \ref{alg:upu}, line \ref{alg:upu:it} iterating over $\sgl_i$). Thus we have $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:wu} holds.
+	Then $\exists \sgl \in \ass_i^R : \delta \in \Delta_i^\pm(\sgl)$ by the induction hypothesis. 
+	
+	Assume towards contradiction that $\sgl = \sgl_i$. As $\delta \in \dpm_i(\sgl)$, the weak complement of $\sgl$ is appended to the assignment (Algorithm \ref{alg:upu}, line \ref{alg:upu:wu:circ}), thus $\negweak{\sgl} \in A_{i+1}$. Then $\delta$ is not weakly unit under $A_{i+1}$ contradicting our assumption.
+	
+	Therefore, $\sgl \not = \sgl_i$. From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$. Further $\delta \in \dpm_{i}(\sgl)$ implies $\delta \in \Delta_{i+1}^\pm(\sgl)$ follows from $\sgl \not = \sgl_i$ and $\delta$ weakly unit under $\ass_i$ (see Algorithm \ref{alg:upu}, line \ref{alg:upu:it} iterating over $\sgl_i$). Thus we have $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:wu} holds.
 %\end{enumerate}
-	\end{enumerate}
 	\item Assume $\delta$ is not weakly unit under $A_i$.
 	
-	Then $\cdpm(\delta, \ass_{i}) \geq 2$ and because $\Delta_i$ watches $A_i$ (ind.~hyp.), we have $\exists \bsgl_1, \bsgl_2 \in \delta : \bsgl_1 \not = \bsgl_2 \wedge \delta \in \Delta_i^\pm(\bsgl_1) \wedge \delta \in \Delta_i^\pm(\bsgl_2)$.
+	Then $\cdpm(\delta, \ass_{i}) \geq 2$ and because $\Delta_i$ watches $A_i$ (ind.~hyp.), we have $\exists \bsgl_1, \bsgl_2 \in \delta : \bsgl_1 \not = \bsgl_2 \wedge \delta \in \Delta_i^\pm(\bsgl_1) \wedge \delta \in \Delta_i^\pm(\bsgl_2)$. We distinguish on whether $\sgl_i$ coincides with one of the watched literals:
 
 	\begin{enumerate}
 		%\item Assume $\sgl_i \not = \bsgl_1$ and $\sgl_i \not = \bsgl_2$ towards a contradiction. As $\bsgl_1, \bsgl_2 \in \cdpm(\delta, \ass_i)$, both $\bsgl_1, \bsgl_2$ are unassigned under $\ass_i$ by definition of $\cdpm$. For $\delta$ to be weakly unit under $\ass_{i+1}$, there must be exactly one $\bsgl' \in \delta$ unassigned under $\ass_{i+1}$.
 		\item Case $\sgl_i \not = \bsgl_1 \wedge \sgl_i \not = \bsgl_2$.
 		
-		$\Delta_i^\pm(\bsgl_1) = \Delta_{i+1}^\pm(\bsgl_1)$ and $\Delta_i^\pm(\bsgl_2) = \Delta_{i+1}^\pm(\bsgl_2)$, as watch sets are only modified in case $\bsgl_1 = \sgl_i$ and respectively $\bsgl_2 = \sgl_i$ (see algorithm \ref{alg:upu}: only nogoods that are being iterated over in line \ref{alg:upu:it} are being removed from any watch sets in line \ref{alg:upu:rm}). Both $\bsgl_1$ and $\bsgl_2$ are in $A_{i+1}^R$, because $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, thus we have \ref{up:sound:ind:wu}.
+		$\Delta_i^\pm(\bsgl_1) = \Delta_{i+1}^\pm(\bsgl_1)$ and $\Delta_i^\pm(\bsgl_2) = \Delta_{i+1}^\pm(\bsgl_2)$, as watch sets are only modified in case $\bsgl_1 = \sgl_i$ and respectively $\bsgl_2 = \sgl_i$ (see Algorithm \ref{alg:upu}: only nogoods that are being iterated over in line \ref{alg:upu:it} are being removed from any watch sets in line \ref{alg:upu:rm}). Both $\bsgl_1$ and $\bsgl_2$ are in $A_{i+1}^R$, because $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, thus we have \ref{up:sound:ind:wu}.
 		
 		\item Case either $\sgl_i = \bsgl_1$ or $\sgl_i = \bsgl_2$.
+		\label{sigmaprimes}		
 		
-		Without loss of generality ($\bsgl_1$ and $\bsgl_2$ arbitrary in $\cdpm(\delta, \ass_i)$), assume $\sgl = \bsgl_1$. $\bsgl_1 \not \in A_{i+1}^R$ and $\bsgl_2 \in A_{i+1}^R$. While processing $\delta$, algorithm \ref{alg:upu}, the branch in line \ref{alg:upu:else} is taken (otherwise $\delta$ cannot be unit under $\ass_{i+1}$. All candidates $\cdpm(\delta, \ass_i)$ except $\bsgl_1$, and therefore any literals $\bsgl_1', \bsgl_2'$ (arbitrarily) chosen in the algorithm, are either unassigned under $\ass_{i+1}$ or in $\ass_{i+1}^R$. As $\delta$ is unit under $\ass_{i+1}$, exactly one of these must be unassigned. Assume (w.l.o.g., symmetric) $\bsgl_1'$ unassigned under $A_{i+1}$ and $\bsgl_2' \in \ass_{i+1}^R$. Then \ref{up:sound:ind:wu} holds for $\bsgl_2'$.
+		Without loss of generality ($\bsgl_1$ and $\bsgl_2$ arbitrary in $\cdpm(\delta, \ass_i)$), let $\sgl_i = \bsgl_1$. Therefore, $\bsgl_1 \not \in A_{i+1}^R$ and $\bsgl_2 \in A_{i+1}^R$. While processing $\delta$, in Algorithm \ref{alg:upu} the branch in line \ref{alg:upu:else} is taken (otherwise $\delta$ cannot be unit under $\ass_{i+1}$. All candidates $\cdpm(\delta, \ass_i)$ except $\bsgl_1$, and therefore any literals $\bsgl_1', \bsgl_2'$ (arbitrarily) chosen in the algorithm, are either unassigned under $\ass_{i+1}$ or in $\ass_{i+1}^R$. As $\delta$ is unit under $\ass_{i+1}$, exactly one of these must be unassigned.
+		Assume (w.l.o.g., symmetric) $\bsgl_1'$ unassigned under $A_{i+1}$ and $\bsgl_2' \in \ass_{i+1}^R$. Then \ref{up:sound:ind:wu} holds for $\bsgl_2'$.
 		
-		\item Case $\bsgl_1 = \sgl_i \wedge \bsgl_2 = \sgl_i$ contradicts $\bsgl_1 \not = \bsgl_2$. \contradiction
+		\item Case $\bsgl_1 = \sgl_i \wedge \bsgl_2 = \sgl_i$ is impossible because $\bsgl_1 \not = \bsgl_2$.
 		\end{enumerate}
 \end{enumerate}
 
-To show \ref{up:sound:ind:su}, let $\delta \in \Delta$ and assume $\delta$ is strongly unit (and therefore also weakly unit) under $\ass_{i+1}$ (else, \ref{up:sound:ind:su} trivially holds):
+\item To show \ref{up:sound:ind:su}, let $\delta \in \Delta$ and assume $\delta$ is strongly unit (and therefore also weakly unit or $\headf(\delta) = \bM v$) under $\ass_{i+1}$ (else, \ref{up:sound:ind:su} trivially holds):
 \begin{enumerate}
 	\item Case $\delta$ is strongly unit under $\ass_i$. Then $\exists {\bT v_1} \in \ass_i^R : \delta \in \dal_i(v_1)$ or $\exists {\bF v_2} \in \ass_i^R : \delta \in \dpm_i({\bF v_2})$ via induction hypothesis.
 	\begin{enumerate}
-		\item Case $\sgl_i = {\bT v_1} \vee \sgl_i = {\bF v_2}$.
-		\begin{enumerate}
-			\item Case $\sgl_i = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$. Then $\negstrong{\headf(\delta)} \in A_{i+1}^R$: Algorithm \ref{alg:upa} performs appending (ln.~\ref{alg:upa:su:circ}). $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
-			\item Case $\sgl_i \not = {\bT v_1} \wedge \sgl_i = {\bF v_2}$. Then $\negstrong{\headf(\delta)} \in A_{i+1}^R$: Algorithm \ref{alg:upu} performs appending (line\ref{alg:upu:su:circ}). $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
-			\item Case $\sgl_i = {\bT v_1} \wedge \sgl_i = {\bF v_2}$ is contradictory. \contradiction % Amounts to the case where $\sgl_i = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$ because algorithm \ref{alg:upu} is executed before algorithm \ref{alg:upa}, which degrades to a no-operation, because $\delta$ is neither strongly unit, nor is $C_\alpha(\delta, A)$ (where $A$ is defined in the scope of the algorithm, a hybrid state between $A_i$ and $A_{i+1}$) non-empty when it is executed.
-		\end{enumerate}
+		\item Case $\sgl_i = {\bT v_1}$. Then Algorithm \ref{alg:upa} appends the strong complement of the head (line \ref{alg:upa:su:circ}), thus $\negstrong{\headf(\delta)} \in A_{i+1}^R$ and therefore $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
+		\item Case $\sgl_i = {\bF v_2}$. Then Algorithm \ref{alg:upu} appends the strong complement of the head (line \ref{alg:upu:su:circ}), thus $\negstrong{\headf(\delta)} \in A_{i+1}^R$ and therefore $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
+			%\item Case $\sgl_i = {\bT v_1} \wedge \sgl_i = {\bF v_2}$ is contradictory. \contradiction % Amounts to the case where $\sgl_i = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$ because algorithm \ref{alg:upu} is executed before algorithm \ref{alg:upa}, which degrades to a no-operation, because $\delta$ is neither strongly unit, nor is $C_\alpha(\delta, A)$ (where $A$ is defined in the scope of the algorithm, a hybrid state between $A_i$ and $A_{i+1}$) non-empty when it is executed.
 		\item Case $\sgl_i \not = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$.
-		From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that if ${\bT v_1}, {\bF v_2}$ exist, they are in $\ass_{i+1}^R$. Also, $\delta \in \dal_i(v_1) \to \delta \in \dal_{i+1}(v_1)$ and $\delta \in  \dpm_i({\bF v_2}) \to \delta \in \dpm_{i+1}({\bF v_2})$ because $\delta$ is strongly unit and $\sgl_i \not \in \delta$. So we have $\exists {\bT v_1} \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v_1)$ or $\exists {\bF v_2} \in \ass_{i+1}^R : \delta \in \dpm_{i+1}({\bF v_2})$, i.e.~\ref{up:sound:ind:su}. % TODO: \sgl might actually change (pointer move) which is not mentioned here. If this does not get mentioned in the watches section of the proof, add a remark here explaining that \sgl might change in the course of algorithm 3.3 but only in a way that fulfills above criteria.
+		From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that if ${\bT v_1}, {\bF v_2}$ exist, they are in $\ass_{i+1}^R$. Also, $\delta \in \dal_i(v_1)$ implies $\delta \in \dal_{i+1}(v_1)$ and $\delta \in  \dpm_i({\bF v_2})$ implies $\delta \in \dpm_{i+1}({\bF v_2})$ because $\delta$ is strongly unit and $\sgl_i \not \in \delta$. So we have $\exists {\bT v_1} \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v_1)$ or $\exists {\bF v_2} \in \ass_{i+1}^R : \delta \in \dpm_{i+1}({\bF v_2})$, i.e.~\ref{up:sound:ind:su}. % TODO: \sgl might actually change (pointer move) which is not mentioned here. If this does not get mentioned in the watches section of the proof, add a remark here explaining that \sgl might change in the course of algorithm 3.3 but only in a way that fulfills above criteria.
 	\end{enumerate}
 	
 	
@@ -747,10 +739,7 @@ To show \ref{up:sound:ind:su}, let $\delta \in \Delta$ and assume $\delta$ is st
 			\begin{enumerate}
 				\item Case $\negweak{\headf(\delta)} \not \in A_{i} \wedge \negstrong{\headf(\delta)} \not \in A_{i}$, i.e.~the head is unassigned. Then there are at least two literals in $\delta$ unassigned under $A_i$ (one in the body and the head). From \ref{up:sound:ind:watches} we have $\bsgl_1, \bsgl $
 				\item Case $\negweak{\headf(\delta)} \in A_{i}$.
-				\begin{enumerate}
-					\item Case $|\bodyf(\delta) \setminus A_i| \geq 2$. Then there are at least two unassigned literals.
-					\item Case $\bodyf(\delta) \setminus A_i = \{ {\bF v} \}$. Then $\delta$ is weakly unit.
-				\end{enumerate}
+				If $|\bodyf(\delta) \setminus A_i| \geq 2$, then there are at least two unassigned literals. Else if $\bodyf(\delta) \setminus A_i = \{ {\bF v} \}$, then $\delta$ is weakly unit.
 			\end{enumerate}
 	\end{enumerate}
 
@@ -761,7 +750,7 @@ To show \ref{up:sound:ind:su}, let $\delta \in \Delta$ and assume $\delta$ is st
 %	\end{enumerate}
 \end{enumerate}
 
-To show \ref{up:sound:ind:vio}, let $\delta \in \Delta$ and assume $\delta$ is violated under $A_{i+1}$ (else \ref{up:sound:ind:vio} trivially holds).
+\item To show \ref{up:sound:ind:vio}, let $\delta \in \Delta$ and assume $\delta$ is violated under $A_{i+1}$ (else \ref{up:sound:ind:vio} trivially holds).
 \begin{enumerate}
 \item Assume $\delta$ is violated under $A_i$.
 
@@ -769,17 +758,20 @@ Then $\exists \sgl \in \ass_i^R : \delta \in \dpm_i(\sgl)$ via induction hypothe
 \begin{enumerate}
 \item Case $\sgl = \sgl_i$.
 
-Then, according to line \ref{alg:upu:conflict} $A_{i+1}$ is \emph{conflict}, so \ref{up:sound:ind:conflict} holds.
+Then, according to Algorithm \ref{alg:upu} (line \ref{alg:upu:conflict}) $A_{i+1} = \emph{conflict}$, so \ref{up:sound:ind:conflict} holds.
 
 \item Case $\sgl \not = \sgl_i$.
 
-Then, from $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$, thus $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$. Also $\delta \in \dpm_i(\sgl) \to \delta \in \dpm_{i+1}(\sgl)$, as watch sets are only modified for nogoods that are watched by $\sgl_i$. So we have $\exists \sgl \in \ass_i^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:vio} holds.
+Then, from $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$, thus $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$. Also $\delta \in \dpm_i(\sgl)$ implies $\delta \in \dpm_{i+1}(\sgl)$, as watch sets are only modified for nogoods that are watched by $\sgl_i$. So we have $\exists \sgl \in \ass_i^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:vio} holds.
 \end{enumerate}
-\item Ass: $\delta$ is not violated under $A_i$. Then $|\bass(A_i) \setminus \delta| \geq 1$  holds by definition of a nogood being violated under an assignment.
+\item Assume $\delta$ is not violated under $A_i$. Then $|\bass(A_i) \setminus \delta| \geq 1$  holds by Definition \ref{def:vio}.
 
 \begin{enumerate}
-\item Ass $|\bass(A_i) \setminus \delta| \geq 2$. Then because $\Delta_i$ watches $A_i$ it follows that $\exists \bsgl_1, \bsgl_2 : \delta \in \Delta_i^\pm(\bsgl_1), \Delta_i^\pm(\bsgl_2)$. Further $\bsgl_1 \not = \sgl_i$ or $\bsgl_2 \not = \sgl_i$, so w.l.o.g.~$\bsgl_1 \not = \sgl_i$, so $\exists \ {\bX v} \in X : \delta \in \Delta_{i+1}^\pm(v)$ for $\bX v = \bsgl_1$.
-\item Ass $|\bass(A_i) \setminus \delta| = 1$ analogous to 2) case 1.
+\item Assume $|\bass(A_i) \setminus \delta| \geq 2$. Then because $\Delta_i$ watches $A_i$ it follows that $\exists \bsgl_1, \bsgl_2 : \delta \in \Delta_i^\pm(\bsgl_1), \Delta_i^\pm(\bsgl_2)$. Further $\bsgl_1 \not = \sgl_i$ or $\bsgl_2 \not = \sgl_i$, so w.l.o.g.~$\bsgl_1 \not = \sgl_i$, so $\exists \ {\bX v} \in X : \delta \in \Delta_{i+1}^\pm(v)$ with a reasoning similar to \ref{sigmaprimes}.
+
+\item Assume $|\bass(A_i) \setminus \delta| = 1$. Then $\delta$ is weakly unit under $A_i$, thus this case amounts to \ref{pr:corr:wu:wu}.
+\end{enumerate}
+
 \end{enumerate}
 
 \end{enumerate}
