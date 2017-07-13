@@ -6,7 +6,6 @@
 \usepackage[utf8]{inputenc} % Determines encoding of the input. All input files have to use UTF8 encoding.
 
 % Extended LaTeX functionality is enables by including packages with \usepackage{...}.
-\usepackage{fixltx2e}   % Provides fixes for several errors in LaTeX2e.
 \usepackage{amsmath}    % Extended typesetting of mathematical expression.
 \usepackage{amsthm}
 \usepackage{amssymb}    % Provides a multitude of mathematical symbols.
@@ -76,19 +75,10 @@
 % Define convenience macros.
 \newcommand{\todo}[1]{{\color{red}\textbf{TODO: {#1}}}} % Comment for the final version, to raise errors.
 
-\theoremstyle{example}
 \newtheorem{example}{Example}[section]
-
-\theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
-
-\theoremstyle{theorem}
 \newtheorem{theorem}{Theorem}[section]
-
-\theoremstyle{lemma}
 \newtheorem{lemma}{Lemma}[theorem]
-
-\theoremstyle{corollary}
 \newtheorem{corollary}{Corollary}[theorem]
 
 \newtheorem*{remark}{Remark}
@@ -378,7 +368,7 @@ For the remainder of the work we assume that an interpretation $I$ is \emph{cons
 
 %Observe that $I$ is a set of \emph{ground} literals, i.e.~we only define an interpretation for ground atoms and a na\ddot{i}ve implementation will therefore first ground the input program. This is the root of the bottleneck.
 
-Considering Example \ref{example}, note that $I_1 = \{ wear(G) \}$ is not an interpretation, because the atom it contains is not ground. However $I_2 = \{ wear(winterjacket) \}$ is an interpretation, because $winterjacket$ is a constant.
+Considering Example \ref{ex:garments}, note that $I_1 = \{ wear(G) \}$ is not an interpretation, because the atom it contains is not ground. However $I_2 = \{ wear(winterjacket) \}$ is an interpretation, because $winterjacket$ is a constant.
 
 With this, the truth value of an atom is defined against an interpretation, which in turn is simply the set of atoms that are considered \emph{true}. Further, an interpretation also defines how default negation as failure is to be handled.
 
@@ -433,7 +423,7 @@ There are two important ASP systems that implement lazy grounding, which we pres
 \subsubsection{\texttt{\asperix}}
 \label{sec:asperix}.
 
-\asperix is one of the first ASP systems that were designed to avoid the grounding bottleneck. It was first prototyped in 2008\footnote{According to the project's website \url{http://www.info.univ-angers.fr/pub/claire/asperix/\#download}} and published in \ref{asperixfirst}, with a more elaborate elaborate explanation in \ref{asperix}.
+\asperix is one of the first ASP systems that were designed to avoid the grounding bottleneck. It was first prototyped in 2008\footnote{According to the project's website \url{http://www.info.univ-angers.fr/pub/claire/asperix/\#download}} and published in \cite{asperixfirst}, with a more elaborate elaborate explanation in \cite{asperix}.
 
 In the process of finding a solution, it extends a partial interpretation \cite[Def.~4]{asperix} in form of a pair $\langle IN, OUT \rangle$ of disjoint atom sets, where the atoms in $IN$ belong to the answer set that is currently searched and the atoms in $OUT$ do not. Further, the system tracks the set of ground rules, $R$, which is lazily extended by grounding the input program. Rules of the program $r$ relate to a partial interpretation and are called \emph{supported} ($\bodyf^+(r) \subseteq IN$), \emph{blocked} ($\bodyf^-(r) \cap IN \not = \emptyset$), \emph{unblocked} ($\bodyf^-(r) \subseteq OUT$), and \emph{applicable} (supported and not blocked) \cite[Def.~5]{asperix}. 
 
@@ -441,7 +431,7 @@ The main concept in this ASP system is an \asperix \emph{computation} \cite[Def.
 
 The most important take-away from \asperix for this work, however is the introduction of a third truth value which allows for more efficient convergence of above computation: The truth value \mbt indicates that an atom that is not in already in $IN$ must be in $IN$ (cannot be in $OU$) in order to find an answer set. It allows to mark certain atoms for which a \enquote{proof}, i.e. a firing rule with the atom as its head, has not yet fired, but must, at some point in the computation, fire.
 
-\begin{example}[{\cite[Example 7}]
+\begin{example}[{\cite[Example 7]{asperix}}]
 Let $\bot \from \fail b$ be a constraint whose body contains only one literal $\fail b$ with $b \not \in IN \cup OUT$. In order to have an answer set, $b$ must be in $IN$ so that the constraint is not applicable but $b$ is not yet proved (it is not in the head of a fired rule). Thus, one can only conclude that $b$ must be true.
 \end{example}
 
@@ -1110,4 +1100,3 @@ Algorithm \ref{alg:up} is sound and complete.
 \bibliography{thesis}
 
 \end{document}
-
