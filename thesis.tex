@@ -1,4 +1,4 @@
-s\documentclass{vutinfth} % Remove option 'final' to obtain debug information.
+\documentclass{vutinfth} % Remove option 'final' to obtain debug information.
 
 % Load packages to allow in- and output of non-ASCII characters.
 \usepackage{lmodern}        % Use an extension of the original Computer Modern font to minimize the use of bitmapped letters.
@@ -133,6 +133,38 @@ s\documentclass{vutinfth} % Remove option 'final' to obtain debug information.
 \newcommand{\headf}{\mathrm{head}}
 \newcommand{\bodyf}{\mathrm{body}}
 
+\newcommand{\fail}{\mathrm{not } \ \xspace}
+%\newcommand{\from}{\mathrm{\ \xspace :- \ \xspace}}
+\newcommand{\from}{\ensuremath{\leftarrow}}
+\newcommand{\problem}{\ensuremath{\mathscr{P}}}
+
+\newcommand{\entails}{\models}
+
+% Least model (of a Horn program).
+\newcommand{\lm}{\mathrm{lm}}
+
+% Set of stable models (of a program).
+\newcommand{\stm}{\mathrm{STM}}
+\newcommand{\sol}{\mathrm{Sol}}
+\newcommand{\compl}{\mathrm{Co}}
+\newcommand{\groundext}{\mathrm{Gr}}
+\newcommand{\defense}{\mathrm{Def}_F}
+
+% Entails according to well founded semantics.
+\newcommand{\wf}{\ensuremath{\entails_{wf}}}
+
+% Entails according to stable model semantics using brave reasoning
+\newcommand{\brave}{\ensuremath{\entails_{st}^b}}
+
+% Entails according to stable model semantics using cautious reasoning
+\newcommand{\caut}{\ensuremath{\entails_{st}^c}}
+
+% Selective Linear Definite-clause with Negation as Failure
+\newcommand{\sldnf}{\ensuremath{\vdash_{NF}}}
+
+\newcommand{\universe}{\mathcal{U}}
+\newcommand{\afs}{\mathcal{F}}
+\newcommand{\attacks}{\rightsquigarrow}
 
 \newcommand{\sgl}{\mu}
 \newcommand{\bsgl}{\sigma}
@@ -158,15 +190,19 @@ s\documentclass{vutinfth} % Remove option 'final' to obtain debug information.
 \end{danksagung*}
 
 \begin{acknowledgements*}
-I would like to thank Antonius Weinzierl for his consistent and continuous efforts in supporting me writing this thesis through numerous meetings, openness in discussion and acceptance of my contributions to the Alpha system and finding the right balance between pushing me to finish and letting me slack off to think freely.
+I would like to thank Antonius Weinzierl for his consistent and continuous efforts in supporting me writing this thesis through numerous meetings, openness in discussion, acceptance of my contributions to the Alpha system and finding the right balance between pushing me to finish and letting me slack off to think freely.
 \end{acknowledgements*}
 
 \begin{kurzfassung}
-\todo{Ihr Text hier.}
+Answer Set Programming (ASP) ist eine deklarative Programmiersprache in Anlehnung an Prädikatenlogik erster Stufe, welche üblicherweise durch ASP-Systeme evaluiert wird. Wir präsentieren das \emph{grounding bottleneck}, um die Limitationen aktueller ASP-Systeme aufzuzeigen und diskutieren mögliche Lösungsansätze mit einem Fokus auf \emph{lazy-grounding} wie im Alpha System.
+
+Der Komppromiss zwischen Speicherverbrauch und vollständiger Verfügbarkeit des grundierten Programms resultiert in neuen Restriktionen für Algorithmen und Datenstrukturen in ASP-Systemen. Der Hauptteil der Arbeit beschreibt wie \emph{Unit Propagation} basierend auf \emph{two-watched-literals} auf drei Literale erweitert werden kann, sodass Berechnungen mit einem teilweise grundierten Programm ausgeführt werden können.
 \end{kurzfassung}
 
 \begin{abstract}
-\todo{Enter your text here.}
+Answer Set Programming (ASP) is a declarative programming language rooted in first order logic that is commonly evaluated using ASP systems. We present the \emph{grounding bottleneck}, which is exhibits limitations of state-of-the-art ASP systems and discuss possible approaches, with a focus on \emph{lazy-grounding} as implemented in the Alpha system.
+
+Trading off memory consumption for complete availability of the ground program poses new design constraints on algorithms and data structures in ASP systems. The main part of the work describes how \emph{unit propagation} based on \emph{two-watched-literals} can be extended to three watched literals in order to account for a lazily grounded program.
 \end{abstract}
 
 \selectlanguage{english}
@@ -177,15 +213,43 @@ I would like to thank Antonius Weinzierl for his consistent and continuous effor
 \mainmatter
 
 \chapter{Introduction}
+\label{sec:introduction}
 
-Since the inception of computer programming, different ways of encoding algorithms, structuring data and modeling the real world in computer programs have led to the development of various, conceptually diverse, programming languages. Families of programming languages that share some of the above properties are usually referred to abide a so called \enquote{programming paradigm}.
+Since the inception of computer programming, different ways of encoding algorithms, structuring data and modeling the real world in computer programs have led to the development of various conceptually diverse programming languages. Families of programming languages that share some of the above properties are usually thought to bide to a so called \enquote{programming paradigm}.
 Such paradigms describe the common, most important concepts and lay a stylistic framework for a family of languages.
 
-While the most widely used languages follow the \enquote{imperative} programming paradigm (some more strict, some less), this work focuses on Answer Set Programming (ASP), a declarative programming language that roots in Nonmonotonic Reasoning.
+The most widely used languages follow the \enquote{imperative} programming paradigm (some more strict, some less), which revolves around \enquote{commanding} the computer. In this work, contrary to mainstream software engineering, the main focus is Answer Set Programming (ASP), a declarative programming language that roots in first order logic.
+
+Without going into details about how ASP works, consider the following example for an intuition.
+
+\begin{example}
+Suppose one needs to decide what to wear. The following program narrows down the selection of garments (a winter jacket, a pair of jeans, a t-shirt and shorts, see lines 1.1 to 1.4) in the wardrobe by checking whether specific pieces are designed to be worn in the current season (lines 1.7 and 1.8).
+\begin{flalign}
+&garment(winterjacket).\\
+&garment(jeans).\\
+&garment(tshirt).\\
+&garment(shorts).\\
+&warm(winterjacket).\\
+&light(shorts).\\
+inseason(G) \from& \ winter, garment(G), \fail light(G).\\
+inseason(G) \from& \ summer, garment(G), \fail warm(G).\\
+wear(G) \from& \ garment(G), inseason(G).
+\end{flalign}
+
+$winter$ and $summer$ are propositions that will need to be provided, as the program cannot figure out whether it is currently summer or winter. The knowledge whether a garment is in season is represented as a rule that looks at whether a piece is not light (or not warm) which means it should be worn in winter (resp.~summer).
+\end{example}
+
+The evaluation of an ASP program is done by an ASP system, which may be comprised of further smaller components. For \enquote{user} and programmer, it largely acts as a black box. Given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets.
+
+Historically, ASP systems evolved from SAT solvers, and their model generation/solving algorithms only work for programs without variables. In the above example, we see that the letter \emph{G} was used as a variable in three different rules. The process of substituting variables with constants, e.g. substituting \emph{G} with one of the four concrete garments, is referred to as \emph{grounding} and the resulting variable-free is said to be \emph{ground}.
+
+Na\ddot{i}vely substituting each occurrence of \emph{G} in the example yields eight instances of the \emph{inseason} rule (two per garment), and four of the \emph{wear} rule (one per garment). With rules that use two garments, the number of instances would once more multiply by the number of garments. We see that while the program with variables can be rather terse, the corresponding ground program is exponentially larger.
 
 \section{Motivation}
 
 \section{Problem Statement}
+
+State-of-the-art ASP systems feature two components: The grounder takes care of substituting all variables, i.e.~generating the ground program, while the solver takes this ground program as input and computes answer sets. Traditionally, the grounder is invoked first, and only after it has output the ground program, the solver starts execution. This two-phased mode of operation is referred to as \emph{pre-grounding}. With the ground program being exponentially larger than the original input program with variables, these systems are prone to what we call the \emph{grounding bottleneck}: When the ground program is so large that it does not fit into memory, the search for answer sets is impossible.
 
 \section{Aim of the Work}
 
@@ -206,17 +270,93 @@ This chapter revisits definitions of syntax and semantics of answer set programs
 
 Apart from these formal foundations, a brief overview of state-of-the-art ASP systems is given and systems that implement grounding-on-the-fly are observed in detail.
 
-Basic knowledge in theoretical computer science are assumed.
-
 \section{Answer Set Programming}
 
-\todo{Introduction to ASP and its semantics.}
+In Section \ref{sec:introduction} we presented an example program with an intuitive description. In this section we formally define syntactic structure and variants of logic programs, and their semantics under ASP. For a thorough introduction to ASP refer to \cite{DBLP:conf/rweb/EiterIK09}.
 
-\subsection{Programs}
+\subsection{Syntax}
 
-\begin{definition}[{\cite[p.~12]{DBLP:conf/rweb/EiterIK09}}]
-A \emph{normal logic program} is a set of clauses having the form $$a \leftarrow b_1, \ldots , b_m, \text{not } c_1, \ldots , \text{not } c_n \qquad (n, m \geq 0)$$ where all $a, b_i$ and $c_j$ ($1 \leq i \leq n$ and $a \leq j \leq m$) are atoms of a first order language $L$. Expressions $\text{not } c_1, \ldots , \text{not } c_n$ are called the \emph{(default) negated literals} and consist of atoms $c_j$ preceded by the negation modifier $\text{not}$. Accordingly the atoms $a_i$ are called \emph{positive literals}.
+Atoms consist of a predicate symbol and a number of terms corresponding to the arity of the predicate.
+
+\begin{definition}
+    An \emph{atom} is an expression of the form $p(t_1, \ldots , t_n)$ where $p$ is a predicate symbol of arity $n \geq 0$ and $t_1, \ldots , t_n$ are terms. A \emph{literal} is an atom $q$ or its negation $\neg q$. The symbol $\neg$ is called \emph{classical negation} or \emph{strong negation}.
 \end{definition}
+
+Programs consist of rules, which in turn can be divided into head and body. The body of a rule can again be divided into positive and negative body.
+
+\begin{definition}
+	A \emph{rule} is an ordered pair of the form $$a_1 \vee \ldots \vee a_m \from b_1 \wedge \ldots \wedge b_k \wedge \fail b_{k+1} \wedge \ldots \wedge \fail b_n$$ where $a_1, \ldots, a_m, b_1, \ldots, b_n$ are literals, $\mathrm{not}$ is \emph{negation as failure} (or \emph{default negation}), $a_1 \vee \ldots \vee a_m$ is the \emph{head}, $b_1, \ldots, b_k$ is the \emph{positive body}, denoted $\bodyf^+(r)$, and $\fail b_{k+1}, \ldots, \fail b_n$ is the \emph{negative body} of $r$, denoted $\bodyf^-(r)$. Positive and negative body together are simply the \emph{body} of $r$.
+\end{definition}
+
+Rules are further differentiated by their form:
+
+\begin{definition}
+Some more concrete classes of rules are of interest: A rule is \ldots
+\begin{itemize}
+\item a \emph{fact} if $n = 0$ and $m \geq 1$;
+\item \emph{basic} if $n = k$ and $m \geq 1$;
+\item \emph{non-disjunctive} if $m = 1$;
+\item \emph{normal} if it is non-disjunctive and contains no strong negation $\neg$;
+\item \emph{Horn} if it is normal and basic;
+\item \emph{ground} if all its literals are ground.
+\end{itemize}
+\end{definition}
+
+Finally, we arrive at the notion of a logic program.
+
+\begin{definition}
+A logic program $P$ is a set of rules. It is basic, non-disjunctive, normal, Horn, or ground if all contained rules are.
+\end{definition}
+
+Note that in practice there are additions to above definitions that allow for more concise and expressive programs.\footnote{For a widely accepted standard among ASP systems consider the \emph{ASP-Core-2 Input Language Format} via \url{https://www.mat.unical.it/aspcomp2013/files/ASP-CORE-2.03c.pdf}}
+
+In this work we mainly consider Horn programs.
+
+%\begin{definition}[{\cite[p.~12]{DBLP:conf/rweb/EiterIK09}}]
+%A \emph{normal logic program} is a set of clauses having the form $$a \leftarrow b_1, \ldots , b_m, \text{not } c_1, \ldots , \text{not } c_n \qquad (n, m \geq 0)$$ where all $a, b_i$ and $c_j$ ($1 \leq i \leq n$ and $a \leq j \leq m$) are atoms of a first order language $L$. Expressions $\text{not } c_1, \ldots , \text{not } c_n$ are called the \emph{(default) negated literals} and consist of atoms $c_j$ preceded by the negation modifier $\text{not}$. Accordingly the atoms $a_i$ are called \emph{positive literals}.
+%\end{definition}
+
+\subsection{Semantics}
+
+An atom in the sense of ASP is a proposition with no deeper structure. It might represent some external state of affairs, e.g.~$rainy$ to indicate that the weather is not nice or $handsome(yue)$ stating that Yue is handsome. Their granularity or level of detail directly affects how detailed the world is modelled by a program, because atoms are treated as internally consistent statements and they cannot be split further.
+In order to reason about the truth values of atoms in a program, we define an interpretation.
+
+\begin{definition}
+A set of ground literals $M$ which is \emph{consistent}, i.e.~there is no atom $p$ with $\{p, \neg p\} \subseteq M$ is called an interpretation.
+\end{definition}
+
+In the above definition lies the intricate detail, that $M$ is a set of \emph{ground} literals, i.e.~we only define an interpretation for ground atoms and a na\ddot{i}ve implementation will therefore first ground the input program. This is the root of the bottleneck.
+
+With this, the truth value of an atom is defined against an interpretation, which in turn is simply the set of atoms that are considered \emph{true}. Further, an interpretation also defines how default negation as failure is to be handled.
+
+\begin{definition}
+A literal $l$ is \emph{true} under an interpretation $M$ iff $l \in M$. Otherwise it is \emph{false} under $M$. A default negated literal $\fail l$ is \emph{true} under $M$ iff $l \not \in M$, otherwise it is \emph{false}.
+\end{definition}
+
+From the truth value of individual atoms we expand to models of rules.
+
+\begin{definition}
+An interpretation $M$ is a \emph{classical model} of a rule $r$ iff whenever $\bodyf^+(r) \subseteq M$, then $\bodyf^-(r) \cap M = \emptyset$ and $\headf(r) \cap M \not = \emptyset$, i.e.~whenever the body of the rule is \emph{true}, then the head of the body is \emph{true} as well.
+\end{definition}
+
+Using the Gelfond-Lifschitz transform, starting from an interpretation, we obtain stable models.
+
+\begin{definition}[see {\cite[Section 2]{DBLP:conf/iclp/GelfondL88}}]
+	Given a logic program $P$ and an interpretation $I$, the \emph{Gelfond-Lifschitz transform} of $P$ with respect to $I$, denoted $P^I$ is defined as follows:
+\begin{flalign*}
+P^I = \{ &a_1 \vee \ldots \vee a_m \from b_1, \ldots , b_k \ | &&\\
+	     &a_1 \vee \ldots \vee a_m \from b_1, \ldots, b_k, \fail b_{k+1}, \ldots, \fail b_n \in P &\\
+	     &\text{ and } \{ b_{k+1} , \ldots , b_n \} \cap I = \emptyset \}
+\end{flalign*}
+\end{definition}
+
+With this we close with the definition of an answer set as the minimal model of the transformed program.
+
+\begin{definition}
+An interpretation $M$ is an \emph{answer set} iff it is a $\subset$-minimal model of $P^M$, i.e. there is no $N \subset M$ which is also a model of $P^M$.
+\end{definition}
+
+Note that we are only interested in the particular semantics of stable models which characterizes ASP and falls into the category of \emph{multiple} model semantics. There exist other semantics, such as the \emph{perfect model} semantics in \cite{DBLP:books/mk/minker88/Przymusinski88}.
 
 \section{State of the Art in ASP Solving}
 
@@ -588,10 +728,12 @@ In case (3.), $\Delta$ is modified in lines 8-11. As $\sgl$ is now assigned, it 
 	}
     \ElseIf{$C_\alpha(\delta, A) \not = \emptyset$}
     {
+      \label{alg:upa:move:start}
       $\dal(\sgl) \leftarrow \dal(\sgl) \setminus \{ \delta \}$\\
       % Choose $\bsgl \in L$ s.t.~there is no $\bsgl' \in L$ with $\ass = (\ldots, \bsgl, \ldots, \bsgl', \ldots)$.\\
       Let $\sigma \in C_\alpha(\delta, A)$ be arbitrary\\
       $\dal(\bsgl) \leftarrow \dal(\bsgl) \cup \{ \delta \}$\\
+      \label{alg:upa:move:end}
     }
   }
   \Return{$\langle \ass, \Delta \rangle$}
@@ -667,14 +809,23 @@ Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} by induction, assu
 
 %We show that every nogood $\delta \in \Delta'$ is \welf wrt.~$\Delta'$ and $\ass'$, i.e.~$\Delta'$ is \welf wrt.~$\ass'$, by using that $\Delta$ is \welf wrt.~$\ass$ and the definition of the algorithm.
 
-\paragraph{Induction Step} For two consecutive iteration steps $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(i)$. For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$, $\sgl_{i+1} = A_{i+1}[j+1]$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:
+\paragraph{Induction Hypothesis} $\mathcal{P}(i)$ holds for some $i$.
 
-\paragraph{Intuition} Note that $\sgl_i \not \in \ass_i^L$, $\sgl_i \in \ass_i^R$ and $\sgl_i \in \ass_{i+1}^L$, $\sgl_i \not \in \ass_{i+1}^R$, intuitively in the $i$-th iteration, $\sgl_i$ \enquote{moves} from the \enquote{right} subsequence of the assignment to its \enquote{left} subsequence. As expected, the two subsequences united add up to the full sequence $A_i = A_i^L \cup A_i^R$. Further the \enquote{right} subsequence \enquote{grows} (with the exception of $\sgl_i$), i.e.~$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$. Also, $\ass_{i+1}^L = \ass_{i}^L \cup \{ \sgl_i \}$ is useful.
+\paragraph{Induction Step} For two consecutive iteration steps $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(i)$. For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:
+
+\paragraph{Intuition} $\ass_i^R$ is the \enquote{right} subsequence of the assignment, which contains all assignments that already are processed and will not cause propagation. Conversely, $\ass_i^L$ is the \enquote{left} subsequence, and contains all the literals that might still cause unit propagation. Note that $\sgl_i \not \in \ass_i^L$, $\sgl_i \in \ass_i^R$ and $\sgl_i \in \ass_{i+1}^L$, $\sgl_i \not \in \ass_{i+1}^R$, intuitively in the $i$-th iteration, $\sgl_i$ \enquote{moves} from the \enquote{right} subsequence of the assignment to its \enquote{left} subsequence. As expected, the two subsequences united add up to the full sequence $A_i = A_i^L \cup A_i^R$. Further the \enquote{right} subsequence \enquote{grows} (with the exception of $\sgl_i$), i.e.~$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$. Also, $\ass_{i+1}^L = \ass_{i}^L \cup \{ \sgl_i \}$ is useful.
 
 \todo{$\Delta$ as the set of all nogoods in the program?}
 
 \begin{enumerate}
-\item \todo{Show \ref{up:sound:ind:watches}}
+\item To show \ref{up:sound:ind:watches}: $A_i^L$ differs from $A_{i+i}^L$ only by $\sgl_i$, which is processed by Algorithm \ref{alg:up}. Note that for two watches $\Delta_{i}$ and $\Delta_{i+1}$ containing the same nogoos $\Delta$, the size of candidate sets (bot $\cdpm$ and $\cdal$) for all nogoods in $\Delta$ monotonically decreases as the size of the assignment $A_i^L$ respectively $A_{i+i}^L$ increases. This follows from the definition of candidate sets.
+\begin{enumerate}
+	\item Assume $\sgl_i \not = \bT v$. Then Algorithm \ref{alg:upu} is invoked and processes all nogoods $\delta \in \dpm(\sgl)$. For any $\delta$, if $|\cdpm(\delta, A)| \geq 2$, then $\delta$ is inserted into the watches for exactly two candidates in lines \ref{alg:upu:move:start}-\ref{alg:upu:move:end}.
+	\item Assume $\sgl_i = \bT v$. Then Algorithm \ref{alg:upa} is invoked and processes all nogoods $\delta \in \dal(\sgl)$. For any $\delta$, if $|\cdal(\delta, A)| \not = \emptyset$, then $\delta$ is inserted into the watches for exactly one candidate in lines \ref{alg:upa:move:start}-\ref{alg:upa:move:end}. 
+\end{enumerate}
+
+If $\sgl_i \in \Delta$ then the premises of the \enquote{watch} property regarding candidate sets are false, or pointers were moved such that $\sgl_i$ does not watch $\delta$ anymore.
+
 \item To show \ref{up:sound:ind:wu}, let $\delta \in \Delta$ and assume $\delta$ is weakly unit under $\ass_{i+1}$ (else, \ref{up:sound:ind:wu} trivially holds):
 \begin{enumerate}
 	\item Assume $\delta$ is weakly unit under $\ass_i$. \label{pr:corr:wu:wu}
@@ -683,7 +834,7 @@ Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} by induction, assu
 	
 	Assume towards contradiction that $\sgl = \sgl_i$. As $\delta \in \dpm_i(\sgl)$, the weak complement of $\sgl$ is appended to the assignment (Algorithm \ref{alg:upu}, line \ref{alg:upu:wu:circ}), thus $\negweak{\sgl} \in A_{i+1}$. Then $\delta$ is not weakly unit under $A_{i+1}$ contradicting our assumption.
 	
-	Therefore, $\sgl \not = \sgl_i$. From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$. Further $\delta \in \dpm_{i}(\sgl)$ implies $\delta \in \Delta_{i+1}^\pm(\sgl)$ follows from $\sgl \not = \sgl_i$ and $\delta$ weakly unit under $\ass_i$ (see Algorithm \ref{alg:upu}, line \ref{alg:upu:it} iterating over $\sgl_i$). Thus we have $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:wu} holds.
+	Therefore, $\sgl \not = \sgl_i$. From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$. Further, we see that $\delta \in \dpm_{i}(\sgl)$ implies $\delta \in \Delta_{i+1}^\pm(\sgl)$ because of the behavior of Algorithm \ref{alg:upu} in case $\sgl \not = \sgl_i$ and $\delta$ being weakly unit: The set of nogoods that are considered for processing is indicated in line \ref{alg:upu:it} and consists of exactly those nogoods that are element of $\dpm_{i}(\sgl)$. From $\sgl \not = \sgl_i$ we know that the algorithm will not consider $\delta$ an specifically not add or remove it from any watch set $\dpm$. Thus we have $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:wu} holds.
 %\end{enumerate}
 	\item Assume $\delta$ is not weakly unit under $A_i$.
 	
@@ -713,7 +864,7 @@ Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} by induction, assu
 		\item Case $\sgl_i = {\bF v_2}$. Then Algorithm \ref{alg:upu} appends the strong complement of the head (line \ref{alg:upu:su:circ}), thus $\negstrong{\headf(\delta)} \in A_{i+1}^R$ and therefore $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
 			%\item Case $\sgl_i = {\bT v_1} \wedge \sgl_i = {\bF v_2}$ is contradictory. \contradiction % Amounts to the case where $\sgl_i = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$ because algorithm \ref{alg:upu} is executed before algorithm \ref{alg:upa}, which degrades to a no-operation, because $\delta$ is neither strongly unit, nor is $C_\alpha(\delta, A)$ (where $A$ is defined in the scope of the algorithm, a hybrid state between $A_i$ and $A_{i+1}$) non-empty when it is executed.
 		\item Case $\sgl_i \not = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$.
-		From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that if ${\bT v_1}, {\bF v_2}$ exist, they are in $\ass_{i+1}^R$. Also, $\delta \in \dal_i(v_1)$ implies $\delta \in \dal_{i+1}(v_1)$ and $\delta \in  \dpm_i({\bF v_2})$ implies $\delta \in \dpm_{i+1}({\bF v_2})$ because $\delta$ is strongly unit and $\sgl_i \not \in \delta$. So we have $\exists {\bT v_1} \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v_1)$ or $\exists {\bF v_2} \in \ass_{i+1}^R : \delta \in \dpm_{i+1}({\bF v_2})$, i.e.~\ref{up:sound:ind:su}. % TODO: \sgl might actually change (pointer move) which is not mentioned here. If this does not get mentioned in the watches section of the proof, add a remark here explaining that \sgl might change in the course of algorithm 3.3 but only in a way that fulfills above criteria.
+		From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that if ${\bT v_1}, {\bF v_2}$ exist, they are in $\ass_{i+1}^R$. Also, $\delta \in \dal_i(v_1)$ implies $\delta \in \dal_{i+1}(v_1)$ and $\delta \in \dpm_i({\bF v_2})$ implies $\delta \in \dpm_{i+1}({\bF v_2})$ because $\delta$ is strongly unit and $\sgl_i \not \in \delta$. So we have $\exists {\bT v_1} \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v_1)$ or $\exists {\bF v_2} \in \ass_{i+1}^R : \delta \in \dpm_{i+1}({\bF v_2})$, i.e.~\ref{up:sound:ind:su}. % TODO: \sgl might actually change (pointer move) which is not mentioned here. If this does not get mentioned in the watches section of the proof, add a remark here explaining that \sgl might change in the course of algorithm 3.3 but only in a way that fulfills above criteria.
 	\end{enumerate}
 	
 	
@@ -876,3 +1027,4 @@ Algorithm \ref{alg:up} is sound and complete.
 \bibliography{thesis}
 
 \end{document}
+
