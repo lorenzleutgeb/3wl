@@ -173,6 +173,11 @@
 
 \newcommand{\wkn}{\textit{weaken}}
 
+\newcommand{\asperix}{{\texttt{ASPeRiX}\xspace}}
+\newcommand{\clasp}{\texttt{clasp}\xspace}
+\newcommand{\dlv}{\texttt{DLV}\xspace}
+\newcommand{\omiga}{\texttt{OMiGA}\xspace}
+
 \usepackage{csquotes}
 
 \begin{document}
@@ -213,17 +218,20 @@ Trading off memory consumption for complete availability of the ground program p
 \mainmatter
 
 \chapter{Introduction}
-\label{sec:introduction}
+\label{chap:intro}
 
 Since the inception of computer programming, different ways of encoding algorithms, structuring data and modeling the real world in computer programs have led to the development of various conceptually diverse programming languages. Families of programming languages that share some of the above properties are usually thought to bide to a so called \enquote{programming paradigm}.
 Such paradigms describe the common, most important concepts and lay a stylistic framework for a family of languages.
 
-The most widely used languages follow the \enquote{imperative} programming paradigm (some more strict, some less), which revolves around \enquote{commanding} the computer. In this work, contrary to mainstream software engineering, the main focus is Answer Set Programming (ASP), a declarative programming language that roots in first order logic.
+The most widely used languages follow the \enquote{imperative} programming paradigm (some more strict, some less), which revolves around \enquote{commanding} the computer. In this work, in contrast to mainstream software engineering, the main focus is Answer Set Programming (ASP), a declarative programming language that roots in first order logic.
 
 Without going into details about how ASP works, consider the following example for an intuition.
 
 \begin{example}
-Suppose one needs to decide what to wear. The following program narrows down the selection of garments (a winter jacket, a pair of jeans, a t-shirt and shorts, see lines 1.1 to 1.4) in the wardrobe by checking whether specific pieces are designed to be worn in the current season (lines 1.7 and 1.8).
+\label{ex:garments}
+Suppose one needs to decide what to wear. The following program narrows down the selection of garments (a winter jacket, a pair of jeans, a t-shirt and shorts, see lines 1.1 to 1.4) in the wardrobe by checking whether specific pieces are designed to be worn in the current season (lines 1.7 and 1.8). Also, the program expresses that it can't be both summer and winter at the same time in line 1.9.
+%rule with two vars
+%allowdisplaybreaks?
 \begin{flalign}
 &garment(winterjacket).\\
 &garment(jeans).\\
@@ -233,84 +241,125 @@ Suppose one needs to decide what to wear. The following program narrows down the
 &light(shorts).\\
 inseason(G) \from& \ winter, garment(G), \fail light(G).\\
 inseason(G) \from& \ summer, garment(G), \fail warm(G).\\
-wear(G) \from& \ garment(G), inseason(G).
+wear(G) \from& \ garment(G), inseason(G).\\
+\from winter, summer.
 \end{flalign}
 
-$winter$ and $summer$ are propositions that will need to be provided, as the program cannot figure out whether it is currently summer or winter. The knowledge whether a garment is in season is represented as a rule that looks at whether a piece is not light (or not warm) which means it should be worn in winter (resp.~summer).
+$winter$ and $summer$ are propositions that will need to be provided, as the program cannot figure out whether it is currently summer or winter. The knowledge whether a garment is \emph{in season} is represented as a rule that considers whether a piece is not light (resp.~not warm) which means it should be worn in winter (resp.~summer).
 \end{example}
 
-The evaluation of an ASP program is done by an ASP system, which may be comprised of further smaller components. For \enquote{user} and programmer, it largely acts as a black box. Given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets.
+The evaluation of an ASP program is done by an ASP system, which may be comprised of further components. For \enquote{user} and programmer, it largely acts as a black box. Given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets.
 
-Historically, ASP systems evolved from SAT solvers, and their model generation/solving algorithms only work for programs without variables. In the above example, we see that the letter \emph{G} was used as a variable in three different rules. The process of substituting variables with constants, e.g. substituting \emph{G} with one of the four concrete garments, is referred to as \emph{grounding} and the resulting variable-free is said to be \emph{ground}.
+% benuetzen gleiche techniken, es hat sich gezeigt, dass techniken aus dem sat bereich effizient sind
 
-Na\ddot{i}vely substituting each occurrence of \emph{G} in the example yields eight instances of the \emph{inseason} rule (two per garment), and four of the \emph{wear} rule (one per garment). With rules that use two garments, the number of instances would once more multiply by the number of garments. We see that while the program with variables can be rather terse, the corresponding ground program is exponentially larger.
+Many ASP system implementations use solving algorithms closely related to those found in SAT solvers to search for answer sets. Adapting SAT solvers turned out to be highly effective for solving ASP. Because there are no variables in SAT, variables such as \emph{G} in the above example must be removed from the program. The process of substituting variables with constants, e.g. substituting \emph{G} with one of the four concrete garments, is referred to as \emph{grounding} and the resulting variable-free is said to be \emph{ground}.
+
+Naively substituting each occurrence of \emph{G} in the example yields eight instances of the \emph{inseason} rule (two per garment), and four of the \emph{wear} rule (one per garment). With rules that use two garments, the number of instances would multiply by the number of garments once more. We see that, in general, while the program with variables can be rather terse, the corresponding ground program might be exponentially larger.
+
+State-of-the-art ASP systems feature two components: The \emph{grounder} takes care of substituting all variables, i.e.~generating the ground program, while the \emph{solver} takes this ground program as input and computes answer sets. Traditionally, the grounder is invoked first, and only after it has output the ground program, the solver starts execution. This two-phased mode of operation is referred to as \emph{ground-and-solve}. With the ground program being exponentially larger than the original input program with variables, these systems are prone to what we call the \emph{grounding bottleneck}: When the ground program is so large that it does not fit into memory, the search for answer sets is impossible in practice. For more examples that exhibit the grounding bottleneck, refer to \cite{asperix}[Section 1].
 
 \section{Motivation}
+\label{sec:motivation}
+% propagation als teil des solvers
+% leitet information her
+% anhand des beispiels beispiel für propagation
+% vergleich mit g-s übersetzen in sat klauseln bzw. nogoods (2wl)
+
+The goal of solver components in ASP systems is determining which propositions (such as $wear(winterjacket)$, for example) are \emph{true} and \emph{false} respectively. A structure encoding which propositions are \emph{true} (resp.~\emph{false}) is called an \emph{assignment}. It allows for statements such as \enquote{$wear(winterjacket)$ is \emph{true}}. Assignments conflicting with rules of the program are considered invalid. In our example, any assignment that allows stating both \enquote{$summer$ is \emph{true}} and \enquote{$winter$ is \emph{true}} at the same time, must be avoided as it cannot represent an answer set.
+
+Through the combination of truth values and information about conflicting truth values of propositions, both encoded in the input program, solvers can infer truth values of other propositions. One method to extend an assignment this way is called \emph{unit propagation}: Consider again the above example. Line 1.9 can be written as a clause $winter \wedge summer$ that must not evaluate to true, or simply as a set $\delta = \{ summer, winter \}$ of the two propositions that cannot conform with the assignment at the same time. Generally, such sets of propositions and their negations are called \emph{nogoods}. From their property that not all corresponding truth values in the assignment may conform with the nogood at the same time, it follows that when all but one elements of the nogood conform with the assignment (we say the nogood is \emph{unit}), the truth value of the remaining proposition can be inferred and added to the assignment. In the example, an assignment saying that \enquote{$summer$ is \emph{true}} in combination with $\delta$ implies a new truth value, namely that \enquote{$winter$ is \emph{false}}. Note that in case we know \enquote{$summer$ is \emph{false}} we may not infer the truth value of $winter$.
+
+In order to perform unit propagation, ground-and-solve systems commonly translate the input program into nogoods, and even more advanced algorithms have been devised to dynamically \enquote{learn} new nogoods in the process of searching for answer sets.
+
+For solvers to be efficient, it is crucial to quickly identify which nogoods are unit, even when the assignment under which the nogoods might individually be unit changes very frequently. Modern solvers implement the so called \emph{two-watched-literals} (2WL) strategy \cite{effsat,questsat}, which describes both an algorithm and a data structure to track nogoods and propagate as soon as they become unit.
+
+However, translation of the input program into nogoods in its entirety requires the input program to be ground, because truth values can only be inferred for concrete propositions. \todo{Is this the correct reason why 2WL does not work for lazy grounding?} The approach is therefore subject to the grounding bottleneck.
+
+The motivation of this work is finding a way to adapt 2WL, which was shown to be successfully in SAT solvers as well as ground-and-solve ASP systems, such that it can be employed in lazy-grounding ASP systems.
 
 \section{Problem Statement}
+\label{sec:problem}
+% 2wl works for sat and ground asp. how to adapt it for lazy grounding?
 
-State-of-the-art ASP systems feature two components: The grounder takes care of substituting all variables, i.e.~generating the ground program, while the solver takes this ground program as input and computes answer sets. Traditionally, the grounder is invoked first, and only after it has output the ground program, the solver starts execution. This two-phased mode of operation is referred to as \emph{pre-grounding}. With the ground program being exponentially larger than the original input program with variables, these systems are prone to what we call the \emph{grounding bottleneck}: When the ground program is so large that it does not fit into memory, the search for answer sets is impossible.
+2WL is an efficient technique for implementing propagation in SAT solvers \cite{effsat,questsat} and ground-and-solve ASP systems \cite[Sec.~5.3]{clasp}. However, it cannot be directly used in lazy-grounding ASP systems, because its prerequisite of a ground program is in conflict with the principle of lazy grounding. The problem to be solved therefore is finding a way to adapt the known procedure in a way that is compatible with lazy-grounding.
 
 \section{Aim of the Work}
+\label{sec:aim}
+% enahnce 2wl st it has properties for lazy g
+% -> 3wl works for lazy grounding
 
 \section{Methodological Approach}
+% design algorithms and datastructures
+% analyze and proof soundness/completeness
+% implementation
+% benchmarks
+
+After an analysis of 2WL, algorithms and data structures that account for lazy-grounding were devised and their soundness and completeness was shown. An implementation was contributed to the Alpha system, which in turn was compared against a naive approach in form of a benchmark.
 
 \section{Structure of the Work} % 3 sentences
 
-Chapter \ref{chap:preliminaries} equips the reader with formal foundations (syntax and semantics) of ASP and stable models. Also, a selection of state-of-the-art ASP systems is discussed.
+In Chapter \ref{chap:prelim} we formally capture logic programs such as the one in the above example (syntax and semantics) of ASP and stable models. Also, a selection of state-of-the-art ASP systems is discussed.
 
 In chapter \ref{chap:prop} efficient propagation for lazy-grounding Answer Set solving is presented.
 
 \todo{Expand to include later chapters.}
 
 \chapter{Preliminaries}
-\label{chap:preliminaries}
+\label{chap:prelim}
 
-This chapter revisits definitions of syntax and semantics of answer set programs. Models and answer sets of such programs are defined.
+\todo{Everything that later sections build up on. Quote a lot. This chapter can be long. Show understanding of the matter in own words (i.e. what is an answer set incl. example?).}
 
-Apart from these formal foundations, a brief overview of state-of-the-art ASP systems is given and systems that implement grounding-on-the-fly are observed in detail.
+This chapter revisits definitions of syntax and semantics of answer set programs. Interpretations and answer sets of such programs are defined.
+
+Apart from these formal foundations, a brief overview of state-of-the-art ASP systems is given and systems that implement lazy-grounding are observed in detail.
 
 \section{Answer Set Programming}
 
-In Section \ref{sec:introduction} we presented an example program with an intuitive description. In this section we formally define syntactic structure and variants of logic programs, and their semantics under ASP. For a thorough introduction to ASP refer to \cite{DBLP:conf/rweb/EiterIK09}.
+In Section \ref{chap:intro} we presented an example program with an intuitive description. In this section we formally define syntactic structure and variants of logic programs, and their semantics under ASP. For a thorough introduction to ASP refer to \cite{DBLP:conf/rweb/EiterIK09}.
 
 \subsection{Syntax}
 
-Atoms consist of a predicate symbol and a number of terms corresponding to the arity of the predicate.
+%set of PS
+%set of Consts
+%set of Vars
+
+Given a finite set of constants $\mathcal{C}$, a set of variables $\mathcal{V}$ and a finite set $\mathcal{P}$ of predicate symbols, with $\mathcal{C}$, $\mathcal{V}$, $\mathcal{P}$ pairwise disjoint, we define one of the core building blocks of ASP programs:
 
 \begin{definition}
-    An \emph{atom} is an expression of the form $p(t_1, \ldots , t_n)$ where $p$ is a predicate symbol of arity $n \geq 0$ and $t_1, \ldots , t_n$ are terms. A \emph{literal} is an atom $q$ or its negation $\neg q$. The symbol $\neg$ is called \emph{classical negation} or \emph{strong negation}.
+An \emph{atom} is an expression of the form $p(t_1, \ldots , t_n)$ where $p \in \mathcal{P}$ is a predicate symbol of arity $n \geq 0$ and $\{ t_1, \ldots , t_n \} \subseteq \mathcal{V} \cup \mathcal{C}$ are terms.
+\end{definition}
+
+Note that for atoms of arity zero, parentheses usually are omitted and that this definition of atoms does not account for function symbols as terms. Grounding the program as briefly mentioned in Section \ref{chap:intro}, we formally define the class of ground atoms, for which terms must be constants.
+
+\begin{definition}
+An atom $p(t_1, \ldots , t_n)$ is called \emph{ground} iff $\{ t_1, \ldots , t_n \} \subseteq \mathcal{C}$
+\end{definition}
+
+Atoms can be negated as usual.
+
+\begin{definition}
+A \emph{literal} is an atom $q$ or its negation $\neg q$. The symbol $\neg$ is called \emph{classical negation} or \emph{strong negation}.
 \end{definition}
 
 Programs consist of rules, which in turn can be divided into head and body. The body of a rule can again be divided into positive and negative body.
 
 \begin{definition}
-	A \emph{rule} is an ordered pair of the form $$a_1 \vee \ldots \vee a_m \from b_1 \wedge \ldots \wedge b_k \wedge \fail b_{k+1} \wedge \ldots \wedge \fail b_n$$ where $a_1, \ldots, a_m, b_1, \ldots, b_n$ are literals, $\mathrm{not}$ is \emph{negation as failure} (or \emph{default negation}), $a_1 \vee \ldots \vee a_m$ is the \emph{head}, $b_1, \ldots, b_k$ is the \emph{positive body}, denoted $\bodyf^+(r)$, and $\fail b_{k+1}, \ldots, \fail b_n$ is the \emph{negative body} of $r$, denoted $\bodyf^-(r)$. Positive and negative body together are simply the \emph{body} of $r$.
-\end{definition}
-
-Rules are further differentiated by their form:
-
-\begin{definition}
-Some more concrete classes of rules are of interest: A rule is \ldots
-\begin{itemize}
-\item a \emph{fact} if $n = 0$ and $m \geq 1$;
-\item \emph{basic} if $n = k$ and $m \geq 1$;
-\item \emph{non-disjunctive} if $m = 1$;
-\item \emph{normal} if it is non-disjunctive and contains no strong negation $\neg$;
-\item \emph{Horn} if it is normal and basic;
-\item \emph{ground} if all its literals are ground.
-\end{itemize}
+	A \emph{rule} $r$ is an expression of the form $$a \from b_1, \ldots, b_m, \fail b_{m+1}, \ldots, \fail b_n.$$ where $a, b_1, \ldots, b_n$ are literals, $\mathrm{not}$ is \emph{negation as failure} (or \emph{default negation}), $a$ is the \emph{head}, $\{ b_1, \ldots, b_m \}$ is the \emph{positive body}, denoted $\bodyf^+(r)$, and $\{ \fail b_{m+1}, \ldots, \fail b_n \}$ is the \emph{negative body} of $r$, denoted $\bodyf^-(r)$. Positive and negative body together are simply the \emph{body} of $r$, $\bodyf(r) = \bodyf^+(r)\cup \bodyf^-(r)$.
 \end{definition}
 
 Finally, we arrive at the notion of a logic program.
 
 \begin{definition}
-A logic program $P$ is a set of rules. It is basic, non-disjunctive, normal, Horn, or ground if all contained rules are.
+A \emph{(logic) program} $P$ is a finite set of rules.
 \end{definition}
 
-Note that in practice there are additions to above definitions that allow for more concise and expressive programs.\footnote{For a widely accepted standard among ASP systems consider the \emph{ASP-Core-2 Input Language Format} via \url{https://www.mat.unical.it/aspcomp2013/files/ASP-CORE-2.03c.pdf}}
+% disjunction, aggregates, choice rules
+% easier to model programs
+% beyond scope
 
-In this work we mainly consider Horn programs.
+For the scope of this work, above definition of rules is sufficient. Programs consisting only of rules of this form are called \emph{normal} programs. For example, more generally, rules with disjunctive heads $a_1 \vee \cdots \vee a_k \from \ldots$ also have interesting properties.
+
+In practice, more syntactic constructs are used to ease modelling programs: Arithmetic expressions, aggregates allowing statements about sets (counting how many elements match some criteria, summation of numeric values, \ldots) and choice rules that encode sets of atoms for which only a given number should be in an answer set. All of these higher level concepts map to rules as defined above. For a widely accepted standard among ASP systems consider \cite{calimeri2015asp}.
 
 %\begin{definition}[{\cite[p.~12]{DBLP:conf/rweb/EiterIK09}}]
 %A \emph{normal logic program} is a set of clauses having the form $$a \leftarrow b_1, \ldots , b_m, \text{not } c_1, \ldots , \text{not } c_n \qquad (n, m \geq 0)$$ where all $a, b_i$ and $c_j$ ($1 \leq i \leq n$ and $a \leq j \leq m$) are atoms of a first order language $L$. Expressions $\text{not } c_1, \ldots , \text{not } c_n$ are called the \emph{(default) negated literals} and consist of atoms $c_j$ preceded by the negation modifier $\text{not}$. Accordingly the atoms $a_i$ are called \emph{positive literals}.
@@ -318,42 +367,51 @@ In this work we mainly consider Horn programs.
 
 \subsection{Semantics}
 
-An atom in the sense of ASP is a proposition with no deeper structure. It might represent some external state of affairs, e.g.~$rainy$ to indicate that the weather is not nice or $handsome(yue)$ stating that Yue is handsome. Their granularity or level of detail directly affects how detailed the world is modelled by a program, because atoms are treated as internally consistent statements and they cannot be split further.
+An atom in the sense of ASP is a proposition with no deeper structure. It might represent some external state of affairs, e.g.~$rainy$ to indicate whether the weather is not nice or $handsome(yue)$ a statement about Yue being handsome. Their granularity or level of abstraction directly affects how detailed the world is modelled by a program, because atoms are treated as internally consistent statements and they cannot be split further.
 In order to reason about the truth values of atoms in a program, we define an interpretation.
 
 \begin{definition}
-A set of ground literals $M$ which is \emph{consistent}, i.e.~there is no atom $p$ with $\{p, \neg p\} \subseteq M$ is called an interpretation.
+An \emph{interpretation} is a set of ground literals $I$.
 \end{definition}
 
-In the above definition lies the intricate detail, that $M$ is a set of \emph{ground} literals, i.e.~we only define an interpretation for ground atoms and a na\ddot{i}ve implementation will therefore first ground the input program. This is the root of the bottleneck.
+For the remainder of the work we assume that an interpretation $I$ is \emph{consistent}, i.e.~there is no atom $p$ with $\{p, \neg p\} \subseteq I$.
+
+%Observe that $I$ is a set of \emph{ground} literals, i.e.~we only define an interpretation for ground atoms and a na\ddot{i}ve implementation will therefore first ground the input program. This is the root of the bottleneck.
+
+Considering Example \ref{example}, note that $I_1 = \{ wear(G) \}$ is not an interpretation, because the atom it contains is not ground. However $I_2 = \{ wear(winterjacket) \}$ is an interpretation, because $winterjacket$ is a constant.
 
 With this, the truth value of an atom is defined against an interpretation, which in turn is simply the set of atoms that are considered \emph{true}. Further, an interpretation also defines how default negation as failure is to be handled.
 
 \begin{definition}
-A literal $l$ is \emph{true} under an interpretation $M$ iff $l \in M$. Otherwise it is \emph{false} under $M$. A default negated literal $\fail l$ is \emph{true} under $M$ iff $l \not \in M$, otherwise it is \emph{false}.
+A literal $l$ is \emph{true} under an interpretation $I$ iff $l \in I$. Otherwise it is \emph{false} under $I$.% A default negated literal $\fail l$ is \emph{true} under $I$ iff $l \not \in I$, otherwise it is \emph{false}.
 \end{definition}
 
 From the truth value of individual atoms we expand to models of rules.
 
 \begin{definition}
-An interpretation $M$ is a \emph{classical model} of a rule $r$ iff whenever $\bodyf^+(r) \subseteq M$, then $\bodyf^-(r) \cap M = \emptyset$ and $\headf(r) \cap M \not = \emptyset$, i.e.~whenever the body of the rule is \emph{true}, then the head of the body is \emph{true} as well.
+%positive body is positive in I and negative body is negatively in I
+An interpretation $I$ is a \emph{(classical) model} of a rule $r$ iff when $\bodyf^+(r) \subseteq I$ and $\{ \neg b \mid \fail b \in \bodyf^-(r) \} \subseteq I$ then $\headf(r) \in I$, i.e.~whenever the body of $r$ is satisfied, then the head of $r$ is satisfied as well.
 \end{definition}
 
-Using the Gelfond-Lifschitz transform, starting from an interpretation, we obtain stable models.
-
-\begin{definition}[see {\cite[Section 2]{DBLP:conf/iclp/GelfondL88}}]
-	Given a logic program $P$ and an interpretation $I$, the \emph{Gelfond-Lifschitz transform} of $P$ with respect to $I$, denoted $P^I$ is defined as follows:
-\begin{flalign*}
-P^I = \{ &a_1 \vee \ldots \vee a_m \from b_1, \ldots , b_k \ | &&\\
-	     &a_1 \vee \ldots \vee a_m \from b_1, \ldots, b_k, \fail b_{k+1}, \ldots, \fail b_n \in P &\\
-	     &\text{ and } \{ b_{k+1} , \ldots , b_n \} \cap I = \emptyset \}
-\end{flalign*}
-\end{definition}
-
-With this we close with the definition of an answer set as the minimal model of the transformed program.
+The definition of a model generalizes to programs.
 
 \begin{definition}
-An interpretation $M$ is an \emph{answer set} iff it is a $\subset$-minimal model of $P^M$, i.e. there is no $N \subset M$ which is also a model of $P^M$.
+A \emph{(classical) model} of a program is an interpretation that is a model of all rules in the program.
+\end{definition}
+
+We use the Gelfond-Lifschitz reduct towards a definition of answer sets.
+
+\begin{definition}[see {\cite[Section 2]{DBLP:conf/iclp/GelfondL88}}]
+	Given a ground program $P$ and an interpretation $I$, the \emph{Gelfond-Lifschitz reduct} (or just \emph{reduct} in short) of $P$ with respect to $I$, denoted $P^I$ is defined as follows:
+\begin{multline*}
+P^I = \Bigl\{ a \from b_1, \ldots , b_m \mid a \from b_1, \ldots, b_m, \fail b_{m+1}, \ldots, \fail b_n \in P\\ \text{ and } \{ \neg b_{m+1} , \ldots , \neg b_n \} \subseteq I \Bigr\}
+\end{multline*}
+\end{definition}
+
+With this we close with the definition of an answer set as the minimal model of the reduct.
+
+\begin{definition}
+An interpretation $I$ is an \emph{answer set} iff it is a $\subset$-minimal model of $P^I$, i.e. there is no $J \subset I$ which is also a model of $P^I$.
 \end{definition}
 
 Note that we are only interested in the particular semantics of stable models which characterizes ASP and falls into the category of \emph{multiple} model semantics. There exist other semantics, such as the \emph{perfect model} semantics in \cite{DBLP:books/mk/minker88/Przymusinski88}.
@@ -362,29 +420,54 @@ Note that we are only interested in the particular semantics of stable models wh
 
 \todo{Two Watched Literals?}
 
-\subsection{Approaches based on Pre-Grounding}
+\subsection{Ground-And-Solve Approaches}
 
-\todo{Explain how a solver works and what has been done already (grounding on the fly, omiga, asperix).}
-\todo{What is a nogood? What is propagation?}
+\subsubsection{\texttt{clingo}}
 
-\todo{Everything that later sections build up on. Quote a lot. This chapter can be long. Show understanding of the matter in own words (i.e. what is an answer set incl. example?).}
+\texttt{clingo}\footnote{\url{https://potassco.org/clingo/}} is a ground-and-solve ASP system which combines the grounder \texttt{gringo} and the solver \texttt{clasp}. \clasp uses the 2WL strategy to implement propagation \cite[Sec.~5.3]{clasp}.
 
 \subsection{Approaches based on Lazy Grounding}
 
+There are two important ASP systems that implement lazy grounding, which we present for comparison.
+
+\subsubsection{\texttt{\asperix}}
+\label{sec:asperix}.
+
+\asperix is one of the first ASP systems that were designed to avoid the grounding bottleneck. It was first prototyped in 2008\footnote{According to the project's website \url{http://www.info.univ-angers.fr/pub/claire/asperix/\#download}} and published in \ref{asperixfirst}, with a more elaborate elaborate explanation in \ref{asperix}.
+
+In the process of finding a solution, it extends a partial interpretation \cite[Def.~4]{asperix} in form of a pair $\langle IN, OUT \rangle$ of disjoint atom sets, where the atoms in $IN$ belong to the answer set that is currently searched and the atoms in $OUT$ do not. Further, the system tracks the set of ground rules, $R$, which is lazily extended by grounding the input program. Rules of the program $r$ relate to a partial interpretation and are called \emph{supported} ($\bodyf^+(r) \subseteq IN$), \emph{blocked} ($\bodyf^-(r) \cap IN \not = \emptyset$), \emph{unblocked} ($\bodyf^-(r) \subseteq OUT$), and \emph{applicable} (supported and not blocked) \cite[Def.~5]{asperix}. 
+
+The main concept in this ASP system is an \asperix \emph{computation} \cite[Def.~7]{asperix}: It is a sequence of pairs $\langle R_i, I_i$ that captures ground rules and a partial interpretation $I_i = \langle IN, OUT \rangle$. The computation starts with $\langle \emptyset, \langle \emptyset, \{ \bot \} \rangle \rangle$ and is inductively defined through the rules \emph{propagation} (monotonic; a new rule $r_i \not \in R_{i-1}$ can be ground from the program such that it \enquote{fires}, i.e.~its head is added to $IN$), \emph{choice} (non-monotonic; there are no rules that propagate, but the solver guesses whether an applicable rule fires, i.e. forces or prohibits ist instantiation) and \emph{stability} (no rules for propagation or choice left). Through inductive definition of computations, it is guaranteed that the sequence converges to an answer set iff there exists one \cite[Thm.~2]{asperix}.
+
+The most important take-away from \asperix for this work, however is the introduction of a third truth value which allows for more efficient convergence of above computation: The truth value \mbt indicates that an atom that is not in already in $IN$ must be in $IN$ (cannot be in $OU$) in order to find an answer set. It allows to mark certain atoms for which a \enquote{proof}, i.e. a firing rule with the atom as its head, has not yet fired, but must, at some point in the computation, fire.
+
+\begin{example}[{\cite[Example 7}]
+Let $\bot \from \fail b$ be a constraint whose body contains only one literal $\fail b$ with $b \not \in IN \cup OUT$. In order to have an answer set, $b$ must be in $IN$ so that the constraint is not applicable but $b$ is not yet proved (it is not in the head of a fired rule). Thus, one can only conclude that $b$ must be true.
+\end{example}
+
+This leads to more a reduction of the search space in propagation \cite[Ex.~8]{asperix} and also decreases the size set of non-monotonic candidate rules for choice \cite[Ex.~9]{asperix}. Partial interpretation and computation are modified to consider \mbt in \cite[Def.~8]{asperix} and \cite[Def.~11]{asperix} accordingly. Again, there is a correspondence to answer sets \cite[Thm.~3]{asperix}.
+
+\asperix show how lazy grounding ASP systems can leverage \mbt as a third truth value. How unit propagation is affected by \mbt is a central topic in Chapter \ref{chap:prop}.
+
+\subsubsection{\texttt{\omiga}}
+
 \section{Analysis}
+\todo{What is this section about?}
 
 \section{Comparison and Summary of Existing Approaches}
 
 \chapter{Propagation for lazy-grounding Answer Set solving}
 \label{chap:prop}
 
-This chapter contextualizes propagation by providing definitions extending chapter \ref{chap:preliminaries}. It then presents and thoroughly explains the algorithms and data structures involved in propagation and concludes in a proof of soundness and completeness thereof.
+The central idea of propagation is to infer (\emph{propagate}) new truth values from known truth values and nogood clauses, derived from the input program, as briefly explained in \ref{sec:motivation}. 
+
+In this chapter, we present algorithms and data structures involved in the propagation step of solving ASP programs. We adapt 2WL, a common strategy for propagation in SAT solves, and account for the truth value \mbt as motivated in \ref{sec:asperix}.
 
 \section{Definitions}
 
 % Signed literal vs. boolean signed literal.
 
-Following definitions lay out the vocabulary and concepts towards an explanation of unit propagation. Most of them fundamentally depend on \emph{atoms} (usually denoted $v$) but do not refer to neither a set of atoms nor their domain. This is because all definitions are bound to a logic program $P$ to be solved (i.e.~to find answer sets for). The set of ground atoms wrt.~$P$, effectively its Herbrand Base $\textit{HB}(P)$, is obtained by the grounding process, which is not detailed in this work. What might seem to be lacking from the definitions therefore is the context of the input program $P$ and therefore the domain of atoms. $P$ and its context is omitted in the following.
+Following definitions lay out the vocabulary and concepts towards an explanation of unit propagation. Most of them fundamentally depend on \emph{atoms} (usually denoted $v$) but do not refer to neither a set of atoms nor their domain. This is because all definitions are bound to a logic program $P$ to be solved (i.e.~to find answer sets for). The set of ground atoms wrt.~$P$, effectively its Herbrand Base $\textit{HB}(P)$, is obtained by the grounding process, which is not detailed in this work. What might seem to be lacking from the definitions therefore is the context of the input program $P$ and the domain of atoms. $P$ and its context is omitted in the following.
 
 \subsection{Literals}
 
@@ -433,7 +516,7 @@ Occasionally the notation $\sgl = \bX v$ will be used to express that $\sgl$ is 
 
 \subsection{Assignments}
 
-Similar to \cite[section 2, p.~3]{DBLP:journals/ai/GebserKS12} we define assignments. However, here assignments contain not only boolean signed literals, but also signed literals and the notation for expressing a partial assignment differs.
+Similar to \cite[section 2, p.~3]{clasp} we define assignments. However, here assignments contain not only boolean signed literals, but also signed literals and the notation for expressing a partial assignment differs.
 
 \begin{definition}
 An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i = \bX v_i$, or \emph{conflict}.
