@@ -120,8 +120,8 @@
 \newcommand{\lowinv}{watches\xspace}
 \newcommand{\stbl}{stable\xspace}
 
-\newcommand{\headf}{\mathrm{head}}
-\newcommand{\bodyf}{\mathrm{body}}
+\newcommand{\headf}{H}
+\newcommand{\bodyf}{B}
 
 \newcommand{\fail}{\mathrm{not } \ \xspace}
 %\newcommand{\from}{\mathrm{\ \xspace :- \ \xspace}}
@@ -163,7 +163,7 @@
 
 \newcommand{\wkn}{\textit{weaken}}
 
-\newcommand{\asperix}{{\texttt{ASPeRiX}\xspace}}
+\newcommand{\asperix}{\texttt{ASPeRiX}\xspace}
 \newcommand{\clasp}{\texttt{clasp}\xspace}
 \newcommand{\dlv}{\texttt{DLV}\xspace}
 \newcommand{\omiga}{\texttt{OMiGA}\xspace}
@@ -189,7 +189,7 @@ I would like to thank Antonius Weinzierl for his consistent and continuous effor
 \end{acknowledgements*}
 
 \begin{kurzfassung}
-Answer Set Programming (ASP) ist eine deklarative Programmiersprache in Anlehnung an Prädikatenlogik erster Stufe, welche üblicherweise durch ASP-Systeme evaluiert wird. Wir präsentieren das \emph{grounding bottleneck}, um die Limitationen aktueller ASP-Systeme aufzuzeigen und diskutieren mögliche Lösungsansätze mit einem Fokus auf \emph{lazy-grounding} wie im Alpha System.
+Answer Set Programming (ASP; \cite{stable}) ist eine deklarative Programmiersprache in Anlehnung an Prädikatenlogik erster Stufe, welche üblicherweise durch ASP-Systeme evaluiert wird. Wir präsentieren das \emph{grounding bottleneck}, um die Limitationen aktueller ASP-Systeme aufzuzeigen und diskutieren mögliche Lösungsansätze mit einem Fokus auf \emph{lazy-grounding} wie im Alpha System.
 
 Der Komppromiss zwischen Speicherverbrauch und vollständiger Verfügbarkeit des grundierten Programms resultiert in neuen Restriktionen für Algorithmen und Datenstrukturen in ASP-Systemen. Der Hauptteil der Arbeit beschreibt wie \emph{Unit Propagation} basierend auf \emph{two-watched-literals} auf drei Literale erweitert werden kann, sodass Berechnungen mit einem teilweise grundierten Programm ausgeführt werden können.
 \end{kurzfassung}
@@ -391,7 +391,7 @@ A \emph{(classical) model} of a program is an interpretation that is a model of 
 
 We use the Gelfond-Lifschitz reduct towards a definition of answer sets.
 
-\begin{definition}[see {\cite[Section 2]{DBLP:conf/iclp/GelfondL88}}]
+\begin{definition}[see {\cite[Section 2]{stable}}]
 	Given a ground program $P$ and an interpretation $I$, the \emph{Gelfond-Lifschitz reduct} (or just \emph{reduct} in short) of $P$ with respect to $I$, denoted $P^I$ is defined as follows:
 \begin{multline*}
 P^I = \Bigl\{ a \from b_1, \ldots , b_m \mid a \from b_1, \ldots, b_m, \fail b_{m+1}, \ldots, \fail b_n \in P\\ \text{ and } \{ \neg b_{m+1} , \ldots , \neg b_n \} \subseteq I \Bigr\}
@@ -414,32 +414,36 @@ Note that we are only interested in the particular semantics of stable models wh
 
 \subsubsection{\texttt{clingo}}
 
-\texttt{clingo}\footnote{\url{https://potassco.org/clingo/}} is a ground-and-solve ASP system which combines the grounder \texttt{gringo} and the solver \texttt{clasp}. \clasp uses the 2WL strategy to implement propagation \cite[Sec.~5.3]{clasp}.
+\texttt{clingo}\footnote{\url{https://potassco.org/clingo/}} is a ground-and-solve ASP system which combines the grounder \texttt{gringo} and the solver \texttt{clasp}. \clasp uses the 2WL strategy for propagation \cite[Sec.~5.3]{clasp} and implements conflict-driven nogood learning (CDNL) \cite[Sec.~4.1]{clasp} in analogy to conflict-driven clause learning (CDCL) in SAT solvers \cite{grasp,cdl-sat}.
 
 \subsection{Approaches based on Lazy Grounding}
 
 There are two important ASP systems that implement lazy grounding, which we present for comparison.
 
 \subsubsection{\texttt{\asperix}}
-\label{sec:asperix}.
+\label{sec:asperix}
 
-\asperix is one of the first ASP systems that were designed to avoid the grounding bottleneck. It was first prototyped in 2008\footnote{According to the project's website \url{http://www.info.univ-angers.fr/pub/claire/asperix/\#download}} and published in \cite{asperixfirst}, with a more elaborate elaborate explanation in \cite{asperix}.
+\asperix is one of the first ASP systems that were designed to avoid the grounding bottleneck. It was first prototyped in 2008\footnote{According to the project's website \url{http://www.info.univ-angers.fr/pub/claire/asperix/\#download}} and published in \cite{asperixfirst,fofchain}, with a detailed explanation in \cite{asperix}. The core algorithm evolved from the concept of computation as in \cite{computations}.
 
 In the process of finding a solution, it extends a partial interpretation \cite[Def.~4]{asperix} in form of a pair $\langle IN, OUT \rangle$ of disjoint atom sets, where the atoms in $IN$ belong to the answer set that is currently searched and the atoms in $OUT$ do not. Further, the system tracks the set of ground rules, $R$, which is lazily extended by grounding the input program. Rules of the program $r$ relate to a partial interpretation and are called \emph{supported} ($\bodyf^+(r) \subseteq IN$), \emph{blocked} ($\bodyf^-(r) \cap IN \not = \emptyset$), \emph{unblocked} ($\bodyf^-(r) \subseteq OUT$), and \emph{applicable} (supported and not blocked) \cite[Def.~5]{asperix}. 
 
-The main concept in this ASP system is an \asperix \emph{computation} \cite[Def.~7]{asperix}: It is a sequence of pairs $\langle R_i, I_i$ that captures ground rules and a partial interpretation $I_i = \langle IN, OUT \rangle$. The computation starts with $\langle \emptyset, \langle \emptyset, \{ \bot \} \rangle \rangle$ and is inductively defined through the rules \emph{propagation} (monotonic; a new rule $r_i \not \in R_{i-1}$ can be ground from the program such that it \enquote{fires}, i.e.~its head is added to $IN$), \emph{choice} (non-monotonic; there are no rules that propagate, but the solver guesses whether an applicable rule fires, i.e. forces or prohibits ist instantiation) and \emph{stability} (no rules for propagation or choice left). Through inductive definition of computations, it is guaranteed that the sequence converges to an answer set iff there exists one \cite[Thm.~2]{asperix}.
+The main concept in this ASP system is an \asperix \emph{computation} \cite[Def.~7]{asperix}: It is a sequence of pairs $\langle R_i, I_i$ that captures ground rules and a partial interpretation $I_i = \langle IN, OUT \rangle$. The computation starts with $\langle \emptyset, \langle \emptyset, \{ \bot \} \rangle \rangle$ and is inductively defined through the rules \emph{propagation} (monotonic; a new rule $r_i \not \in R_{i-1}$ can be ground from the program such that it \enquote{fires}, i.e.~its head is added to $IN$), \emph{choice} (non-monotonic; there are no rules that propagate, but the solver guesses whether an applicable rule fires, i.e. forces or prohibits its instantiation) and \emph{stability} (no rules for propagation or choice left). Through inductive definition of computations, it is guaranteed that the sequence converges to an answer set iff there exists one \cite[Thm.~2]{asperix}.
 
 The most important take-away from \asperix for this work, however is the introduction of a third truth value which allows for more efficient convergence of above computation: The truth value \mbt indicates that an atom that is not in already in $IN$ must be in $IN$ (cannot be in $OU$) in order to find an answer set. It allows to mark certain atoms for which a \enquote{proof}, i.e. a firing rule with the atom as its head, has not yet fired, but must, at some point in the computation, fire.
 
 \begin{example}[{\cite[Example 7]{asperix}}]
-Let $\bot \from \fail b$ be a constraint whose body contains only one literal $\fail b$ with $b \not \in IN \cup OUT$. In order to have an answer set, $b$ must be in $IN$ so that the constraint is not applicable but $b$ is not yet proved (it is not in the head of a fired rule). Thus, one can only conclude that $b$ must be true.
+Let $\from \fail b.$ be a constraint whose body contains only one literal $\fail b$ with $b \not \in IN \cup OUT$. In order to have an answer set, $b$ must be in $IN$ so that the constraint is not applicable but $b$ is not yet proved (it is not in the head of a fired rule). Thus, one can only conclude that $b$ must be true.
 \end{example}
 
-This leads to more a reduction of the search space in propagation \cite[Ex.~8]{asperix} and also decreases the size set of non-monotonic candidate rules for choice \cite[Ex.~9]{asperix}. Partial interpretation and computation are modified to consider \mbt in \cite[Def.~8]{asperix} and \cite[Def.~11]{asperix} accordingly. Again, there is a correspondence to answer sets \cite[Thm.~3]{asperix}.
+This leads to a reduction of the search space in propagation \cite[Ex.~8]{asperix} and also decreases the size set of non-monotonic candidate rules for choice \cite[Ex.~9]{asperix}. Partial interpretation and computation are modified to consider \mbt in \cite[Def.~8]{asperix} and \cite[Def.~11]{asperix} accordingly. Again, there is a correspondence to answer sets \cite[Thm.~3]{asperix}.
 
-\asperix show how lazy grounding ASP systems can leverage \mbt as a third truth value. How unit propagation is affected by \mbt is a central topic in Chapter \ref{chap:prop}.
+\asperix shows how lazy grounding ASP systems can leverage \mbt as a third truth value. How unit propagation is affected by \mbt is a central topic in Chapter \ref{chap:prop}.
 
 \subsubsection{\texttt{\omiga}}
+
+\omiga \cite{omiga} uses computation to explore the search space similar to \asperix. In contrast, however, a Rete \cite{rete} network is used for propagation on rule heads. \omiga was extended for learning of non-ground rules in \cite{nglearn}, analogous to conflict driven learning as in \clasp.
+
+
 
 \section{Analysis}
 \todo{What is this section about?}
@@ -1100,3 +1104,4 @@ Algorithm \ref{alg:up} is sound and complete.
 \bibliography{thesis}
 
 \end{document}
+
