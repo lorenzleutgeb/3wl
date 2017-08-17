@@ -23,6 +23,7 @@
 \usepackage{lmodern}% http://ctan.org/pkg/lmodern
 \usepackage{xspace}
 \usepackage{marvosym}
+\usepackage[numbers,longnamesfirst]{natbib}
 \usepackage{tikz}
 \usetikzlibrary{matrix}
 \usetikzlibrary{shapes.multipart,calc}
@@ -31,7 +32,8 @@
 
 % Define convenience functions to use the author name and the thesis title in the PDF document properties.
 \newcommand{\authorname}{Lorenz Leutgeb} % The author name without titles.
-\newcommand{\thesistitle}{Efficient Propagation for Lazy-Grounding Answer Set Programming} % The title of the thesis. The English version should be used, if it exists.
+\newcommand{\thesistitle}{Three Watched Literals} % The title of the thesis. The English version should be used, if it exists.
+\newcommand{\thesissubtitle}{Efficient Propagation for Lazy-Grounding Answer~Set~Programming Systems} % The title of the thesis. The English version should be used, if it exists.
 
 \hypersetup{
     pdfpagelayout   = TwoPageRight,
@@ -65,8 +67,8 @@
 \setaddress{Engilgasse 3a, 1160 Wien}
 \setregnumber{1127842}
 \setdate{31}{10}{2016} % Set date with 3 arguments: {day}{month}{year}.
-\settitle{\thesistitle}{Efficient Propagation for Lazy-Grounding Answer Set Programming} % Sets English and German version of the title (both can be English or German).
-%\setsubtitle{Optional Subtitle of the Thesis}{Optionaler Untertitel der Arbeit} % Sets English and German version of the subtitle (both can be English or German).
+\settitle{\thesistitle}{\thesistitle} % Sets English and German version of the title (both can be English or German).
+\setsubtitle{\thesissubtitle}{\thesissubtitle} % Sets English and German version of the subtitle (both can be English or German).
 
 \setthesis{bachelor}
 
@@ -83,7 +85,7 @@
 
 \newtheorem*{remark}{Remark}
 
-\newcommand{\mbt}{must-be-true}
+\newcommand{\mbt}{must-be-true\xspace}
 \newcommand{\negstrong}[1]{\overline{#1}^s}
 \newcommand{\negweak}[1]{\overline{#1}^w}
 
@@ -207,55 +209,58 @@ Trading off memory consumption for complete availability of the ground program p
 \label{chap:intro}
 
 Since the inception of computer programming, different ways of encoding algorithms, structuring data and modeling the real world in computer programs have led to the development of various conceptually diverse programming languages. Families of programming languages that share some properties are usually grouped into so called \enquote{programming paradigms}.
-Such paradigms describe the common, most important concepts and lay a stylistic framework for a family of languages.
+Such paradigms describe the common, most important concepts and lay a framework for a family of languages.
 
-The most widely used languages follow the \enquote{imperative} programming paradigm (some more strict, some less), which revolves around \enquote{commanding} the computer. In this work, in contrast to mainstream software engineering, the main focus is Answer Set Programming (ASP), a declarative programming language that roots in first order logic.
+The most widely used languages follow the \enquote{imperative} programming paradigm (some more strict, some less), which revolves around \enquote{commanding} the computer. In this work, in contrast to mainstream software engineering, the main focus is Answer Set Programming (ASP), a declarative programming paradigm that roots in first order logic.
 
-Without going into further details about how ASP works, consider the following example for an intuition.
+Without going into further details about how ASP \enquote{works}, consider the following example for an intuition.
 
 \begin{example}
 \label{ex:garments}
 Suppose one needs to decide what to wear. The following program narrows down the selection of garments in the wardrobe by checking whether specific pieces are designed to be worn in the current season. For the sake of the example we assume that it is summer.
 %rule with two vars
 %allowdisplaybreaks?
-\begin{flalign}
-&garment(winterjacket).\label{ex:garments:garments:begin}\\
-&garment(jeans).\\
-&garment(tshirt).\\
-&garment(shorts).\label{ex:garments:garments:end}\\
-&warm(winterjacket).\label{ex:garments:style:begin}\\
-&light(shorts).\label{ex:garments:style:end}\\
-summer.\label{ex:garments:season}\\
-inseason(G) \from& \ winter, garment(G), \fail light(G). \label{ex:garments:inseason:begin}\\
-inseason(G) \from& \ summer, garment(G), \fail warm(G). \label{ex:garments:inseason:end}\\
+\begin{align}
+garment(winterjacket)\from& \ .\label{ex:garments:garments:begin}\\
+garment(jeans)\from& \ .\\
+garment(tshirt)\from& \ .\\
+garment(shorts)\from& \ .\label{ex:garments:garments:end}\\
+warm(winterjacket)\from& \ .\label{ex:garments:style:begin}\\
+light(shorts)\from& \ .\label{ex:garments:style:end}\\
+summer\from& \ .\label{ex:garments:season}\\
+inseason(G) \from& \ winter, garment(G),~\fail light(G). \label{ex:garments:inseason:begin}\\
+inseason(G) \from& \ summer, garment(G),~\fail warm(G). \label{ex:garments:inseason:end}\\
 wear(G) \from& \ garment(G), inseason(G). \label{ex:garments:wear}\\
-\from winter, summer. \label{ex:garments:seasons}\\
-\end{flalign}
+\from& \ winter, summer. \label{ex:garments:seasons}
+\end{align}
 
-In lines \ref{ex:garments:garments:begin} to \ref{ex:garments:garments:end} we list the five pieces we have in the wardrobe (a winter jacket, a pair of jeans, a t-shirt and shorts) and in lines \ref{ex:garments:style:begin} to \ref{ex:garments:style:end} garments that are warm or light are qualified. The current season is encoded in line \ref{ex:garments:season}. Using the two inference rules in lines \ref{ex:garments:inseason:begin} and \ref{ex:garments:inseason:end} we define when a garment is \enquote{in season}, i.e.~whether a piece is not light (resp.~not warm) which means it should be worn in winter (resp.~summer). Finally, we express that a garment can be worn in case it is in season on line \ref{ex:garments:wear}. Line \ref{ex:garments:seasons} models a constraint: It is unreasonable that it is both winter and summer for one evaluation of the program.
+In lines \ref{ex:garments:garments:begin} to \ref{ex:garments:garments:end} we list the four pieces we have in the wardrobe (a winter jacket, a pair of jeans, a t-shirt and shorts) and in lines \ref{ex:garments:style:begin} to \ref{ex:garments:style:end} garments that are warm or light are qualified. The current season is encoded in line \ref{ex:garments:season}. Using the two inference rules in lines \ref{ex:garments:inseason:begin} and \ref{ex:garments:inseason:end} we define when a garment is \enquote{in season}, i.e.~whether a piece is not light (resp.~not warm) which means it should be worn in winter (resp.~summer). Finally, we express that a garment can be worn in case it is in season on line \ref{ex:garments:wear}. Line \ref{ex:garments:seasons} models a constraint: It is unreasonable that it is both winter and summer for one evaluation of the program.
 \end{example}
 
-The evaluation of an ASP program is done by an ASP system, which may be comprised of further components. For \enquote{user} and programmer, no detailed knowledge about the system is required. The abstract input/output behaviour of these systems is enough to use them in most cases: Given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets.
+The evaluation of an ASP program is done by an ASP system, which may be comprised of further components. For \enquote{user} and programmer, no detailed knowledge about the system is required. The abstract input/output behaviour of these systems is enough to use them in most cases: Given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets. Loosely speaking, answer sets are possible combinations of values that satisfy all requirements that are stated in the program.
 
 % benuetzen gleiche techniken, es hat sich gezeigt, dass techniken aus dem sat bereich effizient sind
 
-Many ASP system implementations use solving algorithms closely related to those found in SAT solvers to search for answer sets. Adapting SAT solvers turned out to be highly effective for solving ASP. Because there are no variables in SAT, variables such as \emph{G} in the above example must be removed from the program. The process of substituting variables with constants, e.g. substituting \emph{G} with one of the four concrete garments, is referred to as \emph{grounding} and the resulting variable-free program is said to be \emph{ground}.
+Many ASP system implementations use solving algorithms closely related to those found in boolean satisfiability (\cite{sat}, SAT) solvers to search for answer sets. Finding an answer set for a logic program, which means exploring truth assignments for atomic expressions under the rules defined in the program, is similar to finding a satisfying assignment for a formula, which means exploring possible truth values for constants under the structure of the formula. Adapting SAT solvers and their methods turned out to be highly effective for solving ASP. To keep up this close relation however, one key difference between formulas in SAT and programs in ASP must be accounted for: Formulas in SAT do not have variables, but logic programs do. Variables such as \emph{G} in the above example must be removed. The process of substituting variables with constants, e.g. substituting \emph{G} with one of the four concrete garments, is referred to as \emph{grounding} and the resulting variable-free program is said to be \emph{ground}.
+
 \begin{example}
 \label{ex:garmentsground}
-Reconsider Example \ref{ex:garments}. Naively substituting each occurrence of \emph{G} in the example yields eight instances of the \emph{inseason} rule (two per garment), and four of the \emph{wear} rule (one per garment).
-\begin{flalign}
-&garment(winterjacket).\label{ex:garmentsground:garments:begin}\\
-&garment(jeans).\\
-&garment(tshirt).\\
-&garment(shorts).\label{ex:garmentsground:garments:end}\\
-&warm(winterjacket).\label{ex:garmentsground:style:begin}\\
-&light(shorts).\label{ex:garmentsground:style:end}\\
-summer.\label{ex:garmentsground:season}\\
-inseason(winterjacket) \from& \ winter, garment(winterjacket), \fail light(winterjacket). \label{ex:garmentsground:inseason:begin}\\
+Reconsider Example \ref{ex:garments}. Na{\"i}vely substituting each occurrence of \emph{G} in the example yields eight instances of the \emph{inseason} rule (two per garment), and four of the \emph{wear} rule (one per garment).
+\begin{align}
+garment(winterjacket)\from& \ .\label{ex:garmentsground:garments:begin}\\
+garment(jeans)\from& \ .\\
+garment(tshirt)\from& \ .\\
+garment(shorts)\from& \ .\label{ex:garmentsground:garments:end}\\
+warm(winterjacket)\from& \ .\label{ex:garmentsground:style:begin}\\
+light(shorts)\from& \ .\label{ex:garmentsground:style:end}\\
+summer\from& \ .\label{ex:garmentsground:season}\\
+inseason(winterjacket) \from& \ winter, garment(winterjacket),\\
+& \ \ \fail light(winterjacket). \label{ex:garmentsground:inseason:begin}\\
 inseason(jeans) \from& \ winter, garment(jeans), \fail light(jeans).\\
 inseason(tshirt) \from& \ winter, garment(tshirt), \fail light(tshirt).\\
 inseason(shorts) \from& \ winter, garment(shorts), \fail light(shorts).\\
-inseason(winterjacket) \from& \ summer, garment(winterjacket), \fail warm(winterjacket).\\
+inseason(winterjacket) \from& \ summer, garment(winterjacket),\\
+& \ \ \fail warm(winterjacket).\\
 inseason(jeans) \from& \ summer, garment(jeans), \fail warm(jeans).\\
 inseason(tshirt) \from& \ summer, garment(tshirt), \fail warm(tshirt).\\
 inseason(shorts) \from& \ summer, garment(shorts), \fail warm(shorts). \label{ex:garmentsground:inseason:end}\\
@@ -263,8 +268,8 @@ wear(winterjacket) \from& \ garment(winterjacket), inseason(winterjacket).\\
 wear(jeans) \from& \ garment(jeans), inseason(jeans).\\
 wear(tshirt) \from& \ garment(tshirt), inseason(tshirt).\\
 wear(shorts) \from& \ garment(shorts), inseason(shorts).\\
-\from winter, summer. \label{ex:garmentsground:seasons}\\
-\end{flalign}
+\from& \ winter, summer. \label{ex:garmentsground:seasons}
+\end{align}
 With rules that use two garments, the number of instances would multiply by the number of garments once more. We see that, in general, while the program with variables can be rather terse, the corresponding ground program might be exponentially larger.
 \end{example}
 
@@ -277,41 +282,47 @@ State-of-the-art ASP systems feature two components: The \emph{grounder} takes c
 % anhand des beispiels beispiel für propagation
 % vergleich mit g-s übersetzen in sat klauseln bzw. nogoods (2wl)
 
-The goal of solver components in ASP systems is determining which propositions (such as $wear(winterjacket)$, for example) are \emph{true} and \emph{false} respectively. An \emph{assignment} designates which propositions are \emph{true} (resp.~\emph{false}), it allows to express statements such as \enquote{$wear(winterjacket)$ is \emph{true}}. Assignments conflicting with rules of the program are considered invalid. In Example \ref{ex:garments}, any assignment that allows stating both \enquote{$summer$ is \emph{true}} and \enquote{$winter$ is \emph{true}} at the same time, must be avoided as it cannot represent an answer set, because of the constraint (line \ref{ex:garments:seasons}).
+The goal of solver components in ASP systems is determining which propositions (such as $wear(winterjacket)$, for example) are \emph{true} and \emph{false} respectively. In the process, an \emph{assignment} designates which propositions are \emph{true} (resp.~\emph{false}), it allows to express statements such as \enquote{$wear(winterjacket)$ is \emph{true}}. Once an assignment is found that associates a truth value with every proposition, an answer set is derived. Assignments conflicting with rules of the program are considered invalid. In Example \ref{ex:garments}, any assignment that allows stating both \enquote{$summer$ is \emph{true}} and \enquote{$winter$ is \emph{true}} at the same time, must be avoided as it cannot represent an answer set, because of the constraint in line \ref{ex:garments:seasons}.
 
-Through the combination of truth values and information about conflicting truth values of propositions, both encoded by the rules of the input program, solvers can infer truth values of other propositions. One method to extend an assignment this way is called \emph{unit propagation}. Rules are modeled as sets of literals (propositions and their negations), called \emph{nogoods}, for which not all might satisfy the assignment. From their property that not all corresponding truth values in the assignment may conform with the nogood at the same time, it follows that when all but one elements of the nogood conform with the assignment (we say the nogood is \emph{unit}), the truth value of the remaining proposition can be inferred and added to the assignment.
+Through the combination of truth values and information about conflicting truth values of propositions, both encoded by the rules of the input program, solvers can infer truth values of other propositions. One method to extend an assignment this way is called \emph{unit propagation}: Rules are modeled as sets of literals (propositions and their negations), called \emph{nogoods}, for which not all might satisfy the assignment. From their property that not all corresponding truth values in the assignment may conform with the nogood at the same time, it follows that when all but one elements of the nogood agree with the assignment (we say the nogood is \emph{unit}), the truth value of the remaining proposition can be inferred and added to the assignment.
 
 \begin{example}
 \label{ex:garmentprop}
 Consider again Example \ref{ex:garments}. Line \ref{ex:garments:seasons} can be written as a clause $winter \wedge summer$ that must not evaluate to \emph{true}, or simply as a nogood $\delta = \{ \bT summer, \bT winter \}$ of the two propositions that cannot conform with the assignment at the same time. An assignment saying that \enquote{$summer$ is \emph{true}} in combination with $\delta$ implies a new truth value, namely that \enquote{$winter$ is \emph{false}}.
 \end{example}
 
-In order to perform unit propagation, ground-and-solve systems commonly translate the input program into nogoods, and even more advanced algorithms have been devised to dynamically \enquote{learn} new nogoods in the process of searching for answer sets.
+In order to perform unit propagation, ground-and-solve systems commonly translate the input program into a set of nogoods, and even more advanced algorithms have been devised to dynamically \enquote{learn} new nogoods in the process of searching for answer sets. 
 
-For solvers to be efficient, it is crucial to quickly identify which nogoods are unit, even when the assignment under which the nogoods might individually be unit changes very frequently. Modern solvers implement the so called \emph{two-watched-literals} (2WL) strategy \cite{effsat,questsat}, which describes both an algorithm and a data structure to track nogoods and propagate as soon as they become unit.
+For solvers to be efficient, it is crucial to quickly identify which nogoods are unit, even when the assignment under which the nogoods might individually be unit changes frequently during search. Modern solvers implement the so called \emph{two-watched-literals} (2WL) strategy \cite{effsat,questsat}, which describes both an algorithm and a data structure to track nogoods and propagate as soon as they become unit.
+
+An optimization technique to speed up the solving process, pioneered by the ground-and-solve system \dlv (cf.~\ref{sec:dlv}) is the introduction of a third truth value \emph{\mbt} in addition to the two well known values \emph{true} and \emph{false}. Using a third truth value also is an effective optimization in lazy-grounding systems (cf.~\ref{sec:asperix,sec:omiga}). However, 2WL does only account for two truth values, thus cannot be used in conjunction with \emph{\mbt}.
+
+The motivation of this work is twofold. Firstly, enabling lazy-grounding systems to profit from the benefits of 2WL. Secondly, by integration a procedure very similar to 2WL into a lazy-grounding framework, making it simpler to eventually re-use results that previously were exclusive to ground-and-solve systems in lazy-grounding systems as well.
+
+In contrast to ground-and-solve systems, lazy-grounding systems commonly improve their search mechanism by using a third truth value, adding \emph{\mbt} to the two well known values \emph{true} and \emph{false}. 
 
 However, translation of the input program into nogoods in its entirety requires the input program to be ground, because truth values can only be inferred for concrete propositions. \todo{Is this the correct reason why 2WL does not work for lazy grounding?} The approach is therefore subject to the grounding bottleneck.
 
 The motivation of this work is finding a way to adapt 2WL, which was shown to be successfully in SAT solvers as well as ground-and-solve ASP systems, such that it can be employed in lazy-grounding ASP systems.
 
-\section{Problem Statement}
-\label{sec:problem}
+%\section{Problem Statement}
+%\label{sec:problem}
 % 2wl works for sat and ground asp. how to adapt it for lazy grounding?
 
-2WL is an efficient technique for implementing propagation in SAT solvers \cite{effsat,questsat} and ground-and-solve ASP systems \cite[Sec.~5.3]{clasp}. However, it cannot be directly used in lazy-grounding ASP systems, because its prerequisite of a ground program is in conflict with the principle of lazy grounding. The problem to be solved therefore is finding a way to adapt the known procedure in a way that is compatible with lazy-grounding.
+%2WL is an efficient technique for implementing propagation in SAT solvers \cite{effsat,questsat} and ground-and-solve ASP systems \cite[Sec.~5.3]{clasp}. However, it cannot be directly used in lazy-grounding ASP systems, because its prerequisite of a ground program is in conflict with the principle of lazy grounding. The problem to be solved therefore is finding a way to adapt the known procedure in a way that is compatible with lazy-grounding.
 
-\section{Aim of the Work}
-\label{sec:aim}
+%\section{Aim of the Work}
+%\label{sec:aim}
 % enahnce 2wl st it has properties for lazy g
 % -> 3wl works for lazy grounding
 
-\section{Methodological Approach}
+%\section{Methodological Approach}
 % design algorithms and datastructures
 % analyze and proof soundness/completeness
 % implementation
 % benchmarks
 
-After an analysis of 2WL, algorithms and data structures that account for lazy-grounding is devised and their soundness and completeness is shown. An implementation is contributed to the Alpha system, which in turn is compared against a naive approach in form of a benchmark.
+After an analysis of 2WL, algorithms and data structures that account for lazy-grounding is devised and their soundness and completeness is shown. An implementation is contributed to the Alpha system, which in turn is compared against a na{\"i}ve approach in form of a benchmark.
 
 \section{Structure of the Work} % 3 sentences
 
@@ -338,33 +349,32 @@ In Section \ref{chap:intro} we presented an example program with an intuitive de
 %set of Consts
 %set of Vars
 
-Given a finite set of constants $\mathcal{C}$, a set of variables $\mathcal{V}$ and a finite set $\mathcal{P}$ of predicate symbols, with $\mathcal{C}$, $\mathcal{V}$, $\mathcal{P}$ pairwise disjoint, we define one of the core building blocks of ASP programs:
+Given a finite set of constants $\mathcal{C}$, a set of variables $\mathcal{V}$ and a finite set $\mathcal{P}$ of predicate symbols, with $\mathcal{C}$, $\mathcal{V}$, $\mathcal{P}$ pairwise disjoint, we define atoms as the \enquote{building blocks} of logic programs.
 
 \begin{definition}
 An \emph{atom} is an expression of the form $p(t_1, \ldots , t_n)$ where $p \in \mathcal{P}$ is a predicate symbol of arity $n \geq 0$ and $\{ t_1, \ldots , t_n \} \subseteq \mathcal{V} \cup \mathcal{C}$ are terms.
 \end{definition}
 
-Note that for atoms of arity zero, parentheses usually are omitted. For simplicity this definition of atoms does not account for function symbols or function terms. Grounding the program as briefly mentioned in Section \ref{chap:intro}, we formally define the class of ground atoms, for which terms must be constants.
+Note that for atoms of arity zero, parentheses usually are omitted. For simplicity, this definition of atoms does not account for function symbols or function terms. Towards a distinction of ground programs (cf.~\ref{chap:intro,ex:garmentsground}) from programs with variables, we formally define the class of ground atoms, for which the set of terms coincides with the set of constants.
 
 \begin{definition}
 An atom $p(t_1, \ldots , t_n)$ is called \emph{ground} if $\{ t_1, \ldots , t_n \} \subseteq \mathcal{C}$
 \end{definition}
 
-Atoms can be negated as usual.
+Atoms can be negated as usual in first order logic, leading to the definition of literals. However, note that we discriminate between two types negation in logic programs.
 
 \begin{definition}
 A \emph{literal} is an atom $q$ or its negation $\neg q$, it is \emph{ground} if $q$ is ground. The symbol $\neg$ is called \emph{classical negation} or \emph{strong negation}.
 \end{definition}
 
-Programs consist of rules, which in turn can be divided into head and body. The body of a rule can again be divided into a positive and a negative body.
+We structure literals in the form of rules, which are in turn divided into a head, consisting of at most one literal, and a body of arbitrary length.
 
 \begin{definition}
-	A \emph{rule} $r$ is an expression of the form $$a \from b_1, \ldots, b_m, \fail b_{m+1}, \ldots, \fail b_n.$$ where $a, b_1, \ldots, b_n$ are literals, $\mathrm{not}$ is \emph{negation as failure} (or \emph{default negation}), $a$ is the \emph{head}, $\{ b_1, \ldots, b_m \}$ is the \emph{positive body}, denoted $\bodyf^+(r)$, and $\{ \fail b_{m+1}, \ldots, \fail b_n \}$ is the \emph{negative body} of $r$, denoted $\bodyf^-(r)$. Positive and negative body together are simply the \emph{body} of $r$ i.e., $\bodyf(r) = \bodyf^+(r)\cup \bodyf^-(r)$.
-	
-	A \emph{fact} is a rule $r$ with $\bodyf(r) = \emptyset$.
-	
-	A rule is \emph{ground} if all atoms in $\headf(r) \cup \bodyf(r)$ are.
+A \emph{rule} $r$ is an expression of the form $$a \from b_1, \ldots, b_m, \fail b_{m+1}, \ldots, \fail b_n.$$ where $a, b_1, \ldots, b_n$ are literals, $\mathrm{not}$ is \emph{negation as failure} (or \emph{default negation}), $\{ a \}$ is the \emph{head}, denoted $\headf(a)$ and $\{ b_1, \ldots, b_m \}$ is the \emph{positive body}, denoted $\bodyf^+(r)$, and $\{ b_{m+1}, \ldots, b_n \}$ is the \emph{negative body} of $r$, denoted $\bodyf^-(r)$. Positive and negative body together are simply the \emph{body} of $r$ i.e., $\bodyf(r) = \bodyf^+(r)\cup \bodyf^-(r)$.
+A \emph{fact} is a rule $r$ with $\bodyf(r) = \emptyset$ and it is \emph{ground} if all atoms in $\headf(r) \cup \bodyf(r)$ are.
 \end{definition}
+
+Note that for a rule $r$ both body and head can be empty: In case $\bodyf(r)$ is empty, we say $r$ is a \emph{fact}, and when $\headf(r)$ is empty, we say that $r$ is a \emph{constraint}.
 
 Finally, we arrive at the notion of a logic program.
 
@@ -378,7 +388,7 @@ A \emph{(logic) program} $P$ is a finite set of rules. It is \emph{ground} if al
 
 For the scope of this work, above definition of rules is sufficient. Programs consisting only of rules of this form are called \emph{normal} programs. For example, more generally, rules with disjunctive heads $a_1 \vee \cdots \vee a_k \from \ldots$ also have interesting properties, but are outside the scope of this thesis.
 
-In practice, more syntactic constructs are used to ease modelling programs: Arithmetic expressions, aggregates allowing statements about sets (counting how many elements match some criteria, summation of numeric values, etc.) and choice rules that encode sets of atoms for which only a given number should be in an answer set. All of these higher level concepts map to rules as defined above. For a widely accepted core standard among ASP systems consider \cite{calimeri2015asp}.
+In practice, many more syntactic constructs are used to ease modelling programs: Arithmetic expressions, aggregates allowing statements about sets (counting how many elements match some criteria, summation of numeric values, etc.) and choice rules that encode sets of atoms for which only a given number should be in an answer set, all of which can be translated into simple rules. For core standard, widely acceptedamong ASP many systems, consider \cite{calimeri2015asp}.
 
 %\begin{definition}[{\cite[p.~12]{DBLP:conf/rweb/EiterIK09}}]
 %A \emph{normal logic program} is a set of clauses having the form $$a \leftarrow b_1, \ldots , b_m, \text{not } c_1, \ldots , \text{not } c_n \qquad (n, m \geq 0)$$ where all $a, b_i$ and $c_j$ ($1 \leq i \leq n$ and $a \leq j \leq m$) are atoms of a first order language $L$. Expressions $\text{not } c_1, \ldots , \text{not } c_n$ are called the \emph{(default) negated literals} and consist of atoms $c_j$ preceded by the negation modifier $\text{not}$. Accordingly the atoms $a_i$ are called \emph{positive literals}.
@@ -386,37 +396,36 @@ In practice, more syntactic constructs are used to ease modelling programs: Arit
 
 \subsection{Semantics}
 
-An atom in the sense of ASP is a proposition with no deeper structure. It might represent some external state of affairs, e.g.~$rainy$ to indicate whether the weather is not nice or $handsome(yue)$ a statement about Yue being handsome. Their granularity or level of abstraction directly affects how detailed the world is modelled by a program, because atoms are treated as internally consistent statements and they cannot be split further.
+An atom in the sense of ASP is a proposition with no deeper structure. It might represent some external state of affairs, e.g.~$rainy$ to indicate whether the weather is not nice or $handsome(yue)$ a statement about Yue being handsome. Their granularity or level of abstraction directly affects how detailed the world is modeled by a program, because atoms are treated as internally consistent statements and they cannot be split further.
+
 In order to reason about the truth values of atoms in a program, we define an interpretation.
 
 \begin{definition}
-An \emph{interpretation} is a set of ground atoms $I$. All atoms contained in $I$ are said to be \emph{true}.
+An \emph{interpretation} is a set of ground atoms $I$.
 \end{definition}
-
-%Consistency only for total interpretations, not needed anymore.
-%For the remainder of the work we assume that an interpretation $I$ is \emph{consistent}, i.e.~there is no atom $p$ with $\{p, \neg p\} \subseteq I$.
 
 %Observe that $I$ is a set of \emph{ground} literals, i.e.~we only define an interpretation for ground atoms and a na\ddot{i}ve implementation will therefore first ground the input program. This is the root of the bottleneck.
 
-Considering Example \ref{ex:garments}, note that $I_1 = \{ wear(G) \}$ is not an interpretation, because the atom it contains is not ground. However $I_2 = \{ wear(winterjacket) \}$ is an interpretation, because $winterjacket$ is a constant.
+Considering Example \ref{ex:garments}, note that the set $I_1 = \{ wear(G) \}$ is not an interpretation, because the atom it contains is not ground. However $I_2 = \{ wear(winterjacket) \}$ is an interpretation, because $winterjacket$ is used as a constant in the program.
 
-With this, the truth value of an atom is defined against an interpretation, which in turn is simply the set of atoms that are considered \emph{true}. Further, an interpretation also defines how default negation as failure is to be handled.
+The truth value of an atom is defined against an interpretation, which in turn is simply the set of atoms that are considered \emph{true}, i.e.~we say that 
+
+Interpretations and literals are related through satisfaction.
 
 \begin{definition}
-A literal $l$ is \emph{true} under an interpretation $I$ iff $l \in I$. Otherwise it is \emph{false} under $I$.% A default negated literal $\fail l$ is \emph{true} under $I$ iff $l \not \in I$, otherwise it is \emph{false}.
+An interpretation $I$ \emph{satisfies} a positive literal $l = p$, if $p \in I$ and a negative literal $l = \neg p$ if $p \not \in I$. We denote this as $I \models l$ .
 \end{definition}
 
-From the truth value of individual atoms we expand to models of rules.
+We commonly encode the truth value of atoms through satisfaction, e.g.~we say that an atom $p$ is \emph{true} under some interpretation $I$ if the the literal $l = p$ is satisfied by $I$ and vice versa. Satisfaction of literals expands to satisfaction of rules.
 
 \begin{definition}
-%positive body is positive in I and negative body is negatively in I
-An interpretation $I$ is a \emph{(classical) model} of a ground rule $r$ if $\bodyf^+(r) \subseteq I$ and $\bodyf^-(r) \cap I = \emptyset$ imply that $\headf(r) \in I$, i.e.~whenever the body of $r$ is satisfied, then the head of $r$ is satisfied as well.
+An interpretation $I$ \emph{satisfies} a ground rule $r$, denoted $I \models r$ if $\bodyf^+(r) \subseteq I \wedge \bodyf^-(r) \cap I = \emptyset$ implies that $\headf(r) \subseteq I$ and $\headf(r) \not = \emptyset$, i.e.~whenever the body of $r$ is satisfied, then the head of $r$ is satisfied as well.
 \end{definition}
 
-The definition of a model generalizes to programs.
+In case an interpretation satisfies all rules of a program, we call it a model thereof.
 
 \begin{definition}
-A \emph{(classical) model} of a ground program is an interpretation that is a model of all rules in the program.
+A \emph{(classical) model} of a ground program $P$ is an interpretation $I$ that is a model of all rules in the program, i.e.~$I \models r$ for all $r \in P$.
 \end{definition}
 
 We use the Gelfond-Lifschitz reduct towards a definition of answer sets.
@@ -428,22 +437,32 @@ P^I = \Bigl\{ a \from b_1, \ldots , b_m \mid a \from b_1, \ldots, b_m, \fail b_{
 \end{multline*}
 \end{definition}
 
-With this we close with the definition of an answer set as the minimal model of the reduct.
+Finally, an answer set is a $\subset$-minimal model of the corresponding reduct.
 
 \begin{definition}
 An interpretation $I$ is an \emph{answer set} iff it is a $\subset$-minimal model of $P^I$, i.e. there is no $J \subset I$ which is also a model of $P^I$.
 \end{definition}
+
+\todo{Examples! Three programs and some interpretations that are no models, models that are no answer sets, and answer sets.}
+
+In practice, interpretations cannot be guessed in their entirety but are constructed step-by-step in a search process (\enquote{solving}). A distinction between an unassigned atom and an atom that has been found to be \emph{false} is not possible when directly working with interpretations like above; partial interpretations cannot be expressed, as everything that is not explicitly included in the interpretation is effectively assumed to be \emph{false}. This is why interpretations are commonly represented by assignments, which explicitly encode the truth value of atoms.
+
+\begin{definition}
+An \emph{assignment} $\ass$ is a set of literals.
+\end{definition}
+
+Literals can be related with assignments similar to interpretations: $A \models l$ if $l \in A$. We say that an atom $p$ is unassigned if neither $A \models p$ nor $A \models \neg p$. For the case where there are no unassigned atoms, the interpretation that corresponds to the assignment is the subset of all positive literals in the assignment itself.
 
 % "ASP means stable models. Logic programs with negation may use other semantics."
 %Note that we are only interested in the particular semantics of stable models which characterizes ASP and falls into the category of \emph{multiple} model semantics. There exist other semantics, such as the \emph{perfect model} semantics in \cite{DBLP:books/mk/minker88/Przymusinski88}.
 
 \section{State-of-the-art ASP Systems}
 
-In this section we survey state-of-the-art ASP systems in order to highlight similarities and differences in their approaches. We focus on the comparison of ground-and-solve and lazy-grounding systems. \todo{Because this work is concerned with optimizing lazy-grounding systems using methods shown to be efficient in ground-and-solve systems.}
+In this section we survey state-of-the-art ASP systems in order to highlight similarities and differences in their approaches. As this work is concerned with the adoption of 2WL, a technique common in SAT solvers and ground-and-solve ASP systems, for lazy-grounding systems, we focus on the comparison of ground-and-solve and lazy-grounding systems.
 
-The first ASP systems developed are based on the ground-and-solve approach, as it is simpler and can be implemented in a more straight-forward manner than lazy-grounding. We chose to exhibit \clasp as it uses two-watched literals and employs nogood learning and \dlv because it introduced \mbt as a truth value, which turns out to be very effective in lazy-grounding as well.
+The first ASP systems developed are based on the ground-and-solve approach, as it is less involved and can be implemented in a more straight-forward manner than lazy-grounding. We consider \clasp as it uses two-watched literals and employs nogood learning and \dlv because it introduced \emph{\mbt} as a truth value, which turns out to be very effective in lazy-grounding as well.
 
-Only gradually, running into the grounding bottleneck with benchmarks and in industry settings, the grounding bottleneck was recognized, which lead to the development of lazy-grounding systems. With lazy-grounding systems being newer, and less time spent reasoning about their efficiency and (re-)engineering them, they often fail to achieve the performance of ground-and-solve systems. The main culprit of early lazy-grounding systems is that they cannot leverage state-of-the-art techniques from ground-and-solve systems: Propagation using two-watched literals and heuristics are where the performance of ground-and-solve systems stems from.
+Only gradually, running into the grounding bottleneck with benchmarks and in industry settings, the grounding bottleneck was recognized, which lead to the development of lazy-grounding systems. With lazy-grounding systems being newer, and less time spent reasoning about their efficiency and (re-)engineering them, they often fail to achieve the performance of ground-and-solve systems. The main culprit of early lazy-grounding systems is that they cannot leverage state-of-the-art techniques from ground-and-solve systems: Among others, propagation using two-watched literals and heuristics are where the performance of ground-and-solve systems stems from.
 
 \subsection{Ground-and-Solve}
 
@@ -495,31 +514,49 @@ In \omiga the network is used to: (a) store ground atoms, (b) retrieve ground at
 
 GASP \cite{gasp,gasp2}\footnote{\url{https://users.dimi.uniud.it/~agostino.dovier/GASP/} and \url{https://users.dimi.uniud.it/~agostino.dovier/CLPASP/}} is implemented SICStus Prolog 4\footnote{\url{https://sicstus.sics.se/}}. It represents interpretations as finite domains and uses Constraint Logic Programming.
 
-\subsection{Summary}
+%\subsection{Summary}
 
-Any newly enveloped ASP system should naturally profit from the design efforts and experimental results of the above systems (and others). We therefore aim to identify key features and techniques of these approaches.
+%Any newly developed ASP system should naturally profit from the design efforts and experimental results of the above systems (and others). We therefore aim to identify key features and techniques of these approaches.
 
-\section{Two-Watched Literals}
+\section{Two Watched Literals}
 
-As briefly mentioned in Section \ref{sec:motivation}, two-watched literals (2WL, \cite{effsat,questsat}) is an algorithm for unit propagation mainly used in SAT solvers. In this section we formally define nogoods and explain 2WL.
+As briefly mentioned in Section \ref{sec:motivation}, Two Watched Literals (also \enquote{Two Literal Watching}, 2WL, \cite{effsat,questsat}) is an algorithm for unit propagation commonly used in SAT solvers (cf.~\cite[Section 2.2.2, p.~94]{handbook-sat}), which has been adopted by ground-and-solve ASP systems \cite{clasp}. This section is devoted to a description of the method, first in the context of SAT, then about its application in  ASP solving.
 
-When grounding a program, rules can be rearranged to clauses that must not be satisfied as shown in Example \ref{ex:garmentprop}. Such clauses written as sets are called nogoods.
+\begin{example}
+\label{ex:clause-prop}
+Suppose $\psi = (a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4) \wedge (\neg a_1 \vee \neg a_2 \vee a_3 \vee a_4)$ is input to a SAT solver\footnote{In SAT solving, formulas are typically input to solvers in conjunctive normal form (CNF). The DIMACS format is commonly used to encode concrete formulas.}. The formula $\psi$ would yield two \enquote{clauses}, $\psi = \phi_1 \wedge \phi_2$ with $\phi_1 = a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4$ and $\phi_2 = \neg a_1 \vee \neg a_2 \vee a_3 \vee a_4$, both of which have to be satisfied in order for $\psi$ to be satisfied. As the solver is evaluating $\psi$ under different (partial) assignments for atoms $a_1, \ldots, a_4$ it \enquote{watches} two literals per clause. This way it can detect whether a clause is unit. Whenever an atom $a$ is assigned it considers the clauses where $a$ is a watched literal for propagation. Conversely, all other clauses, where $a$ is not watched, are guaranteed to not be unit.
+\end{example}
 
-\begin{definition}
+The concept of a nogood originates in constraint programming (CP) (cf.~\cite{clasp,handbook-cp,handbook-kr-cp}), where the goal is to find an assignment for variables such that given constraints are satisfied. SAT and ASP can be viewed as specializations of CP. For example, in a problem containing the variable $x$ and the constraint $x > 1$ one can forbid the value $x = 1$. The assignment $x = 1$ is a nogood. In this work, nogoods are only used to represent boolean constraints. Unit propagation is sometimes also referred to as boolean constraint propagation.
+
+\begin{definition}[cf.~\cite{handbook-cp}]
 \label{def:nogood}
-A \emph{nogood} is a set $\{ \bsgl_1, \ldots, \bsgl_n \}$ of literals.
+A \emph{nogood} is a set $\{ \bsgl_1, \ldots, \bsgl_n \}$ of literals that cannot be extended to a solution.
 \end{definition}
 
-We will come back to this definition and extend it in section \ref{sec:nogoods}.
+First proposed by \citet{clasp}, in the solver components of ASP systems, nogoods take the role of clauses in SAT solvers. Nogoods correspond to partial assignments that cannot be extended to an answer set, and are derived from rules \cite[Section 3]{clasp}.
 
-Nogoods are partial interpretations that cannot be extended to a solution. Given a nogood $\delta$ and an interpretation $I$, with $I \models \bsgl$ for all $\bsgl \in \delta$, then $I$ is not a solution. This property allows for propagation: If $T = \{ \bsgl \mid \bsgl \in \delta \text{ and } I \not \models \bsgl\}$ and $|T| = 1$ we say that $\delta$ is \emph{unit} or unit on $\bsgl$ for $\bsgl \in T$. In order to obtain a solution we may extend $I$ to $I'$ so that $I' \models \neg \bsgl$.
+\begin{example}
+\label{ex:rule-to-nogood}
+For example, a rule $r$ of the form $a_1 \from a_2, \neg a_3, a_4$ translates to the nogood $\delta = \{\neg a_1, a_2, \neg a_3, a_4 \}$. An interpretation $I$ that satisfies all elements of $\bodyf(r) = \{a_2, \neg a_3, a_4$ and $\neg a_1$, the negation of the only element of $\headf(r)$, cannot be a model of $r$.
+\end{example}
 
-The number of nogoods generated from a program is proportional to the size of the corresponding ground program. Thus, one can expect many nogoods to be generated in the process. However, after constructing nogoods from (parts of) the input program and propagating truth values, it is important to efficiently re-evaluate whether there is a nogood that is unit under the extended assignment. This is where the 2WL strategy comes in. It descirbes an algorithm and associated data structure to efficiently track state of the nogoods.
+Given a nogood $\delta$ and an interpretation $I$, with $I \models \bsgl$ for all $\bsgl \in \delta$, then $I$ is not a solution. This property allows for propagation: If $T = \{ \bsgl \mid \bsgl \in \delta \text{ and } I \not \models \bsgl\}$ and $|T| = 1$ we say that $\delta$ is \emph{unit} or unit on $\bsgl$ for $\bsgl \in T$. In order to obtain a solution we may extend $I$ to $I'$ so that $I' \models \neg \bsgl$.
+
+The number of nogoods generated from a program is proportional to the size of the corresponding ground program. Thus, one can expect many nogoods to be generated in the process. However, after constructing nogoods from the input program (or parts thereof, as in the lazy-grounding case) and propagating truth values, it is important to efficiently re-evaluate whether there is a nogood that is unit under the extended assignment. This is where the benefits of 2WL in SAT over clauses and in ASP over nogoods align.
 
 For each nogood, two distinct and unassigned literals are chosen to watch the nogood. When one of these literals is assigned, a different literal (distinct from the second watching literal) in the nogood is chosen to watch the nogood. This process is continued until there are no more two distinct literals available in the nogood. If the nogood is unit at this point, a new assignment can be generated.
 
+When grounding a program, rules can be transformed into conjunctive clauses represented by nogoods that must not be satisfied as shown in Example \ref{ex:garmentprop}. Such clauses written as sets are called nogoods.
+
 \begin{example}
-Consider Figure \ref{fig:2wl}. It shows the nogood $\delta = \{\bF a_1, \bT a_2, \bF a_3, \bT a_4 \}$ in the context of propagation using 2WL. The literals watching $\delta$ are marked by arrows. Literals that 
+Consider Figure \ref{fig:2wl}. It shows the nogood $\delta = \{\neg a_1, a_2, \neg a_3, a_4 \}$ (which might represent a rule like $r$ from Example \ref{ex:rule-to-nogood} or $\phi_1$ from Example \ref{ex:clause-prop}) in the context of propagation using 2WL. The watched literals are marked by arrows.
+
+Initially, the two watched literals are selected arbitrarily. Transitioning from State 1 (empty assignment) to State 2, the solver will not check $\delta$ for unity, because $a_3$ is not watched. When $a_2$ is assigned to \emph{true}, the solver \enquote{looks at} $\delta$. As $a_2$ is assigned, it cannot be a watched literal anymore, but $\delta$ also is not unit, because $a_1$ is still unassigned. The pointer that previously pointed at $a_2$ is \enquote{moved} to $\neg a_1$. Note that this is the only option, as the atoms of all other literals are already assigned and $a_4$ is already being pointed at.
+
+Processing the assignment of $a_1$, again, $\delta$ is considered. Now, there is no unassigned literal, that is not also watched, left. The nogood is unit. The truth value of $a_4$ is inferred to be \emph{false}. At this point (State 5), pointer placement is irrelevant, because $\delta$ is satisfied.
+\end{example}
+
 \begin{figure}
   \centering
 \begin{tikzpicture}[stack/.style={rectangle split, rectangle split parts=#1,draw, anchor=center},->]
@@ -528,12 +565,14 @@ Consider Figure \ref{fig:2wl}. It shows the nogood $\delta = \{\bF a_1, \bT a_2,
     stack=4,
     rectangle split horizontal,
     rectangle split part fill={white,white,white,white},
-    inner sep=5pt,
+    inner sep=6pt,
+    text width=6mm,
+    align=center
     ] {
-$\bF a_1$     % two
-\nodepart{two} $\bT a_2$
-\nodepart{three}  $\bF a_3$
-\nodepart{four}  $\bT a_4$
+$\neg a_1$     % two
+\nodepart{two} $a_2$
+\nodepart{three}  $\neg a_3$
+\nodepart{four}  $a_4$
 };
 
 \node[left=0.7cm of ng1]{State 1};
@@ -550,13 +589,15 @@ $\bF a_1$     % two
     stack=4,
     rectangle split horizontal,
     rectangle split part fill={white,white,yellow!60,white},
-    inner sep=5pt,
+    inner sep=8pt,
+    text width=6mm,
+    align=center,
     below = 3cm of ng1
     ] {
-$\bF a_1$     % two
-\nodepart{two} $\bT a_2$
-\nodepart{three}  $\bF a_3$
-\nodepart{four}  $\bT a_4$
+$\neg a_1$     % two
+\nodepart{two} $a_2$
+\nodepart{three}  $\neg a_3$
+\nodepart{four}  $a_4$
 };
 
 \node[left=0.7cm of ng2]{State 2};
@@ -564,8 +605,8 @@ $\bF a_1$     % two
 \draw [<-] (ng2.two north) to node[auto] {} ++ (-0.1,0.5);
 \draw [<-] (ng2.four north) to node[auto] {} ++ (0.1,0.5);
 
-\node(ng2ass)[below=0.4cm of ng2] { $A_2 = \{\bF a_3\}$ };
-\node(ng2des)[right=1cm of ng2.east, text width=7cm] { Pointers were not checked, as $a_3$ is not watching. };
+\node(ng2ass)[below=0.4cm of ng2] { $A_2 = \{\neg a_3\}$ };
+\node(ng2des)[right=1cm of ng2.east, text width=7cm] { Pointers were not checked, as $a_3$ is not watched. };
 
 \draw ($ (ng2.east) + (1,-1.2) $) -- ($ (ng2.east) + (1,-2.2) $) node[right=0.5cm,pos=0.5] {$a_2$ is assigned \emph{true}.};
 
@@ -573,13 +614,15 @@ $\bF a_1$     % two
     stack=4,
     rectangle split horizontal,
     rectangle split part fill={white,yellow!60,yellow!60,white},
-    inner sep=5pt,
+    inner sep=8pt,
+    text width=6mm,
+    align=center,
     below = 3cm of ng2
     ] {
-$\bF a_1$     % two
-\nodepart{two} $\bT a_2$
-\nodepart{three}  $\bF a_3$
-\nodepart{four}  $\bT a_4$
+$\neg a_1$     % two
+\nodepart{two} $a_2$
+\nodepart{three}  $\neg a_3$
+\nodepart{four}  $a_4$
 };
 
 \node[left=0.7cm of ng3]{State 3};
@@ -587,7 +630,7 @@ $\bF a_1$     % two
 \draw [<-] (ng3.one north) to node[auto] {} ++ (-0.1,0.5);
 \draw [<-] (ng3.four north) to node[auto] {} ++ (0.1,0.5);
 
-\node(ng3ass)[below=0.4cm of ng3] { $A_3 = \{\bF a_3, \bT a_2 \}$ };
+\node(ng3ass)[below=0.4cm of ng3] { $A_3 = \{\neg a_3, a_2 \}$ };
 \node(ng3des)[right=1cm of ng3.east, text width=7cm] {No pointer must point at an assigned atom, therefore it is moved. };
 
 \draw ($ (ng3.east) + (1,-1.2) $) -- ($ (ng3.east) + (1,-2.2) $) node[right=0.5cm,right,pos=0.5] { $a_1$ is assigned \emph{false}. };
@@ -596,21 +639,23 @@ $\bF a_1$     % two
     stack=4,
     rectangle split horizontal,
     rectangle split part fill={yellow!60,yellow!60,yellow!60,white},
-    inner sep=5pt,
+    inner sep=8pt,
+    text width=6mm,
+    align=center,
     below = 3cm of ng3
     ] {
-$\bF a_1$     % two
-\nodepart{two} $\bT a_2$
-\nodepart{three}  $\bF a_3$
-\nodepart{four}  $\bT a_4$
+$\neg a_1$     % two
+\nodepart{two} $a_2$
+\nodepart{three}  $\neg a_3$
+\nodepart{four}  $a_4$
 };
 
 \node[left=0.7cm of ng4]{State 4};
 
-\draw [<-] (ng4.three north) to node[auto] {} ++ (-0.1,0.5);
+\draw [<-] (ng4.one north) to node[auto] {} ++ (-0.1,0.5);
 \draw [<-] (ng4.four north) to node[auto] {} ++ (0.1,0.5);
 
-\node(ng4ass)[below=0.4cm of ng4] { $A_4 = \{\bF a_3, \bT a_2, \bF a_1 \}$ };
+\node(ng4ass)[below=0.4cm of ng4] { $A_4 = \{\neg a_3, a_2, \neg a_1 \}$ };
 \node(ng4des)[right=1cm of ng4.east, text width=7cm] {  Only one literal is left unassigned. };
 
 \draw ($ (ng4.east) + (1,-1.2) $) -- ($ (ng4.east) + (1,-2.2) $) node[right=0.5cm,pos=0.5] { The nogood is unit, $a_4$ is assigned \emph{false}. };
@@ -619,13 +664,15 @@ $\bF a_1$     % two
     stack=4,
     rectangle split horizontal,
     rectangle split part fill={yellow!60,yellow!60,yellow!60,teal!60},
-    inner sep=5pt,
+    inner sep=8pt,
+    text width=6mm,
+    align=center,
     below = 3cm of ng4
     ] {
-$\bF a_1$     % two
-\nodepart{two} $\bT a_2$
-\nodepart{three}  $\bF a_3$
-\nodepart{four}  $\bT a_4$
+$\neg a_1$     % two
+\nodepart{two} $a_2$
+\nodepart{three}  $\neg a_3$
+\nodepart{four}  $a_4$
 };
 
 \node[left=0.7cm of ng5]{State 5};
@@ -633,7 +680,7 @@ $\bF a_1$     % two
 \draw [<-] (ng5.one north) to node[auto] {} ++ (-0.1,0.5);
 \draw [<-] (ng5.four north) to node[auto] {} ++ (0.1,0.5);
 
-\node(ng5ass)[below=0.4cm of ng5] { $A_5 = \{\bF a_1, \bT a_2, \bF a_3, \bF a_4 \}$ };
+\node(ng5ass)[below=0.4cm of ng5] { $A_5 = \{\neg a_1, a_2, \neg a_3, \neg a_4 \}$ };
 \node(ng5des)[right=1cm of ng5.east, text width=6cm] { $a_4$ was assigned via propagation, s.t.~the nogood is satisfied. };
 
 \end{tikzpicture}
@@ -641,34 +688,37 @@ $\bF a_1$     % two
   \label{fig:2wl} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
 
-\end{example}
-
-\chapter{Propagation for Lazy-Grounding Answer Set Programming}
+\chapter{Three Watched Literals}
 \label{chap:prop}
 
 The central idea of propagation is to infer (\emph{propagate}) new truth values from known truth values and nogood clauses, derived from the input program, as briefly explained in \ref{sec:motivation}. 
 
-In this chapter, we present algorithms and data structures involved in the propagation step of solving ASP programs. We adapt 2WL, a common strategy for propagation in SAT solves, and account for the truth value \mbt as motivated in Section \ref{sec:asperix}.
+In this chapter we extend 2WL, a technique to implement propagation, and present an algorithm that accounts for \emph{\mbt} as third truth value.
 
-\section{Definitions}
+\section{Literals, Assignments and Nogoods}
 
 % Signed literal vs. boolean signed literal.
 
+In this section we amend the definition of Literals and Nogoods, for the purpose of propagation with \emph{\mbt}.
+
 Following definitions lay out the vocabulary and concepts towards an explanation of unit propagation. Most of them fundamentally depend on \emph{atoms} (usually denoted $v$) but do not refer to neither a set of atoms nor their domain. This is because all definitions are bound to a logic program $P$ to be solved (i.e.~to find answer sets for). The set of ground atoms wrt.~$P$, effectively its Herbrand Base $\textit{HB}(P)$, is obtained by the grounding process, which is not detailed in this work. What might seem to be lacking from the definitions therefore is the context of the input program $P$ and the domain of atoms. $P$ and its context is omitted in the following.
 
-\subsection{Literals}
+%In this section we define the notions 
+%As we will be mainly concerned ith assignments, sequences that, informally, \enquote{relate} to interpretations, but require explicitly stating that some atom is \emph{false}.
 
 % TODO: Where does v come from? Should be in some HB(P)?
 %\begin{definition}
 %A \emph{ground atom} (or simply \emph{atom}) wrt.~a logic program $P$ is an element of $\textit{HB}(P)$, usually denoted $v$.
 %\end{definition}
 
+Amending Definition \ref{def:lit}, for the remainder of the work we consider boolean signed literals, which mean atoms and their negations in the classical sense, and, more generally, signed literals, which also allow for a third sign that allows modeling \emph{\mbt}.
+
 \begin{definition}
-A \emph{boolean signed literal} $\bsgl$ of the form $\bT v$ or $\bF v$ where $v$ is an atom and  $\bT v$ expresses that $v$ is \emph{true}, and $\bF v$ that it is \emph{false}.
+A \emph{boolean signed literal} $\bsgl$ of the form $\bT v$ or $\bF v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, and $\bF v$ that it is \emph{false}.
 \end{definition}
 
 \begin{definition}
-A generalization of boolean signed literal, called a \emph{signed literal} $\sgl$ is of the form $\bT v$, $\bF v$, or $\bM v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, $\bF v$ that it is \emph{false} (equivalent to the semantics of boolean signed literals) and $\bM v$ that it \emph{must be true}.
+A \emph{signed literal} $\sgl$ is of the form $\bT v$, $\bF v$, or $\bM v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, $\bF v$ that it is \emph{false} and $\bM v$ that it \emph{\mbt}.
 \end{definition}
 
 %\begin{definition}
@@ -676,6 +726,8 @@ A generalization of boolean signed literal, called a \emph{signed literal} $\sgl
 %\end{definition}
 
 % TODO: Remark on boolean signed literal vs. signed literal with context of clasp?
+
+With the introduction of literals like $\bM v$, we also explicitly define two forms of taking the complement of such literals.
 
 \begin{definition}
 Strong complement, denoted by $\negstrong{\sgl}$, and weak complement, $\negweak{\sgl}$, mapping $\bF v$ to $\bT v$ and $\bF v$ to $\bM v$ respectively, of a signed literal are defined by the following truth table:%equalities: $\negstrong{\bT v} = \bF v$, $\negstrong{\bM v} = \bF v$ and  $\negstrong{\bF v} = \bT v$, while $\negweak{\bT v} = \bF v$, $\negweak{\bM v} = \bF v$ and $\negweak{\bF v} = \bM v$.
@@ -695,29 +747,25 @@ $\bF v$&$\bT v$&$\bM v$\\
 \end{center}
 \end{definition}
 
+A literal does not only conflict with its strong complement but also with its weak complement.
+
 \begin{definition}
 Two literals $\sgl_1, \sgl_2$ are said to \emph{conflict} in case $\sgl_1 = \negweak{\sgl_2}$ or $\negweak{\sgl_1} = \sgl_2$.
 \end{definition}
 
 Occasionally the notation $\sgl = \bX v$ will be used to express that $\sgl$ is a literal of $v$ where $\bX \in \thrice$, i.e.~$\sgl$ is \enquote{bound} to $v$, but the sign is not important.
 
-\subsection{Assignments}
-
-Similar to \cite[section 2, p.~3]{clasp} we define assignments. However, here assignments contain not only boolean signed literals, but also signed literals and the notation for expressing a partial assignment differs.
+Similar to \cite[Section 2, p.~3]{clasp} we define assignments. However, here assignments contain not only boolean signed literals, but also signed literals and the notation for expressing a partial assignment differs.
 
 \begin{definition}
-An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i = \bX v_i$, or \emph{conflict}.
+An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i = \bX v_i$ with $1 \leq i \leq n$, or \emph{conflict}.
 \end{definition}
 
 %\begin{remark}
 Below, assignments are sometimes also used as sets, in which case the set represented by some assignment is simply the set of all signed literals contained in the sequence.
 %\end{remark}
 
-The number of elements in an assignment $|\ass|$ is intuitive, with $|\emph{conflict}| = 0$.
-
-A partial assignment is a sub-sequence constructed from an assignment denoted as $\ass[i,j] = (\sgl_i, \ldots, \sgl_j)$ where $\ass = (\sgl_1, \ldots, \sgl_i, \ldots, \sgl_j, \ldots, \sgl_n)$ and $1 \leq i < j \leq n$.
-
-A single literal is referenced using $A[i] = \sgl_i$ for $1 \leq i \leq |A|$.
+For an assignment $\ass = (\sgl_1, \ldots, \sgl_i, \ldots, \sgl_j, \ldots, \sgl_n)$, we denote its size as $|\ass|$ with $|\ass| = n$, and a partial assignment, which is a sub-sequence constructed from an assignment, as $\ass[i,j] = (\sgl_i, \ldots, \sgl_j)$ where $1 \leq i < j \leq n$ and reference a single literal using $A[i] = \sgl_i$ for $1 \leq i \leq n$.
 
 The assignment obtained by appending the literal $\sgl$ to $\ass = (\sgl_1, \ldots, \sgl_n)$ is denoted by $$\ass \circ \sgl = \left\{\begin{array}{ll}
         
@@ -730,73 +778,77 @@ The assignment obtained by appending the literal $\sgl$ to $\ass = (\sgl_1, \ldo
 
 %Furthermore $\emph{conflict} \circ \sgl = \emph{conflict}$ for any $\sgl$. 
 
-\begin{definition}
-For every assignment, a respective \emph{boolean assignment}, denoted $\bass(\ass)$ can be constructed by collapsing all atoms that \emph{must be true} to being \emph{true}:$$\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$$
-\end{definition}
+For every assignment, we can also construct a corresponding boolean assignment, which is obtained by substituting all literals of the form $\bM v$ with $\bT v$. Boolean assignments are just sets, and not sequences like assignments are, because we do not require any ordering in this work.
 
 \begin{definition}
-An atom $v$ is \emph{assigned} under some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} \not = \emptyset$$
+A \emph{boolean assignment} is a set of boolean signed literals derived from an assignment, denoted $\bass(\ass)$ and defined as $\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$.
 \end{definition}
+
+Relating assignments with literals and atoms, we say that an atom $v$ is \emph{assigned} under some assignment $\ass$ if any literal containing it is in $\ass$, i.e.~if $\ass \cap \{\bT v, \bM v, \bF v \} \not = \emptyset$. We say that an atom is unassigned under $A$ if it is not assigned under $A$. We also say that a literal $\bX v$ is assigned under $\ass$ if $v$ is. \todo{Do I really say that a literal is assigned under some assignment at some point? Sounds strange.}
 
 %\begin{definition}
 %An atom $v$ is \emph{unassigned} under some assignment $\ass$ iff $$\ass \cap \{\bT v, \bM v, \bF v \} = \emptyset$$
 %\end{definition}
 
-\begin{definition}
-A signed literal $\bX v$ is \emph{assigned} under $\ass$ iff $v$ is assigned under $\ass$.
-\end{definition}
+%\begin{definition}
+%A signed literal $\bX v$ is \emph{assigned} under $\ass$ if $v$ is assigned under $\ass$.
+%\end{definition}
 
-Intuitively, atoms and literals are \emph{unassigned} under $\ass$ iff the are not assigned under $\ass$.
+%Intuitively, atoms and literals are \emph{unassigned} under $\ass$ iff the are not assigned under $\ass$.
 
 \begin{definition}
 A literal $\sgl_1$ is said to conflict with $\ass$ in case it conflicts with any $\sgl_2 \in \ass$.
 \end{definition}
 
-\subsection{Nogoods}
-\label{sec:nogoods}
-
-In this section we extends Definition \ref{def:nogood} and give associated definitions.
+In this section we extend Definition \ref{def:nogood}. For propagation with \emph{\mbt}, it is important qualify literals in nogoods that correspond to correspond heads of rules.
 
 \begin{definition}
-At most one of the boolean signed literals inside a nogood might be qualified as head. The head literal $\bsgl$ of $\delta$ denoted $\headf(\delta) = \bsgl$.
+The \emph{head} of a nogood $\delta$, is a set of literals $\headf(\delta)$, for which $\headf(\delta) \subseteq \delta$ and $|\headf(\delta)| \leq 1$.\end{definition}
+
+Note that $\headf(\delta)$ is always of the form $\bF v$. \todo{Why?} Complementary we define the body, as all literals that are not in the head.
+
+\begin{definition}
+The \emph{body} of a nogood $\delta$ a set of literals $\bodyf(\delta)$ such that $\bodyf(\delta) \cap \headf(\delta) = \emptyset$ and $\delta = \bodyf(\delta) \cup \headf(\delta)$.
 \end{definition}
 
-Note that $\headf(\delta)$ is always of the form $\bF v$. % TODO why?
+We need two variants of a nogood being unit. One that accounts for \emph{\mbt} and one that does not, i.e.~treats $\bM v$ the same as $\bT v$.
 
 \begin{definition}
-Any literal in a nogood $\delta$ that is not it's head is element of the so called \emph{body} of the nogood: $\bodyf(\delta) = \{ \bsgl \in \delta \ | \ \bsgl \not = \headf(\delta) \}$.
+A nogood $\delta$ is \emph{strongly unit} under an assignment $\ass$ if $\delta \setminus \ass = \{ \headf(\delta) \}$
 \end{definition}
 
 \begin{definition}
-A nogood $\delta$ is \emph{weakly unit} under an assignment $\ass$ iff $\delta \setminus \bass(\ass) = \{ \bsgl \}$
-\end{definition}
-
-\begin{definition}
-A nogood $\delta$ is \emph{strongly unit} under an assignment $\ass$ iff $\delta \setminus \ass = \{ \headf(\delta) \}$
+A nogood $\delta$ is \emph{weakly unit} under an assignment $\ass$ if $\delta \setminus \bass(\ass) = \{ \bsgl \}$
 \end{definition}
 
 Note that, as the names suggest, any nogood that is strongly unit under some assignment is also weakly unit, but not the other way round. Below, nogoods are sometimes referred to be \emph{unit} which amounts to stating that they are weakly unit. Also, when clear from context, reference to a particular assignment is omitted.
 
 \begin{definition}
 \label{def:vio}
-A nogood $\delta$ is \emph{violated} under an assignment $\ass$ iff $\delta \subseteq \bass(\ass)$.
+A nogood $\delta$ is \emph{violated} under an assignment $\ass$ if $\delta \subseteq \bass(\ass)$.
 \end{definition}
 
 \begin{definition}
-A nogood $\delta$ is \emph{satisfied} under an assignment $\ass$ iff there is no $\ass' \supseteq \ass$ s.t.~$\delta$ is violated under $\ass'$.
+A nogood $\delta$ is \emph{satisfied} under an assignment $\ass$ if there is no $\ass' \supseteq \ass$ s.t.~$\delta$ is violated under $\ass'$.
 \end{definition}
 
-For the purpose of unit propagation, it is important to see that because a satisfied nogood will never be unit, therefore never yield a new assignment using unit propagation.
+Note that for an assignment $\ass$, any nogood that is satisfied under $\ass$ will also never be unit, and never propagate, for any $\ass' \supseteq \ass$.
 
 \begin{definition}
-A nogood $\delta$ is \emph{\upinv} under some assignment $\ass$ iff $\delta$ is not violated by $\ass$ and $\delta$ is not unit wrt.~$\ass$.
+A nogood $\delta$ is \emph{silent} under some assignment $\ass$ if $\delta$ is not violated by $\ass$ and $\delta$ is not unit wrt.~$\ass$.
 \end{definition}
 
-Note the difference between some $\delta$ being \upinv vs.~satisfied under an assignment: With $\delta$ being \upinv under $\ass_1$, there might well be some $\ass_1' \supset \ass_1$ under which $\delta$ is unit or violated. However $\delta$ satisfied under $\ass_2$ is stronger and implies that there is no \enquote{larger} assignment $\ass_2' \supset \ass_2$ such that $\delta$ is not satisfied under $\ass_2'$ by definition. It follows that $\delta$ can neither be unit nor violated under $\ass_2'$.
+Note the difference between some $\delta$ being silent vs.~satisfied under an assignment: With $\delta$ being silent under $\ass_1$, there might well be some $\ass_1' \supset \ass_1$ under which $\delta$ is unit or violated. However $\delta$ satisfied under $\ass_2$ is stronger and implies that there is no \enquote{larger} assignment $\ass_2' \supset \ass_2$ such that $\delta$ is not satisfied under $\ass_2'$. It follows that $\delta$ can neither be unit nor violated under $\ass_2'$.
 
-When implementing propagation, na{\"i}vely obtaining checking a large set of nogoods that represents an ASP program for unity is infeasible. Sophisticated data structures are needed to make propagation sufficiently fast.
+\section{Watch Structures}
 
-\subsection{Watch structures}
+In Section \ref{sec:2wl} we have left open how the \enquote{pointers}, as illustrated in Figure \ref{fig:2wl} are stored. Without an efficient way of associating assigned atoms with the nogoods that they are \enquote{watching}, there is no benefit in using watched literals at all. We therefore define watch structures, abstract data structures that allow to store this information.
+
+Concrete implementations might use hash table lookups to implement watch structures as outlined below.
+
+%Here, a watch structure is a function that maps atoms to to triples, as 
+
+%When implementing propagation, na{\"i}vely obtaining checking a large set of nogoods that represents an ASP program for unity is infeasible. Sophisticated data structures are needed to make propagation sufficiently fast.
 
 \begin{definition}
 % ASK: Why not define watch structure as a function/relation mapping from atom to watch sets? Structure is irrelevant, and mapping function is closer to a map in code.
@@ -813,7 +865,9 @@ For some signed literal $\sgl = \bX v$ let $$\dpm(\sgl) = \left\{\begin{array}{l
 For some signed literal $\sgl = \bX v$ or an atom $v$ let $$\dal(\sgl) = \dal(v) = W_i^\alpha \ \text{with } \Delta(v) = \langle W^+, W^-, W^\alpha \rangle .$$
 \end{definition}
 
-Interpretation as a set $\Delta = \{(v_i, (W_i^+, W_i^-, W_i^\alpha)\}$ for $1 \leq i \leq n$ where $i \not = j \to v_i \not = v_j$ for $1 \leq j \leq n$ reveals how such a mapping can be stored or visualized (see figure~\ref{fig:watches}).
+The functions $\dpm(\sgl)$ and $\dal(\sgl)$ can for example be implemented as simple hash table lookups (visualized in Figure \ref{fig:watches}), which take constant time. When a literal $\bX v$ is appended to the assignment, all nogoods that might have become unit can be found in the sets $\dpm(\bX v)$ and $\dal(\bX v)$.
+
+%Interpretation as a set $\Delta = \{(v_i, (W_i^+, W_i^-, W_i^\alpha)\}$ for $1 \leq i \leq n$ where $i \not = j \to v_i \not = v_j$ for $1 \leq j \leq n$ reveals how such a mapping can be stored or visualized (see figure~\ref{fig:watches}).
 
 \begin{figure}
   \centering
@@ -853,6 +907,11 @@ edge [out=east,in=west, above] node {$\alpha$} (v1f)
   \caption{Example layout of a \emph{watch structure}.}
   \label{fig:watches} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
+
+Given a nogood $\delta$ and an assignment $\ass$ we call the subset of literals in $\delta$ that might be \enquote{watched}, the candidate set. For the case of 2WL, the candidate set is simply the set of unassigned literals. However, with \emph{\mbt}, we have three pointers 
+
+We call the set of literals that can be watched
+For 2WL, only unassigned literals can we \enquote{watched}. Again, suppose some new assignment $\bX v$ is made, and 
 
 \begin{definition}
 The \emph{candidate sets} of a nogood $\delta$ under an assignment $A$ are subsets of the nogood  and defined as follows:
@@ -1292,7 +1351,8 @@ Algorithm \ref{alg:up} is sound and complete.
 %\printglossaries
 
 % Add a bibliography.
-\bibliographystyle{alpha}
+%\bibliographystyle{alpha}
+\bibliographystyle{plainnat}
 \bibliography{thesis}
 
 \end{document}
