@@ -436,7 +436,7 @@
   naustrian={Hiermit erkl\"are ich, dass ich diese Arbeit
     selbst\"andig verfasst habe, dass ich die verwendeten Quellen
     und Hilfsmittel vollst\"andig angegeben habe und dass ich die
-    Stellen der Arbeit -- einschlie{\ss}lich Tabellen, Karten und
+    Stellen der Arbeit -- einschlie{\ss}lich Tabellen und
     Abbildungen --, die anderen Werken oder dem Internet im Wortlaut
     oder dem Sinn nach entnommen sind, auf jeden Fall unter Angabe
     der Quelle als Entlehnung kenntlich gemacht habe.}]{Statement}%
