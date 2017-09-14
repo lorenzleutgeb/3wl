@@ -197,7 +197,7 @@ Im Unterschied zu SAT-Formeln enthalten ASP-Programme jedoch Variablen, wodurch 
 
 Der Hauptteil der Arbeit beschreibt einen möglichen Lösungsansätz der effizienten Einheitsresolution mit drei Wahrheitswerten, insbesondere für lazy-grounding ASP-Systeme, aufbauend auf der \emph{Two Watched Literals} (2WL) Methode. Die neue Methode nennt sich \emph{Three Watched Literals} (3WL).
 
-Der Algorithmus wurde implementiert und in das lazy-grounding ASP-System \enquote{Alpha} integriert. Ergebnisse einer Evaluation dieser Implementierung anhand von frei verfügbaren Eingabeprogrammen werden diskutiert.
+Die Korrektheit Algorithmus wird gezeigt. Die erste bekannte Implementierung des Verfahrens -- Teil des lazy-grounding ASP-Systems \enquote{Alpha} -- wurde zu einer Evaluation anhand von  verfügbaren Eingabeprogrammen herangezogen, deren Ergebnisse diskutiert werden.
 %Der Komppromiss zwischen Speicherverbrauch und vollständiger Verfügbarkeit des grundierten Programms resultiert in neuen Restriktionen für Algorithmen und Datenstrukturen in ASP-Systemen. Der Hauptteil der Arbeit beschreibt wie \emph{Unit Propagation} basierend auf \emph{two-watched-literals} auf drei Literale erweitert werden kann, sodass Berechnungen mit einem teilweise grundierten Programm ausgeführt werden können.
 \end{kurzfassung}
 
@@ -206,11 +206,11 @@ Der Algorithmus wurde implementiert und in das lazy-grounding ASP-System \enquot
 \begin{abstract}
 Answer Set Programming (ASP) is a declarative programming paradigm based on first order logic. ASP programs are usually evaluated by ASP systems, whose design is strongly inspired by solvers for the Boolean satisfiability problem (SAT). A central method in these systems is \emph{unit propagation}, enabling to derive new truth assignments for constants from known truth assignments, using the structure of the input formula.
 
-Contrary to SAT formulas, ASP programs contain variables, leading to the so called \emph{grounding bottleneck}, which limits the practical applicability of ASP systems. The development of \emph{lazy-grounding} ASP systems to overcome the grounding bottleneck is an active area of research. By introducing a third truth value \emph{\mbt} (in addition to the two Boolean truth values \emph{true} and \emph{false}) search for solutions can be improved. This optimization was shown to be especially effective in lazy-grounding ASP systems, but it is not compatible with established variants of unit propagation, because they only consider the Boolean truth values.
+Contrary to SAT formulas, ASP programs contain variables, leading to the so-called \emph{grounding bottleneck}, which limits the practical applicability of ASP systems. The development of \emph{lazy-grounding} ASP systems to overcome the grounding bottleneck is an active area of research. By introducing a third truth value \emph{\mbt} (in addition to the two Boolean truth values \emph{true} and \emph{false}) search for solutions can be improved. This optimization was shown to be especially effective in lazy-grounding ASP systems, but it is not compatible with established variants of unit propagation, because they only consider the Boolean truth values.
 
-The main part of the work describes a possible approach for efficient unit propagation with three truth values, especially considering lazy-grounding ASP systems, based on the \emph{Two Watched Literals} (2WL) method. The new approach is called \emph{Three Watched Literals} (3WL).
+The main part of this work describes an approach for efficient unit propagation with three truth values, especially considering lazy-grounding ASP systems, based on the \emph{Two Watched Literals} (2WL) method. The new approach is called \emph{Three Watched Literals} (3WL).
 
-The algorithm was implemented and integrated into the lazy-grounding ASP system \enquote{Alpha}. By using freely available input programs, the implementation was evaluated, and results are discussed.
+Correctness of the new algorithm is shown. The first known implementation -- part of the lazy-grounding ASP system \enquote{Alpha} -- was used to evaluate performance with freely available input programs. Results are discussed.
 \end{abstract}
 
 \tableofcontents % Starred version, i.e., \tableofcontents*, removes the self-entry.
@@ -224,11 +224,11 @@ The algorithm was implemented and integrated into the lazy-grounding ASP system 
 Since the inception of computer programming, different ways of encoding algorithms, structuring data and modeling the real world in computer programs have led to the development of various conceptually diverse programming languages. Families of programming languages that share some properties are usually grouped into so called \enquote{programming paradigms}.
 Such paradigms describe the common, most important concepts and lay a framework for a family of languages.
 
-The languages most widely used in the industry follow the \enquote{imperative} programming paradigm (some more strict, some less), which revolves around \enquote{commanding} the computer. In this work, in contrast to mainstream software engineering, the main focus is Answer Set Programming (ASP, \cite{stable}), a declarative programming paradigm that roots in first order logic.
+The languages most widely used in industry follow the \emph{imperative} programming paradigm (some more strict, some less), which revolves around instructing the computer step by step. In this work, in contrast to mainstream software engineering, the main focus is Answer Set Programming (ASP, \cite{stable}), a declarative programming paradigm that roots in first order logic.
 
 A key difference between declarative and imperative programming is that in the former the focus is explaining the problem to be solved and \emph{what} a solution should look like, while for the latter, programmers write code that specifies \emph{how} the problem is to be solved.
 
-Without going into further details about how ASP internally \enquote{works}, consider the following example for an intuition.
+Without going into further details about how ASP internally works, consider the following example for an intuition.
 
 \begin{example}
 \label{ex:garments}
@@ -249,10 +249,10 @@ wear(G) \from& \ garment(G), inseason(G). \tag{$r_3$}\label{ex:garments:wear}\\
 \from& \ winter, summer. \tag{$c_1$}\label{ex:garments:seasons}
 \end{align}
 
-The program is made up of eleven rules: \ref{ex:garments:garments:begin} \ldots \ref{ex:garments:garments:end} list the four pieces we have in the wardrobe (a winter jacket, a pair of jeans, a t-shirt and shorts). Rules \ref{ex:garments:style:begin} and \ref{ex:garments:style:end} qualify garments that are light or warm. The current season is encoded in \ref{ex:garments:season}. Through \ref{ex:garments:inseason:begin} and \ref{ex:garments:inseason:end} we define when a garment is \enquote{in season}, i.e.~whether a piece is not light (resp.~not warm) which means it should be worn in winter (resp.~summer). Finally, we express that a garment can be worn in case it is in season in rule \ref{ex:garments:wear}. The last rule \ref{ex:garments:seasons} models a constraint: It is unreasonable that it is both winter and summer for one evaluation of the program.
+The program is made up of eleven rules: \ref{ex:garments:garments:begin} \ldots \ref{ex:garments:garments:end} list the four pieces we have in the wardrobe (a winter jacket, a pair of jeans, a t-shirt and shorts). As these rules have no premises, they are also called \emph{facts}. Rules \ref{ex:garments:style:begin} and \ref{ex:garments:style:end} qualify garments that are light or warm. The current season is encoded in \ref{ex:garments:season}. Through \ref{ex:garments:inseason:begin} and \ref{ex:garments:inseason:end} we define when a garment is \enquote{in season}, i.e.~whether a piece is not light (resp.~not warm) which means it should be worn in winter (resp.~summer). Finally, we express that a garment can be worn in case it is in season in rule \ref{ex:garments:wear}. The last rule \ref{ex:garments:seasons} models a \emph{constraint}: it is unreasonable that it is both winter and summer for one evaluation of the program.
 \end{example}
-
-The evaluation of an ASP program is done by an ASP system, which may be comprised of further components. For \enquote{user} and programmer, no detailed knowledge about the system is required. The abstract input/output behaviour of these systems is enough to use them in most cases: Given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets. Loosely speaking, answer sets are possible combinations of values that satisfy all requirements that are stated in the program.
+enquote
+The evaluation of an ASP program is done by an ASP system, which may be comprised of further components. For user and programmer, no detailed knowledge about the system is required. The abstract input/output behaviour of these systems is enough to use them in most cases: given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets. Loosely speaking, answer sets are possible combinations of values that satisfy all requirements that are stated in the program.
 
 % benuetzen gleiche techniken, es hat sich gezeigt, dass techniken aus dem sat bereich effizient sind
 
@@ -260,7 +260,7 @@ Many ASP system implementations use solving algorithms closely related to those 
 
 \begin{example}
 \label{ex:garmentsground}
-Reconsider Example \ref{ex:garments}. Na{\"i}vely substituting all occurrences of \emph{G} yields eight instances of the rule $r_1$ (two per garment), and four of rule $r_2$ (one per garment).
+Reconsider Example \ref{ex:garments}, na{\"i}vely substituting all occurrences of \emph{G} yields eight instances of the rule $r_1$ (two per garment), and four of rule $r_2$ (one per garment).
 \begin{align}
 garment(winterjacket)\from& \ . \tag{$f_1$}\label{ex:garmentsground:garments:begin}\\
 garment(jeans)\from& \ .\tag{$f_2$}\\
@@ -287,7 +287,7 @@ wear(shorts) \from& \ garment(shorts), inseason(shorts).\tag{$r_{2,4}$}\\
 \end{align}
 \end{example}
 
-Generally, the ground program is exponentially bigger than the input program.
+Generally, the ground program may be exponentially bigger than the input program.
 
 \newpage
 
@@ -306,7 +306,7 @@ Facts $f_1$ to $f_n$ span a domain of size $n$, while rules $r_1$ and $r_2$ toge
 
 Adding another rule to the program will however cause the size of the ground program to grow out of polynomial relation:
 \begin{align}p(X_1, \ldots, X_k) \from selected(X_1), \ldots, selected(X_k). \tag{$r_3$} \end{align}
-Now, the size of the ground program of $P \cup \{ r_4 \}$ will be exponential\footnote{In practice for most ASP systems. \cite{bounded-arities} shows that for programs with bounded predicate arities, polynomial space is sufficient.} in $k$, precisely $n^k + n^2 + 2n$.
+Now, the size of the ground program of $P \cup \{ r_3 \}$ will be exponential\footnote{In practice for most ASP systems. \cite{bounded-arities} shows that for programs with bounded predicate arities, polynomial space is sufficient.} in $k$, precisely $n^k + n^2 + 2n$.
 \end{example}
 
 State-of-the-art ASP systems feature two components: The \emph{grounder} takes care of substituting all variables, i.e.~generating the ground program, while the \emph{solver} takes this ground program as input and computes answer sets. Traditionally, the grounder is invoked first, and only after it has output the ground program, the solver starts execution. This two-phased mode of operation is referred to as \emph{ground-and-solve}. With the ground program being exponentially larger than the original input program with variables, these systems are prone to what we call the \emph{grounding bottleneck}: When the ground program is so large that it does not fit into memory, the search for answer sets is impossible in practice. For more examples that exhibit the grounding bottleneck, we refer to \cite[Section 1]{asperix}.
@@ -327,17 +327,17 @@ Through the combination of truth values and information about conflicting truth 
 Consider Example \ref{ex:garments} again, which contains the constraint \ref{ex:garments:seasons}. It can be written as a clause $winter \wedge summer$ that must not evaluate to \emph{true}, or simply as a nogood $\delta = \{ \bT summer, \bT winter \}$ of the two propositions that cannot conform with the assignment at the same time. An assignment saying that \enquote{$summer$ is \emph{true}} in combination with $\delta$ implies a new truth value, namely that \enquote{$winter$ is \emph{false}}.
 \end{example}
 
-In order to perform unit propagation, ground-and-solve systems commonly translate the input program into a set of nogoods, and even more advanced algorithms have been devised to dynamically \enquote{learn} new nogoods in the process of searching for answer sets. 
+In order to perform unit propagation, ground-and-solve systems commonly translate the input program into a set of nogoods, and even more advanced algorithms have been devised to dynamically learn new nogoods in the process of searching for answer sets. 
 
-For solvers to be efficient, it is crucial to quickly identify which nogoods are unit, even when the assignment under which the nogoods might individually be unit changes frequently during search. Modern solvers implement the so called \emph{two-watched-literals} (2WL) strategy \cite{effsat,questsat}, which describes both an algorithm and a data structure to track nogoods and propagate as soon as they become unit.
+For solvers to be efficient, it is crucial to quickly identify which nogoods are unit, even when the assignment under which the nogoods might individually be unit changes frequently during search. Modern solvers implement the so called \emph{Two Watched Literals} (2WL) strategy \cite{effsat,questsat}, which describes both an algorithm and a data structure to track nogoods and propagate as soon as they become unit.
 
-An optimization technique to speed up the solving process, pioneered by the ground-and-solve system \dlv (cf.~\ref{sec:dlv}) is the introduction of a third truth value \emph{\mbt} in addition to the two well known values \emph{true} and \emph{false}. Using a third truth value also is an effective optimization in lazy-grounding systems (cf.~Sections \ref{sec:asperix} and \ref{sec:omiga}). However, 2WL does only account for two truth values, thus cannot be used in conjunction with \emph{\mbt}.
+An optimization technique to speed up the solving process, pioneered by the ground-and-solve system \dlv (cf.~\ref{sec:dlv}) is the introduction of a third truth value \emph{\mbt} in addition to the two usual values \emph{true} and \emph{false}. Using a third truth value also is an effective optimization in lazy-grounding systems (cf.~Sections \ref{sec:asperix} and \ref{sec:omiga}). However, 2WL does only account for two truth values, thus cannot be used in conjunction with \emph{\mbt}.
 
-The goal of this to combine the two improvements (2WL for propagation and \emph{\mbt} as a third truth value) in order to be applied within the same system.
+The goal of this work is to combine the two improvements (2WL for propagation and \emph{\mbt} as a third truth value) in order to be applied within the same system.
 
 The motivation of this work is finding a way to adapt 2WL, which was shown to be successfully in SAT solvers as well as ground-and-solve ASP systems, such that it can be employed in lazy-grounding ASP systems.
 
-Motivation for this is twofold: Firstly, enabling lazy-grounding systems to profit from the benefits of 2WL, i.e.~improved propagation speeds, while still using \emph{\mbt}. Secondly, by integrating a procedure very similar to 2WL into a lazy-grounding framework, making it simpler to eventually re-use results that previously were exclusive to ground-and-solve systems in lazy-grounding systems as well.
+Motivation for this is twofold: firstly, enabling lazy-grounding systems to profit from the benefits of 2WL, i.e.~improved propagation speeds, while still using \emph{\mbt}. Secondly, by integrating a procedure very similar to 2WL into a lazy-grounding framework, making it simpler to eventually re-use results that previously were exclusive to ground-and-solve systems in lazy-grounding systems as well.
 
 %\section{Problem Statement}
 %\label{sec:problem}
@@ -356,11 +356,11 @@ Motivation for this is twofold: Firstly, enabling lazy-grounding systems to prof
 % implementation
 % benchmarks
 
-After an analysis of 2WL, algorithms and data structures that account for lazy-grounding is devised and their soundness and completeness is shown. An implementation is contributed to the Alpha system, which in turn is compared against a na{\"i}ve approach in form of a benchmark.
+Contributions: After an analysis of 2WL, algorithms and data structures that account for lazy-grounding are devised and their correctness is shown. An implementation is contributed to the Alpha system, which in turn is compared against a na{\"i}ve approach in form of a benchmark.
 
 \section{Structure of the Work}
 
-In Chapter \ref{chap:prelim} we formally introduce logic programs such as the one in the above example (syntax and semantics) of ASP and stable models. Also, a selection of state-of-the-art ASP systems is discussed. The main part of the work is Chapter \ref{chap:prop} introducing Three Watched Literals (3WL), an algorithm for efficient propagation for lazy-grounding Answer Set solving based on Two Watched Literals. Evaluation 3WL as implemented in the Alpha system is evaluated in Chapter \ref{chap:eval} and we conclude in Chapter \ref{chap:conc}.
+In Chapter \ref{chap:prelim} we formally introduce logic programs such as the one in the above example (syntax and semantics) of ASP and stable models. Also, a selection of state-of-the-art ASP systems is discussed. The main part of the work is Chapter \ref{chap:prop} introducing Three Watched Literals (3WL), an algorithm for efficient propagation for lazy-grounding Answer Set solving based on Two Watched Literals. Evaluation of 3WL as implemented in the Alpha system is evaluated in Chapter \ref{chap:eval} and we conclude in Chapter \ref{chap:conc}.
 
 \chapter{Preliminaries}
 \label{chap:prelim}
@@ -411,15 +411,15 @@ Note that for a rule $r$ both body and head can be empty: In case $\bodyf(r)$ is
 A \emph{(logic) program} $P$ is a finite set of rules. It is \emph{ground} if all $r \in P$ are ground. The ground program derived from $P$ is denoted $grnd(P)$.
 \end{definition}
 
-For the scope of this work, the above definition of rules is sufficient. Programs consisting only of rules of this form are called \emph{normal} programs. For example, more generally, rules with disjunctive heads $a_1 \vee \cdots \vee a_k \from \ldots$ also have interesting properties, but are outside the scope of this thesis.
+For the scope of this work, the above definition of rules is sufficient. Programs consisting only of rules of this form are called \emph{normal} programs. More general, e.g.~rules with disjunctive heads $a_1 \vee \cdots \vee a_k \from \ldots$ also have interesting properties, but are outside the scope of this thesis.
 
-In practice, many more syntactic constructs are used to ease modelling programs: Arithmetic expressions, aggregates allowing statements about sets (counting how many elements match some criteria, summation of numeric values, etc.) and choice rules that encode sets of atoms for which only a given number should be in an answer set, all of which can be translated into simple rules. For core standard, widely accepted among ASP many systems, consider \cite{calimeri2015asp}.
+In practice, many more syntactic constructs are used to ease modelling programs: arithmetic expressions, aggregates allowing statements about sets (counting how many elements match some criteria, summation of numeric values, etc.) and choice rules that encode sets of atoms for which only a given number should be in an answer set, all of which can be translated into simple rules. The core standard, widely accepted by ASP many systems, is available from \cite{calimeri2015asp}.
 
 \subsection{Semantics}
 
 An atom in the sense of ASP is a proposition with no deeper structure. It might represent some external state of affairs, e.g.~$rainy$ to indicate whether the weather is not nice or $handsome(yue)$ a statement about Yue being handsome. Their granularity or level of abstraction directly affects how detailed the world is modeled by a program, because atoms are treated as internally consistent statements and they cannot be split further.
 
-In order to reason about the truth values of atoms in a program, we define an interpretation.
+In order to state the truth values of atoms in a program, we define an interpretation.
 
 \begin{definition}
 An \emph{interpretation} is a set of ground atoms $I$.
@@ -427,9 +427,9 @@ An \emph{interpretation} is a set of ground atoms $I$.
 
 %Observe that $I$ is a set of \emph{ground} literals, i.e.~we only define an interpretation for ground atoms and a na\ddot{i}ve implementation will therefore first ground the input program. This is the root of the bottleneck.
 
-Considering Example \ref{ex:garments}, note that the set $I_1 = \{ wear(G) \}$ is not an interpretation, because the atom it contains is not ground. However $I_2 = \{ wear(winterjacket) \}$ is an interpretation, because $winterjacket$ is used as a constant in the program.
+Considering Example \ref{ex:garments}, note that the set $I_1 = \{ wear(G) \}$ is not an interpretation, because the atom it contains is not ground, however $I_2 = \{ wear(winterjacket) \}$ is an interpretation, because $winterjacket$ is.
 
-The truth value of an atom is defined against an interpretation, which in turn is simply the set of atoms that are considered \emph{true}, i.e.~we say that 
+The truth value of an atom is defined by an interpretation $I$, which in turn is simply the set of atoms that are considered \emph{true}, i.e.~we say that \enquote{$a$ is \emph{true}} if $a \in I$.
 
 Interpretations and literals are related through satisfaction.
 
@@ -437,7 +437,7 @@ Interpretations and literals are related through satisfaction.
 An interpretation $I$ \emph{satisfies} a positive literal $l = p$, if $p \in I$ and a negative literal $l = \fail p$ if $p \not \in I$. We denote this as $I \models l$ .
 \end{definition}
 
-We commonly encode the truth value of atoms through satisfaction, e.g.~we say that an atom $p$ is \emph{true} under some interpretation $I$ if the the literal $l = p$ is satisfied by $I$ and vice versa. Satisfaction of literals expands to satisfaction of rules. \cite{ryan}
+We commonly encode the truth value of atoms through satisfaction, e.g.~we say that an atom $p$ is \emph{true} under some interpretation $I$ if the the literal $l = p$ is satisfied by $I$ and vice versa. Satisfaction of literals expands to satisfaction of rules.% \cite{ryan}. TODO why is this source here?
 
 \begin{definition}
 \label{def:rule-model}
@@ -482,7 +482,7 @@ democrat(alice) \from& \ citizen(alice),~\fail republican(alice). \tag{$r_1$} \\
 republican(alice) \from& \ citizen(alice),~\fail democrat(alice). \tag{$r_2$} 
 \end{align}
 
-Conceivable interpretations are:
+Note that interpretations without $citizen(alice)$ immediately conflict with $f_1$, i.e.~$f_1$ is not satisfied. Conceivable interpretations are:
 \begin{align*}
 I_1 =& \{ citizen(alice), democrat(alice) \}\\
 I_2 =& \{ citizen(alice), republican(alice) \}\\
@@ -499,7 +499,7 @@ The negative body of $r_1$ is removed because $democrat(alice) \in I_1$ and $r_2
 
 Considering $I_3$ we see that $P^{I_3}$ is just the fact $f_1$, but there are two more elements in $I_3$, so it is not an answer set.
 
-$P^{I_4}$ contains the positive part of both rules:
+$P^{I_4}$ contains the positive part of both rules, i.e.~$P^{I_4}$ is:
 \begin{align*}
 citizen(alice)\from& \ . \\
 democrat(alice) \from& \ citizen(alice). \\
@@ -508,7 +508,7 @@ republican(alice) \from& \ citizen(alice).
 Two atoms that are in the smallest model of $P^{I_4}$, inferred via the two rules, are missing from $I_4$: $\{democrat(alice), republican(alice) \}$
 \end{example}
 
-In practice, interpretations cannot be guessed in their entirety but are constructed step-by-step in a search process (\enquote{solving}). A distinction between an unassigned atom and an atom that has been found to be \emph{false} is not possible when directly working with interpretations like above; partial interpretations cannot be expressed, as everything that is not explicitly included in the interpretation is effectively assumed to be \emph{false}. This is why interpretations are commonly represented by assignments, which explicitly encode the truth value of atoms.
+In practice, interpretations cannot be guessed in their entirety but are constructed step-by-step in a search process called \emph{solving}. A distinction between an unassigned atom and an atom that has been found to be \emph{false} is not possible when directly working with interpretations like above; partial interpretations cannot be expressed, as everything that is not explicitly included in the interpretation is effectively assumed to be \emph{false}. This is why interpretations are commonly represented by assignments, which explicitly encode the truth value of atoms.
 
 \begin{definition}
 An \emph{assignment} $\ass$ is a set of literals. Assignments are consistent, i.e. for any atom $a \in \ass$, its negation is not contained, i.e. $\neg a \not \in \ass$.
@@ -525,7 +525,7 @@ In this section we survey state-of-the-art ASP systems in order to highlight sim
 
 The first ASP systems developed are based on the ground-and-solve approach, as it is less involved and can be implemented in a more straight-forward manner than lazy-grounding. We consider \clasp as it uses two-watched literals and employs nogood learning and \dlv because it introduced \emph{\mbt} as a truth value, which turns out to be very effective in lazy-grounding as well.
 
-Only gradually, running into the grounding bottleneck with benchmarks and in industry settings, the grounding bottleneck was recognized, which lead to the development of lazy-grounding systems. With lazy-grounding systems being newer, and less time spent reasoning about their efficiency and (re-)engineering them, they often fail to achieve the performance of ground-and-solve systems. The main culprit of early lazy-grounding systems is that they cannot leverage state-of-the-art techniques from ground-and-solve systems: Among others, propagation using two-watched literals and heuristics are where the performance of ground-and-solve systems stems from.
+Only gradually, running into grounding issues with benchmarks and in industry settings, the grounding bottleneck was recognized, which lead to the development of lazy-grounding systems. With lazy-grounding systems being newer, and less time spent reasoning about their efficiency and engineering them, they often fail to achieve the performance of ground-and-solve systems. The main culprit of early lazy-grounding systems is that they cannot leverage state-of-the-art techniques from ground-and-solve systems: Among others, propagation using two-watched literals and heuristics are where the performance of ground-and-solve systems stems from.
 
 \subsection{Ground-and-Solve}
 
@@ -533,14 +533,14 @@ We describe two very successful systems that follow the ground-and-solve approac
 
 \subsubsection{clingo}
 
-\texttt{clingo}\footnote{\url{https://potassco.org/clingo/}} is a ground-and-solve ASP system, written in C++\footnote{\url{http://www.open-std.org/jtc1/sc22/wg21/}}, which combines the grounder \texttt{gringo} and the solver \texttt{clasp} \cite{clasp-first}. \clasp uses the 2WL strategy for propagation \cite[Sec.~5.3]{clasp} and implements conflict-driven nogood learning (CDNL) \cite[Sec.~4.1]{clasp} in analogy to conflict-driven clause learning (CDCL) in SAT solvers \cite{grasp,cdl-sat}. It is among the fastest ASP systems according to \cite{aspcomp2015}\footnote{With detailed results at \url{http://aspcomp2015.dibris.unige.it/aspcomp2015-iclp-slides.pdf}}.
+\texttt{clingo}\footnote{\url{https://potassco.org/clingo/}} is a ground-and-solve ASP system, written in C++\footnote{\url{http://www.open-std.org/jtc1/sc22/wg21/}}, which combines the grounder \texttt{gringo} and the solver \texttt{clasp} \cite{clasp-first}. \clasp uses the 2WL strategy for propagation \cite[Sec.~5.3]{clasp} and implements conflict-driven nogood learning (CDNL) \cite[Sec.~4.1]{clasp} in analogy to conflict-driven clause learning (CDCL) in SAT solvers \cite{grasp,cdl-sat}. It is among the fastest ASP systems according to \cite{aspcomp2015}\footnote{See \url{http://aspcomp2015.dibris.unige.it/aspcomp2015-iclp-slides.pdf} for detailed results}.
 
 \subsubsection{DLV}
 \label{sec:dlv}
 
 \dlv \cite{dlv} is a versatile ground-and-solve ASP system divided into front-end, intelligent grounding, model generation and model checking components. It comes with front-ends for various applications: (Extended) Disjunctive Logic Programming \cite{dlp} (similar to DISLOG \cite{dislog} and DisLoP \cite{dislop}), Diagnostic Reasoning, and the Structured Query Language\footnote{\cite{dlv} references the 1999 version available from \url{https://www.iso.org/standard/26196.html} and \url{https://www.iso.org/standard/26197.html}}). With \cite{dlv-mbt} the authors add two important features: Firstly, they introduce a third truth value, \mbt, to enhance propagation. It marks atoms that must be assigned true in order to yield an answer set, but where there is no proof found in the search process (see Section \ref{sec:asperix} and Example \ref{ex:mbt} as well). Secondly, heuristics that increase the odds of choices to be correct greatly improve overall performance.
 
-A detailed paper on the development, optimization and industrial application of \dlv is available through \cite{dlvproject}.
+A detailed account on the development, optimization and industrial application of \dlv is available \cite{dlvproject}.
 
 \subsection{Lazy-Grounding}
 
@@ -549,13 +549,13 @@ In this section we briefly describe three different ASP systems that were design
 \subsubsection{ASPeRiX}
 \label{sec:asperix}
 
-\asperix is one of the first ASP systems that were designed to avoid the grounding bottleneck. It was first prototyped in 2008\footnote{According to the project's website\\ \url{http://www.info.univ-angers.fr/pub/claire/asperix/\#download}} and published in \cite{asperixfirst,fofchain}, with a detailed explanation in \cite{asperix}. It is implemented in C++. The core algorithm evolved from the concept of computation as in \cite{computations}.
+\asperix is one of the first ASP systems that were designed to avoid the grounding bottleneck. It was first prototyped in 2008\footnote{According to the project's website\\ \url{http://www.info.univ-angers.fr/pub/claire/asperix/\#download}} and published in \cite{asperixfirst,fofchain}, with a detailed explanation in \cite{asperix} and a C++ implementation. Its core algorithm evolved from the concept of computation as in \cite{computations}.
 
-In the process of finding a solution, it extends a partial interpretation \cite[Def.~4]{asperix} in form of a pair $\langle IN, OUT \rangle$ of disjoint atom sets, where the atoms in $IN$ belong to the answer set that is currently searched and the atoms in $OUT$ do not. Further, the system tracks the set of ground rules, $R$, which is lazily extended by grounding the input program. Rules of the program $r$ relate to a partial interpretation and are called \emph{supported} ($\bodyf^+(r) \subseteq IN$), \emph{blocked} ($\bodyf^-(r) \cap IN \not = \emptyset$), \emph{unblocked} ($\bodyf^-(r) \subseteq OUT$), and \emph{applicable} (supported and not blocked) \cite[Def.~5]{asperix}. 
+In the process of finding a solution, it extends a partial interpretation \cite[Def.~4]{asperix} in form of a pair $\langle IN, OUT \rangle$ of disjoint atom sets, where the atoms in $IN$ belong to the answer set that is currently searched and the atoms in $OUT$ do not. Furthermore, the system tracks the set of ground rules, $R$, which is lazily extended by grounding the input program. Rules of the program $r$ relate to a partial interpretation and are called \emph{supported} ($\bodyf^+(r) \subseteq IN$), \emph{blocked} ($\bodyf^-(r) \cap IN \not = \emptyset$), \emph{unblocked} ($\bodyf^-(r) \subseteq OUT$), and \emph{applicable} (supported and not blocked) \cite[Def.~5]{asperix}. 
 
 The main concept in this ASP system is an \asperix \emph{computation} \cite[Def.~7]{asperix}: It is a sequence of pairs $\langle R_i, I_i \rangle$ that captures ground rules and a partial interpretation $I_i = \langle IN, OUT \rangle$. The computation starts with $\langle \emptyset, \langle \emptyset, \{ \bot \} \rangle \rangle$ and is inductively defined through the rules \emph{propagation} (monotonic; a new rule $r_i \not \in R_{i-1}$ can be ground from the program such that it \enquote{fires}, i.e.~its head is added to $IN$), \emph{choice} (non-monotonic; there are no rules that propagate, but the solver guesses whether an applicable rule fires, i.e. forces or prohibits its instantiation) and \emph{stability} (no rules for propagation or choice left). Through inductive definition of computations, it is guaranteed that the sequence converges to an answer set iff there exists one \cite[Thm.~2]{asperix}.
 
-The most important take-away from \asperix for this work, however is the introduction of a third truth value which allows for more efficient convergence of above computation: The truth value \mbt indicates that an atom that is not in already in $IN$ must be in $IN$ (cannot be in $OUT$) in order to find an answer set. It allows to mark certain atoms for which a \enquote{proof}, i.e. a firing rule with the atom as its head, has not yet fired, but must, at some point in the computation.
+The most important take-away from \asperix for this work, however is the introduction of a third truth value which allows for more efficient convergence of above computations: The truth value \mbt indicates that an atom that is not in already in $IN$ must be in $IN$ (cannot be in $OUT$) in order to find an answer set. It allows to mark certain atoms for which a \enquote{proof}, i.e. a firing rule with the atom as its head, has not yet fired, but must, at some point in the computation.
 
 \begin{example}[{\cite[Example 7]{asperix}}]
 \label{ex:mbt}
@@ -569,7 +569,7 @@ This leads to a reduction of the search space in propagation \cite[Ex.~8]{asperi
 \subsubsection{OMiGA}
 \label{sec:omiga}
 
-\omiga\footnote{\url{http://www.kr.tuwien.ac.at/research/systems/omiga/}} \cite{omiga}, written in Java\footnote{\url{https://oracle.com/java/}}, uses computation to explore the search space similar to \asperix. In contrast it uses a so called \emph{Rete network} \cite{rete} as dominating data structure: Rete is an algorithm to search large collections of objects for those matching a pattern, and it was initially designed to be used in expert systems and rule based production systems, where there are many rules to consider.
+\omiga\footnote{\url{http://www.kr.tuwien.ac.at/research/systems/omiga/}} \cite{omiga}, written in Java\footnote{\url{https://oracle.com/java/}}, uses computation to explore the search space similar to \asperix. In contrast to that it uses a so called \emph{Rete network} \cite{rete} as dominating data structure: Rete is an approach to search large collections of objects for those matching a pattern, and it was initially designed to be used in expert systems and rule based production systems, where there are many rules to consider.
 
 In \omiga the network is used to: (a) store ground atoms, (b) retrieve ground atoms for the purpose of grounding new rules, (c) find applicable non-ground rules (\emph{propagation} in \asperix), and (d) find rules to guess on (corresponding to \emph{choice} in \asperix). While \asperix re-evaluates applicability of non-ground rules at each step in the computation, \omiga keeps grounded atoms and partial ground rule interpretations in the network. In choosing a Rete network to store these data, \omiga trades space for time, as information retrieval from the network is faster than re-computation of applicability. 
 
@@ -577,7 +577,7 @@ In \omiga the network is used to: (a) store ground atoms, (b) retrieve ground at
 
 \subsubsection{GASP}
 
-GASP \cite{gasp,gasp2}\footnote{\url{https://users.dimi.uniud.it/~agostino.dovier/GASP/} and\\ \url{https://users.dimi.uniud.it/~agostino.dovier/CLPASP/}} is implemented SICStus Prolog 4\footnote{\url{https://sicstus.sics.se/}}. It represents interpretations as finite domains and uses Constraint Logic Programming.
+GASP \cite{gasp,gasp2}\footnote{\url{https://users.dimi.uniud.it/~agostino.dovier/GASP/} and\\ \url{https://users.dimi.uniud.it/~agostino.dovier/CLPASP/}} is implemented in SICStus Prolog 4\footnote{\url{https://sicstus.sics.se/}}. It represents interpretations as finite domains and uses Constraint Logic Programming.
 
 %\subsection{Summary}
 
@@ -600,23 +600,23 @@ The concept of a nogood originates in constraint programming (CP) (cf.~\cite{cla
 A \emph{nogood} is a set $\{ \bsgl_1, \ldots, \bsgl_n \}$ of literals that cannot be extended to a solution.
 \end{definition}
 
-First proposed by \citet{clasp-first}, in the solver components of ASP systems, nogoods take the role of clauses in SAT solvers. Nogoods correspond to partial assignments that cannot be extended to an answer set, and are derived from rules. \clasp uses a translation procedure based on Clark completion \cite{clark}, described in \cite[Section 3]{clasp}, which requires knowledge of the full ground program. The Alpha system uses a different scheme defined in \cite[Definition 5]{blend} and other methods are conceivable.
+First proposed by \citet{clasp-first}, in the solver components of ASP systems, nogoods take the role of clauses in SAT solvers. Nogoods correspond to partial assignments that cannot be extended to an answer set, and are derived from rules. \clasp uses a translation procedure based on Clark's completion \cite{clark}, described in \cite[Section 3]{clasp}, which requires knowledge of the full ground program. The Alpha system uses a different scheme defined in \cite[Definition 5]{blend} and other methods are conceivable.
 
 \begin{example}
 \label{ex:rule-to-nogood}
 For example, given a rule $r$ of the form $a_1 \from a_2, a_3, \fail a_4$, the nogood $\delta = \{\neg a_1, a_2, a_3, \neg a_4 \}$ excludes assignments where the body of the rule is satisfied, but its head is not: An interpretation $I$ that satisfies all elements of $\bodyf(r) = \{a_2, a_3, \neg a_4 \}$ and $\neg a_1$, the negation of the only element of $\headf(r)$, cannot be a model of $r$ (Definition \ref{def:rule-model}).
 \end{example}
 
-Given a nogood $\delta$ and an assignment $\ass$ with $\delta \subseteq \ass$, then no interpretation derived from $\ass$ can be a solution. This property allows for propagation: If $\ass \cap \delta = \{ \bsgl \}$, we say that $\delta$ is \emph{unit} or unit on $\bsgl$. In order to obtain a solution we may extend $\ass$ to $\ass'$ so that $\neg \bsgl \in \ass$.
+Given a nogood $\delta$ and an assignment $\ass$ with $\delta \subseteq \ass$, then no interpretation derived from $\ass$ can be a solution. This property allows for propagation: If $\ass \cap \delta = \{ \bsgl \}$, we say that $\delta$ is \emph{unit} or unit on $\bsgl$. In order to obtain a solution we may extend $\ass$ to $\ass'$ so that $\neg \bsgl \in \ass'$.
 
-The number of nogoods generated from a program is proportional to the size of the corresponding ground program (depending on the translation scheme used). Thus, one can expect many nogoods, possibly many thousands, to be generated in the process. However, after constructing nogoods from the input program (or parts thereof, as in the lazy-grounding case) and propagating truth values, it is important to efficiently re-evaluate whether there is a nogood that is unit under the extended assignment. This is where the benefits of 2WL in SAT over clauses and in ASP over nogoods align.
+The number of nogoods generated from a program is proportional to the size of the corresponding ground program (depending on the translation scheme used). Thus, one can expect many nogoods, possibly millions, to be generated in the process. However, after constructing nogoods from the input program (or parts thereof, as in the lazy-grounding case) and propagating truth values, it is important to efficiently evaluate whether there is a nogood that is unit under the extended assignment. This is where the benefits of 2WL in SAT (over clauses) and in ASP (over nogoods) align.
 
-For each nogood, two distinct and unassigned literals are chosen to be watched. When one of these literals is assigned, a different literal (distinct from the second watched literal) in the nogood is chosen as the new watched literal. This process is continued until there are no two distinct literals available in the nogood. If the nogood is unit at this point, a new assignment can be generated.
+For each nogood, two distinct and unassigned literals are chosen to be watched. When one of these literals is assigned, a different literal (distinct from the second watched literal) in the nogood is chosen as the new watched literal. This process is continued until there are no two distinct literals available in the nogood. Then the nogood is unit at this point and a new assignment can be generated.
 
 \begin{example}
 Consider Figure \ref{fig:2wl}. It shows the nogood $\delta = \{\neg a_1, a_2, \neg a_3, a_4 \}$ (which might be part of the representation of a rule in an ASP program, or $\phi_1$ from Example \ref{ex:clause-prop}) in the context of propagation using 2WL. The watched literals are marked by arrows.
 
-Initially, the two watched literals are selected arbitrarily. Transitioning from State 1 (empty assignment) to State 2, the solver will not check whether $\delta$ is unit, because $a_3$ is not watched. When $a_2$ is assigned to \emph{true}, the solver \enquote{looks at} $\delta$. As $a_2$ is assigned, it cannot be a watched literal anymore, but $\delta$ also is not unit, because $a_1$ is still unassigned. The pointer that previously pointed at $a_2$ is \enquote{moved} to $\neg a_1$. Note that this is the only option, as the atoms of all other literals are already assigned and $a_4$ is already being pointed at.
+Initially, the two watched literals are selected arbitrarily. Transitioning from State 1 (empty assignment) to State 2, the solver will not check whether $\delta$ is unit, because $a_3$ is not watched. When $a_2$ is assigned to \emph{true}, the solver checks $\delta$. As $a_2$ is assigned, it cannot be a watched literal anymore, but $\delta$ also is not unit, because $a_1$ is still unassigned. The pointer that previously pointed at $a_2$ is moved to $\neg a_1$. Note that this is the only option, as the atoms of all other literals are already assigned and $a_4$ is already being pointed at.
 
 Processing the assignment of $a_1$, again, $\delta$ is considered. Now, there is no unassigned literal left that is not also watched. The nogood is unit. The truth value of $a_4$ is inferred to be \emph{false}. At this point (State 5), pointer placement is largely irrelevant, because $\delta$ is satisfied.
 \end{example}
@@ -823,7 +823,7 @@ Concerning the control flow inside the solver system, we are not concerned with 
   \label{fig:arch}
 \end{figure}
 
-\section{Extended of Literals, Assignments and Nogoods for Lazy-Grounding}
+\section{Extended Notions for Lazy-Grounding}
 
 % Signed literal vs. boolean signed literal.
 
