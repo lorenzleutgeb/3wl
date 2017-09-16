@@ -48,7 +48,7 @@
 \nonzeroparskip             % Create space between paragraphs (optional).
 \setlength{\parindent}{0pt} % Remove paragraph identation (optional).
 
-\makeindex      % Use an optional index.
+%\makeindex      % Use an optional index.
 %\makeglossaries % Use an optional glossary.
 %\glstocfalse   % Remove the glossaries from the table of contents.
 
@@ -91,6 +91,7 @@
 
 % Function B transforming an assignment into a boolean assignment.
 \newcommand{\bass}{\mathcal{B}}
+\newcommand{\bpro}{\mathcal{B}}
 
 % An assignment A.
 \newcommand{\ass}{A}
@@ -190,30 +191,30 @@ I would like to thank Antonius Weinzierl for his consistent and continuous effor
 
 \selectlanguage{naustrian}
 
-\begin{kurzfassung}
+\begin{kurzfassung*}
 Answer Set Programming (ASP) ist eine deklaratives Programmierparadigma in Anlehnung an Prädikatenlogik erster Stufe. ASP-Programme werden üblicherweise durch ASP-Systeme evaluiert, deren Design stark durch Löser (engl.~\enquote{solver}) für das Erfüllbarkeitsproblem der Aussagenlogik (SAT, von engl.~\enquote{satisfiability}) inspiriert ist. Ein zentrales Verfahren in diesen Systemen ist die sogenannte \emph{Einheitsresolution} (engl.~\enquote{unit propagation}), wodurch aus bekannten Wahrheitswerten für Konstanten und der Struktur der Formel neue Wahrheitswerte ableitet werden können.
 
 Im Unterschied zu SAT-Formeln enthalten ASP-Programme jedoch Variablen, wodurch sich das sogenannte \emph{grounding bottleneck} ergibt, welches die praktische Verwendbarkeit von ASP-Systemen einschränkt. An der Entwicklung sogenannter \emph{lazy-grounding} ASP-Systeme wird aktiv geforscht. Durch die Einführung eines dritten Wahrheitswerts \emph{\mbt} (neben den zwei Boolschen Werten \emph{true} und \emph{false}) kann die Suche nach Lösungen beschleunigt werden. Diese Optimierung hat sich für lazy-grounding ASP-Systeme als besonders wirkungsvoll herausgestellt, sie ist allerdings mit den bewährten Varianten der Einheitsresolution nicht kompatibel, da diese nur die zwei Booleschen Wahrheitswerte berücksichtigen.
 
 Der Hauptteil der Arbeit beschreibt einen möglichen Lösungsansätz der effizienten Einheitsresolution mit drei Wahrheitswerten, insbesondere für lazy-grounding ASP-Systeme, aufbauend auf der \emph{Two Watched Literals} (2WL) Methode. Die neue Methode nennt sich \emph{Three Watched Literals} (3WL).
 
-Die Korrektheit Algorithmus wird gezeigt. Die erste bekannte Implementierung des Verfahrens -- Teil des lazy-grounding ASP-Systems \enquote{Alpha} -- wurde zu einer Evaluation anhand von  verfügbaren Eingabeprogrammen herangezogen, deren Ergebnisse diskutiert werden.
+Die Korrektheit des Algorithmus wird gezeigt. Die erste bekannte Implementierung des Verfahrens -- Teil des lazy-grounding ASP-Systems \enquote{Alpha} -- wurde zu einer Evaluation anhand von  verfügbaren Eingabeprogrammen herangezogen, deren Ergebnisse diskutiert werden.
 %Der Komppromiss zwischen Speicherverbrauch und vollständiger Verfügbarkeit des grundierten Programms resultiert in neuen Restriktionen für Algorithmen und Datenstrukturen in ASP-Systemen. Der Hauptteil der Arbeit beschreibt wie \emph{Unit Propagation} basierend auf \emph{two-watched-literals} auf drei Literale erweitert werden kann, sodass Berechnungen mit einem teilweise grundierten Programm ausgeführt werden können.
-\end{kurzfassung}
+\end{kurzfassung*}
 
 \selectlanguage{english}
 
-\begin{abstract}
-Answer Set Programming (ASP) is a declarative programming paradigm based on first order logic. ASP programs are usually evaluated by ASP systems, whose design is strongly inspired by solvers for the Boolean satisfiability problem (SAT). A central method in these systems is \emph{unit propagation}, enabling to derive new truth assignments for constants from known truth assignments, using the structure of the input formula.
+\begin{abstract*}
+Answer Set Programming (ASP) is a declarative programming paradigm based on first order logic. ASP programs are usually evaluated by ASP systems, whose design is strongly inspired by solvers for the boolean satisfiability problem (SAT). A central method in these systems is \emph{unit propagation}, enabling to derive new truth assignments for constants from known truth assignments, using the structure of the input formula.
 
-Contrary to SAT formulas, ASP programs contain variables, leading to the so-called \emph{grounding bottleneck}, which limits the practical applicability of ASP systems. The development of \emph{lazy-grounding} ASP systems to overcome the grounding bottleneck is an active area of research. By introducing a third truth value \emph{\mbt} (in addition to the two Boolean truth values \emph{true} and \emph{false}) search for solutions can be improved. This optimization was shown to be especially effective in lazy-grounding ASP systems, but it is not compatible with established variants of unit propagation, because they only consider the Boolean truth values.
+Contrary to SAT formulas, ASP programs contain variables, leading to the so-called \emph{grounding bottleneck}, which limits the practical applicability of ASP systems. The development of \emph{lazy-grounding} ASP systems to overcome the grounding bottleneck is an active area of research. By introducing a third truth value \emph{\mbt} (in addition to the two boolean truth values \emph{true} and \emph{false}) search for solutions can be improved. This optimization was shown to be especially effective in lazy-grounding ASP systems, but it is not compatible with established variants of unit propagation, because they only consider the boolean truth values.
 
 The main part of this work describes an approach for efficient unit propagation with three truth values, especially considering lazy-grounding ASP systems, based on the \emph{Two Watched Literals} (2WL) method. The new approach is called \emph{Three Watched Literals} (3WL).
 
-Correctness of the new algorithm is shown. The first known implementation -- part of the lazy-grounding ASP system \enquote{Alpha} -- was used to evaluate performance with freely available input programs. Results are discussed.
-\end{abstract}
+Soundness of the new algorithm is shown. The first known implementation -- part of the lazy-grounding ASP system \enquote{Alpha} -- was used to evaluate performance with freely available input programs. Results are discussed.
+\end{abstract*}
 
-\tableofcontents % Starred version, i.e., \tableofcontents*, removes the self-entry.
+\tableofcontents* % Starred version, i.e., \tableofcontents*, removes the self-entry.
 
 % Switch to arabic numbering and start the enumeration of chapters in the table of content.
 \mainmatter
@@ -228,7 +229,7 @@ The languages most widely used in industry follow the \emph{imperative} programm
 
 A key difference between declarative and imperative programming is that in the former the focus is explaining the problem to be solved and \emph{what} a solution should look like, while for the latter, programmers write code that specifies \emph{how} the problem is to be solved.
 
-Without going into further details about how ASP internally works, consider the following example for an intuition.
+Without going into further details about how ASP works internally, consider the following example for an intuition.
 
 \begin{example}
 \label{ex:garments}
@@ -256,7 +257,7 @@ The evaluation of an ASP program is done by an ASP system, which may be comprise
 
 % benuetzen gleiche techniken, es hat sich gezeigt, dass techniken aus dem sat bereich effizient sind
 
-Many ASP system implementations use solving algorithms closely related to those found in boolean satisfiability (\cite{sat}, SAT) solvers to search for answer sets. Finding an answer set for a logic program, which means exploring truth assignments for atomic expressions under the rules defined in the program, is similar to finding a satisfying assignment for a formula, which means exploring possible truth values for constants under the structure of the formula. Adapting SAT solvers and their methods turned out to be highly effective for solving ASP. To keep up this close relation however, one key difference between formulas in SAT and programs in ASP must be accounted for: formulas in SAT do not have variables, but logic programs do. Variables such as \emph{G} in the above example must be removed. The process of substituting variables with constants, e.g. substituting \emph{G} with one of the four concrete garments, is referred to as \emph{grounding} and the resulting variable-free program is said to be \emph{ground}.
+Many ASP system implementations use solving algorithms closely related to those found in boolean satisfiability (SAT, \cite{sat}) solvers to search for answer sets. Finding an answer set for a logic program, which means exploring truth assignments for atomic expressions under the rules defined in the program, is similar to finding a satisfying assignment for a formula, which means exploring possible truth values for constants under the structure of the formula. Adapting SAT solvers and their methods turned out to be highly effective for solving ASP. To keep up this close relation however, one key difference between formulas in SAT and programs in ASP must be accounted for: formulas in SAT do not have variables, but logic programs do. Variables such as \emph{G} in the above example must be removed. The process of substituting variables with constants, e.g. substituting \emph{G} with one of the four concrete garments, is referred to as \emph{grounding} and the resulting variable-free program is said to be \emph{ground}.
 
 \begin{example}
 \label{ex:garmentsground}
@@ -333,9 +334,7 @@ For solvers to be efficient, it is crucial to quickly identify which nogoods are
 
 An optimization technique to speed up the solving process, pioneered by the ground-and-solve system \dlv (cf.~\ref{sec:dlv}) is the introduction of a third truth value \emph{\mbt} in addition to the two usual values \emph{true} and \emph{false}. Using a third truth value also is an effective optimization in lazy-grounding systems (cf.~Sections \ref{sec:asperix} and \ref{sec:omiga}). However, 2WL does only account for two truth values, thus cannot be used in conjunction with \emph{\mbt}.
 
-The goal of this work is to combine the two improvements (2WL for propagation and \emph{\mbt} as a third truth value) in order to be applied within the same system.
-
-The motivation of this work is finding a way to adapt 2WL, which was shown to be successfully in SAT solvers as well as ground-and-solve ASP systems, such that it can be employed in lazy-grounding ASP systems.
+\paragraph{Goal} The goal of this work is to combine the two improvements (2WL for propagation, which was shown to be successfully in SAT solvers as well as ground-and-solve ASP systems, and \emph{\mbt} as a third truth value) within one algorithmic framework, such that it can employed in lazy-grounding ASP systems.
 
 Motivation for this is twofold: firstly, enabling lazy-grounding systems to profit from the benefits of 2WL, i.e.~improved propagation speeds, while still using \emph{\mbt}. Secondly, by integrating a procedure very similar to 2WL into a lazy-grounding framework, making it simpler to eventually re-use results that previously were exclusive to ground-and-solve systems in lazy-grounding systems as well.
 
@@ -356,7 +355,7 @@ Motivation for this is twofold: firstly, enabling lazy-grounding systems to prof
 % implementation
 % benchmarks
 
-Contributions: After an analysis of 2WL, algorithms and data structures that account for lazy-grounding are devised and their correctness is shown. An implementation is contributed to the Alpha system, which in turn is compared against a na{\"i}ve approach in form of a benchmark.
+\paragraph{Contributions} After an analysis of 2WL, algorithms and data structures that account for lazy-grounding are devised and their soundness is shown. We call the new approach Three Watched Literals (3WL). It comes with a description of \emph{watch strctures}, abstract data structures that suggest a memory layout for implementations, as well as a procedural description of the algorithm. It is an extension of 2WL but uses three instead of two watched literals in order to account for the third truth value \emph{\mbt}. An implementation is contributed to the Alpha system, which in turn is compared against a na{\"i}ve approach in form of a benchmark. Instances for the benchmark are taken from previous work in the field to maximize reproducibility.
 
 \section{Structure of the Work}
 
@@ -391,14 +390,14 @@ Note that for atoms of arity zero, parentheses usually are omitted. For simplici
 An atom $p(t_1, \ldots , t_n)$ is called \emph{ground} if $\{ t_1, \ldots , t_n \} \subseteq \mathcal{C}$
 \end{definition}
 
-Atoms can be negated as usual in first order logic, leading to the definition of literals. However, note that we discriminate between two types negation in logic programs.
+%Atoms can be negated as usual in first order logic, leading to the definition of literals. However, note that we discriminate between two types negation in logic programs.
 
-\begin{definition}
-\label{def:lit}
-A \emph{literal} is an atom $q$ or its negation $\neg q$, it is \emph{ground} if $q$ is ground. The symbol $\neg$ is called \emph{classical negation} or \emph{strong negation}.
-\end{definition}
+%\begin{definition}
+%\label{def:lit}
+%A \emph{literal} is an atom $q$ or its negation $\neg q$, it is \emph{ground} if $q$ is ground. The symbol $\neg$ is called \emph{classical negation} or \emph{strong negation}.
+%\end{definition}
 
-We structure literals in the form of rules, which are in turn divided into a head, consisting of at most one literal, and a body of arbitrary length.
+We structure atoms in the form of rules, which are in turn divided into a head, consisting of at most one atom, and a body of arbitrary size.
 
 \begin{definition}
 A \emph{rule} $r$ is an expression of the form $$a \from b_1, \ldots, b_m, \fail b_{m+1}, \ldots, \fail b_n.$$ where $a, b_1, \ldots, b_n$ are atoms, $\mathrm{not}$ is \emph{negation as failure} (or \emph{default negation}), $\{ a \}$ is the \emph{head}, denoted $\headf(a)$ and $\{ b_1, \ldots, b_m \}$ is the \emph{positive body}, denoted $\bodyf^+(r)$, and $\{ b_{m+1}, \ldots, b_n \}$ is the \emph{negative body} of $r$, denoted $\bodyf^-(r)$. Positive and negative body together are simply the \emph{body} of $r$ i.e., $\bodyf(r) = \bodyf^+(r)\cup \bodyf^-(r)$.
@@ -408,8 +407,10 @@ A rule $r$ is \emph{ground} if all atoms in $\headf(r) \cup \bodyf(r)$ are.
 Note that for a rule $r$ both body and head can be empty: In case $\bodyf(r)$ is empty, we say $r$ is a \emph{fact}, and when $\headf(r)$ is empty, we say that $r$ is a \emph{constraint}. Finally, we arrive at the notion of a logic program.
 
 \begin{definition}
-A \emph{(logic) program} $P$ is a finite set of rules. It is \emph{ground} if all $r \in P$ are ground. The ground program derived from $P$ is denoted $grnd(P)$.
+A \emph{(logic) program} $P$ is a finite set of rules. It is \emph{ground} if all $r \in P$ are ground.
 \end{definition}
+
+%\todo{We refer to $grnd(P)$ which is not defined. Probably we can ditch it because we do not need it anyhow ...}
 
 For the scope of this work, the above definition of rules is sufficient. Programs consisting only of rules of this form are called \emph{normal} programs. More general, e.g.~rules with disjunctive heads $a_1 \vee \cdots \vee a_k \from \ldots$ also have interesting properties, but are outside the scope of this thesis.
 
@@ -441,7 +442,7 @@ We commonly encode the truth value of atoms through satisfaction, e.g.~we say th
 
 \begin{definition}
 \label{def:rule-model}
-An interpretation $I$ \emph{satisfies} a ground rule $r$, denoted $I \models r$ if $\bodyf^+(r) \subseteq I \wedge \bodyf^-(r) \cap I = \emptyset$ implies that $\headf(r) \subseteq I$ and $\headf(r) \not = \emptyset$, i.e.~whenever the body of $r$ is satisfied, then the head of $r$ is satisfied as well.
+An interpretation $I$ \emph{satisfies} a ground rule $r$, denoted $I \models r$ if $\bodyf^+(r) \subseteq I$ and $\bodyf^-(r) \cap I = \emptyset$ implies that $\headf(r) \subseteq I$, i.e.~when the body of $r$ is satisfied, then the head of $r$ is satisfied as well.
 \end{definition}
 
 In case an interpretation satisfies all rules of a program, we call it a model thereof.
@@ -455,7 +456,7 @@ We use the Gelfond-Lifschitz reduct towards a definition of answer sets.
 \begin{definition}[see {\cite[Section 2]{stable}}]
 	Given a ground program $P$ and an interpretation $I$, the \emph{Gelfond-Lifschitz reduct} (or just \emph{reduct} in short) of $P$ with respect to $I$, denoted $P^I$ is defined as follows:
 \begin{multline*}
-P^I = \Bigl\{ a \from b_1, \ldots , b_m \mid a \from b_1, \ldots, b_m, \fail b_{m+1}, \ldots, \fail b_n \in P\\ \text{ and } \{ \neg b_{m+1} , \ldots , \neg b_n \} \subseteq I \Bigr\}
+P^I = \Bigl\{ a \from b_1, \ldots , b_m \mid a \from b_1, \ldots, b_m, \fail b_{m+1}, \ldots, \fail b_n \in P\\ \text{ and } \{ b_{m+1} , \ldots , b_n \} \cap I = \emptyset \Bigr\}
 \end{multline*}
 \end{definition}
 
@@ -511,10 +512,10 @@ Two atoms that are in the smallest model of $P^{I_4}$, inferred via the two rule
 In practice, interpretations cannot be guessed in their entirety but are constructed step-by-step in a search process called \emph{solving}. A distinction between an unassigned atom and an atom that has been found to be \emph{false} is not possible when directly working with interpretations like above; partial interpretations cannot be expressed, as everything that is not explicitly included in the interpretation is effectively assumed to be \emph{false}. This is why interpretations are commonly represented by assignments, which explicitly encode the truth value of atoms.
 
 \begin{definition}
-An \emph{assignment} $\ass$ is a set of literals. Assignments are consistent, i.e. for any atom $a \in \ass$, its negation is not contained, i.e. $\neg a \not \in \ass$.
+An \emph{assignment} $\ass$ is a set of literals. Assignments are consistent, i.e. for any literal $\bT a \in \ass$, its negation is not contained, i.e. $\bF a \not \in \ass$.
 \end{definition}
 
-Literals can be related with assignments similar to interpretations: $A \models l$ if $l \in A$. We say that an atom $p$ is unassigned if neither $A \models p$ nor $A \models \neg p$. For the case where there are no unassigned atoms, the interpretation that corresponds to the assignment is the subset of all positive literals in the assignment itself.
+Literals can be related with assignments similar to interpretations: $A \models l$ if $l \in A$. We say that an atom $p$ is unassigned if neither $A \models \bT p$ nor $A \models \bF p$. For the case where there are no unassigned atoms, the interpretation that corresponds to the assignment is the subset of all positive literals in the assignment itself.
 
 % "ASP means stable models. Logic programs with negation may use other semantics."
 %Note that we are only interested in the particular semantics of stable models which characterizes ASP and falls into the category of \emph{multiple} model semantics. There exist other semantics, such as the \emph{perfect model} semantics in \cite{DBLP:books/mk/minker88/Przymusinski88}.
@@ -588,9 +589,11 @@ GASP \cite{gasp,gasp2}\footnote{\url{https://users.dimi.uniud.it/~agostino.dovie
 
 As briefly mentioned in Section \ref{sec:motivation}, Two Watched Literals (also \enquote{Two Literal Watching}, 2WL, \cite{effsat,questsat}) is an algorithm for unit propagation commonly used in SAT solvers (cf.~\cite[Section 2.2.2, p.~94]{handbook-sat}). This section is devoted to a description of the method, first in the context of SAT, then about its application in ASP solving.
 
+In SAT solving, formulas are typically input to solvers in conjunctive normal form (CNF), i.e. conjunctions of disjunctive clauses of classical literals\footnote{The DIMACS format is commonly used to encode concrete formulas.}: $\psi = (l_{1,1} \vee \cdots \vee l_{1,k_1}) \wedge \cdots \wedge (l_{n,1} \vee \cdots \vee l_{n,k_n})$. As all disjunctive clauses are connected through conjunction, all of them must evaluate to \emph{true} for the formula to be satisfied. Each disjunctive clause evaluates to \emph{true} if at least one literal does. This property is exploited by SAT solvers to infer assignments. We call a disjunctive clause \emph{unit} if all but one literal in the clause evaluate to \emph{false}, and the last remaining literal has no truth value, i.e.~the variable in the literal is unassigned. In this case, we say that the clause \emph{propagates} and the unassigned varaible is assigned s.t.~the disjunctive clause evaluates to \emph{true}. Consider \ref{ryan} for efficient algorithms in SAT solvers.
+
 \begin{example}
 \label{ex:clause-prop}
-Suppose $\psi = (a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4) \wedge (\neg a_1 \vee \neg a_2 \vee a_3 \vee a_4)$ is input to a SAT solver\footnote{In SAT solving, formulas are typically input to solvers in conjunctive normal form (CNF). The DIMACS format is commonly used to encode concrete formulas.}. The formula $\psi$ would yield two \enquote{clauses}, $\psi = \phi_1 \wedge \phi_2$ with $\phi_1 = a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4$ and $\phi_2 = \neg a_1 \vee \neg a_2 \vee a_3 \vee a_4$, both of which have to be satisfied in order for $\psi$ to be satisfied. As the solver is evaluating $\psi$ under different (partial) assignments for atoms $a_1, \ldots, a_4$ it \enquote{watches} two literals per clause. This way it can detect whether a clause is unit. Whenever an atom $a$ is assigned it considers the clauses where $a$ is a watched literal for propagation. Conversely, all other clauses, where $a$ is not watched, are guaranteed to not be unit.
+Consider the $\psi = (a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4) \wedge (\neg a_1 \vee \neg a_2 \vee a_3 \vee a_4)$ It yields two  disjunctive clauses, $\psi = \phi_1 \wedge \phi_2$ with $\phi_1 = a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4$ and $\phi_2 = \neg a_1 \vee \neg a_2 \vee a_3 \vee a_4$, both of which have to be satisfied in order for $\psi$ to be satisfied. As the solver is evaluating $\psi$ under different (partial) assignments for atoms $a_1, \ldots, a_4$ it \enquote{watches} two literals per clause. This way it can detect whether a clause is unit. Whenever an atom $a$ is assigned it considers the clauses where $a$ is a watched literal for propagation. Conversely, all other clauses, where $a$ is not watched, are guaranteed to not be unit.
 \end{example}
 
 The concept of a nogood originates in constraint programming (CP) (cf.~\cite{clasp,handbook-cp,handbook-kr-cp}), where the goal is to find an assignment for variables such that given constraints are satisfied. SAT and ASP can be viewed as specializations of CP. For example, in a problem containing the variable $x$ and the constraint $x > 1$ one can forbid the value $x = 1$. The assignment $x = 1$ is a nogood. In this work, nogoods are only used as representations of boolean constraints. Unit propagation is sometimes also referred to as boolean constraint propagation.
@@ -604,19 +607,19 @@ First proposed by \citet{clasp-first}, in the solver components of ASP systems, 
 
 \begin{example}
 \label{ex:rule-to-nogood}
-For example, given a rule $r$ of the form $a_1 \from a_2, a_3, \fail a_4$, the nogood $\delta = \{\neg a_1, a_2, a_3, \neg a_4 \}$ excludes assignments where the body of the rule is satisfied, but its head is not: An interpretation $I$ that satisfies all elements of $\bodyf(r) = \{a_2, a_3, \neg a_4 \}$ and $\neg a_1$, the negation of the only element of $\headf(r)$, cannot be a model of $r$ (Definition \ref{def:rule-model}).
+For example, given a rule $r$ of the form $a_1 \from a_2, a_3, \fail a_4$, the nogood $\delta = \{\bF a_1, \bT a_2, \bT a_3, \bF a_4 \}$ excludes assignments where the body of the rule is satisfied, but its head is not: An interpretation $I$ that satisfies all elements of $\bodyf(r) = \{a_2, a_3, \fail a_4 \}$ and the negation of the only element of $\headf(r)$, cannot be a model of $r$ (Definition \ref{def:rule-model}).
 \end{example}
 
-Given a nogood $\delta$ and an assignment $\ass$ with $\delta \subseteq \ass$, then no interpretation derived from $\ass$ can be a solution. This property allows for propagation: If $\ass \cap \delta = \{ \bsgl \}$, we say that $\delta$ is \emph{unit} or unit on $\bsgl$. In order to obtain a solution we may extend $\ass$ to $\ass'$ so that $\neg \bsgl \in \ass'$.
+Given a nogood $\delta$ and an assignment $\ass$ with $\delta \subseteq \ass$, then no interpretation derived from $\ass$ can be a solution. This property allows for propagation: If $\ass \cap \delta = \{ \bsgl \}$, we say that $\delta$ is \emph{unit} or unit on $\bsgl$. In order to obtain a solution we may extend $\ass$ to $\ass'$ so that $\overline{\bsgl} \in \ass'$.
 
 The number of nogoods generated from a program is proportional to the size of the corresponding ground program (depending on the translation scheme used). Thus, one can expect many nogoods, possibly millions, to be generated in the process. However, after constructing nogoods from the input program (or parts thereof, as in the lazy-grounding case) and propagating truth values, it is important to efficiently evaluate whether there is a nogood that is unit under the extended assignment. This is where the benefits of 2WL in SAT (over clauses) and in ASP (over nogoods) align.
 
 For each nogood, two distinct and unassigned literals are chosen to be watched. When one of these literals is assigned, a different literal (distinct from the second watched literal) in the nogood is chosen as the new watched literal. This process is continued until there are no two distinct literals available in the nogood. Then the nogood is unit at this point and a new assignment can be generated.
 
 \begin{example}
-Consider Figure \ref{fig:2wl}. It shows the nogood $\delta = \{\neg a_1, a_2, \neg a_3, a_4 \}$ (which might be part of the representation of a rule in an ASP program, or $\phi_1$ from Example \ref{ex:clause-prop}) in the context of propagation using 2WL. The watched literals are marked by arrows.
+Consider Figure \ref{fig:2wl}. It shows the nogood $\delta = \{\bF a_1, \bT a_2, \bF a_3, \bT a_4 \}$ (which might be part of the representation of a rule in an ASP program, or $\phi_1$ from Example \ref{ex:clause-prop} with different semantics) in the context of propagation using 2WL. The watched literals are marked by arrows.
 
-Initially, the two watched literals are selected arbitrarily. Transitioning from State 1 (empty assignment) to State 2, the solver will not check whether $\delta$ is unit, because $a_3$ is not watched. When $a_2$ is assigned to \emph{true}, the solver checks $\delta$. As $a_2$ is assigned, it cannot be a watched literal anymore, but $\delta$ also is not unit, because $a_1$ is still unassigned. The pointer that previously pointed at $a_2$ is moved to $\neg a_1$. Note that this is the only option, as the atoms of all other literals are already assigned and $a_4$ is already being pointed at.
+Initially, the two watched literals are selected arbitrarily. Transitioning from State 1 (empty assignment) to State 2, the solver will not check whether $\delta$ is unit, because $\bT a_3$ is not watched. When $a_2$ is assigned to \emph{true}, the solver checks $\delta$. As $a_2$ is assigned, $\bT a_2$ cannot be a watched literal anymore, but $\delta$ also is not unit, because $a_1$ is still unassigned. The pointer that previously pointed at $\bT a_2$ is moved to $\bF a_1$. Note that this is the only option, as the atoms of all other literals are already assigned and $\bT a_4$ is already being pointed at.
 
 Processing the assignment of $a_1$, again, $\delta$ is considered. Now, there is no unassigned literal left that is not also watched. The nogood is unit. The truth value of $a_4$ is inferred to be \emph{false}. At this point (State 5), pointer placement is largely irrelevant, because $\delta$ is satisfied.
 \end{example}
@@ -628,14 +631,14 @@ Processing the assignment of $a_1$, again, $\delta$ is considered. Now, there is
     stack=4,
     rectangle split horizontal,
     rectangle split part fill={white,white,white,white},
-    inner sep=6pt,
+    inner sep=8pt,
     text width=6mm,
     align=center
     ] {
-$\neg a_1$     % two
-\nodepart{two} $a_2$
-\nodepart{three}  $\neg a_3$
-\nodepart{four}  $a_4$
+$\bF a_1$     % two
+\nodepart{two} $\bT a_2$
+\nodepart{three}  $\bF a_3$
+\nodepart{four}  $\bT a_4$
 };
 
 \node[left=0.7cm of ng1]{State 1};
@@ -657,10 +660,10 @@ $\neg a_1$     % two
     align=center,
     below = 3cm of ng1
     ] {
-$\neg a_1$     % two
-\nodepart{two} $a_2$
-\nodepart{three}  $\neg a_3$
-\nodepart{four}  $a_4$
+$\bF a_1$     % two
+\nodepart{two} $\bT a_2$
+\nodepart{three}  $\bF a_3$
+\nodepart{four}  $\bT a_4$
 };
 
 \node[left=0.7cm of ng2]{State 2};
@@ -668,8 +671,8 @@ $\neg a_1$     % two
 \draw [<-] (ng2.two north) to node[auto] {} ++ (-0.1,0.5);
 \draw [<-] (ng2.four north) to node[auto] {} ++ (0.1,0.5);
 
-\node(ng2ass)[below=0.4cm of ng2] { $A_2 = \{\neg a_3\}$ };
-\node(ng2des)[right=1cm of ng2.east, text width=7cm] { Pointers were not checked, as $a_3$ is not watched. };
+\node(ng2ass)[below=0.4cm of ng2] { $A_2 = \{\bF a_3\}$ };
+\node(ng2des)[right=1cm of ng2.east, text width=7cm] { Pointers were not checked, as $\bF a_3$ is not watched. };
 
 \draw ($ (ng2.east) + (1,-1.2) $) -- ($ (ng2.east) + (1,-2.2) $) node[right=0.5cm,pos=0.5] {$a_2$ is assigned \emph{true}.};
 
@@ -682,10 +685,10 @@ $\neg a_1$     % two
     align=center,
     below = 3cm of ng2
     ] {
-$\neg a_1$     % two
-\nodepart{two} $a_2$
-\nodepart{three}  $\neg a_3$
-\nodepart{four}  $a_4$
+$\bF a_1$     % two
+\nodepart{two} $\bT a_2$
+\nodepart{three}  $\bF a_3$
+\nodepart{four}  $\bT a_4$
 };
 
 \node[left=0.7cm of ng3]{State 3};
@@ -693,7 +696,7 @@ $\neg a_1$     % two
 \draw [<-] (ng3.one north) to node[auto] {} ++ (-0.1,0.5);
 \draw [<-] (ng3.four north) to node[auto] {} ++ (0.1,0.5);
 
-\node(ng3ass)[below=0.4cm of ng3] { $A_3 = \{\neg a_3, a_2 \}$ };
+\node(ng3ass)[below=0.4cm of ng3] { $A_3 = \{\bF a_3, \bT a_2 \}$ };
 \node(ng3des)[right=1cm of ng3.east, text width=7cm] {No pointer must point at an assigned atom, therefore it is moved. };
 
 \draw ($ (ng3.east) + (1,-1.2) $) -- ($ (ng3.east) + (1,-2.2) $) node[right=0.5cm,right,pos=0.5] { $a_1$ is assigned \emph{false}. };
@@ -707,10 +710,10 @@ $\neg a_1$     % two
     align=center,
     below = 3cm of ng3
     ] {
-$\neg a_1$     % two
-\nodepart{two} $a_2$
-\nodepart{three}  $\neg a_3$
-\nodepart{four}  $a_4$
+$\bF a_1$     % two
+\nodepart{two} $\bT a_2$
+\nodepart{three}  $\bF a_3$
+\nodepart{four}  $\bT a_4$
 };
 
 \node[left=0.7cm of ng4]{State 4};
@@ -718,7 +721,7 @@ $\neg a_1$     % two
 \draw [<-] (ng4.one north) to node[auto] {} ++ (-0.1,0.5);
 \draw [<-] (ng4.four north) to node[auto] {} ++ (0.1,0.5);
 
-\node(ng4ass)[below=0.4cm of ng4] { $A_4 = \{\neg a_3, a_2, \neg a_1 \}$ };
+\node(ng4ass)[below=0.4cm of ng4] { $A_4 = \{\bF a_3, \bT a_2, \bF a_1 \}$ };
 \node(ng4des)[right=1cm of ng4.east, text width=7cm] {  Only one literal is left unassigned. };
 
 \draw ($ (ng4.east) + (1,-1.2) $) -- ($ (ng4.east) + (1,-2.2) $) node[right=0.5cm,pos=0.5] { The nogood is unit, $a_4$ is assigned \emph{false}. };
@@ -732,10 +735,10 @@ $\neg a_1$     % two
     align=center,
     below = 3cm of ng4
     ] {
-$\neg a_1$     % two
-\nodepart{two} $a_2$
-\nodepart{three}  $\neg a_3$
-\nodepart{four}  $a_4$
+$\bF a_1$     % two
+\nodepart{two} $\bT a_2$
+\nodepart{three}  $\bF a_3$
+\nodepart{four}  $\bT a_4$
 };
 
 \node[left=0.7cm of ng5]{State 5};
@@ -743,11 +746,11 @@ $\neg a_1$     % two
 \draw [<-] (ng5.one north) to node[auto] {} ++ (-0.1,0.5);
 \draw [<-] (ng5.four north) to node[auto] {} ++ (0.1,0.5);
 
-\node(ng5ass)[below=0.4cm of ng5] { $A_5 = \{\neg a_1, a_2, \neg a_3, \neg a_4 \}$ };
+\node(ng5ass)[below=0.4cm of ng5] { $A_5 = \{\bF a_1, \bT a_2, \bF a_3, \bF a_4 \}$ };
 \node(ng5des)[right=1cm of ng5.east, text width=6cm] { $a_4$ was assigned via propagation, s.t.~the nogood is satisfied. };
 
 \end{tikzpicture}
-  \caption{Step-by-step visualization of unit propagation with Two Watched Literals.}
+  \caption{Step-by-step visualization of unit propagation with Two Watched Literals}
   \label{fig:2wl} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
 
@@ -758,11 +761,9 @@ The central idea of propagation is to infer (\emph{propagate}) new truth values 
 
 In this chapter we extend Two Watched Literals (2WL), and present an algorithm that accounts for \emph{\mbt} as third truth value. We call the new algorithm Three Watched Literals (3WL).
 
-\section{Scope}
+For the description of 3WL we will largely disregard the original structure of the input logic program (both forms: with variables and ground), i.e.~its rules. We are only concerned with the solver component of the ASP system which deals with nogoods that in turn represent rules. The task of translating rules to nogoods is left to the grounder component and abstracted away for our purposes. However, we will still refer to a set of nogoods, meaning all nogoods that were generated from the input program by the grounder, and passed to the solver. Note that we do not require that these nogoods represent \emph{all} rules in the ground program, which would defeat the purpose of lazy-grounding.
 
-For the description of 3WL we will largely disregard the original structure of the input logic program (both forms: with variables and ground), i.e.~its rules. We are only concerned with the solver component of the ASP system which deals with nogoods that in turn represent rules. The task of translating rules to nogoods is left to the grounder component and \enquote{abstracted away} for our purposes. However, we will still refer to a \enquote{set of nogoods}, meaning all nogoods that were generated from the input program by the grounder, and passed to the solver. Note that we do not require that these nogoods represent \emph{all} rules in the ground program, which would defeat the purpose of lazy-grounding.
-
-The propagation algorithm described here will usually be called in alternation with the grounder component (among other procedures), \enquote{converging} for an assignment that represents an answer set. Visualizing which part of the ASP system we are concerned with in this work, we show the architecture of the Alpha system in Figure \ref{fig:arch}. Nogood storage implements what we call \emph{watch structures} in the following sections of the chapter, and the assignment component directly implements assignments as defined in the next section.
+The propagation algorithm described here will usually be called in alternation with the grounder component (among other procedures), searching for an assignment that represents an answer set. Visualizing which part of the ASP system we are concerned with in this work, we show the architecture of the Alpha system in Figure \ref{fig:arch}. Nogood storage implements what we call \emph{watch structures} in the following sections of the chapter, and the assignment component directly implements assignments as defined in the next section.
 
 Concerning the control flow inside the solver system, we are not concerned with conflict resolution, but propagation only. As described below, the propagation algorithms is designed so that an implementation can stop computation as soon as a conflict is detected, but the resolution part is delegated to other components of the system.
 
@@ -785,16 +786,16 @@ Concerning the control flow inside the solver system, we are not concerned with 
   \node (gro) [below=12mm of par.west, text width=22mm, typetag] { Lazy-Grounding };
   \node (trans) [below=2.3mm of gro.west] {};
 
-  \node (g) [draw=black, line width=1pt, dotted, inner sep=8pt, fit={(gl) (par) (trans) (gro)}] {};
+  \node (g) [draw=black, line width=2pt, inner sep=8pt, fit={(gl) (par) (trans) (gro)}] {};
 
   \node (sl) at (8.8cm, 0) [align=center, text width=4.5cm, title] { \large Solver };
 
-  \node (ngs) [below=8mm of sl.east, text width=1.8cm, typetag, anchor=east, color=red] { \textit{Nogood Storage} };
-  \node (ass) [below=13.5mm of ngs.west, text width=1.8cm, typetag, color=red] { \textit{Assignment} };
+  \node (ngs) [below=8mm of sl.east, text width=1.8cm, typetag, anchor=east, color=red, dotted, line width=2pt] { \textit{Nogood Storage} };
+  \node (ass) [below=13.5mm of ngs.west, text width=1.8cm, typetag, color=red, dotted, line width=2pt] { \textit{Assignment} };
   \node (conf) [left=6mm of ngs.west, text width=1.8cm, typetag, anchor=east] { Conflict Resolution };
   \node (heur) [below=12mm of conf.west, text width=1.8cm, typetag] { Decision Heuristic };
 
-  \node (s) [draw=black, dotted, line width=1pt, inner sep=8pt, fit={(sl) (ngs) (ass) (heur) (conf)}] {};
+  \node (s) [draw=black, line width=2pt, inner sep=8pt, fit={(sl) (ngs) (ass) (heur) (conf)}] {};
   
   
   \draw [->,line width=1.5pt] (s.south) to [out=230, in=310] node [midway, above=1.2ex] {partial Assignment} (g.south);
@@ -807,7 +808,7 @@ Concerning the control flow inside the solver system, we are not concerned with 
   \draw [->, draw=black!80] (heur.west-|g.east) to node [pos=0.38, text width=1cm] {Choice Atoms} (heur.west) ;
   
   
-  \draw [<->, draw=red] (ngs) -- (ass) node [midway, pos=0.3] {};
+  \draw [<->, draw=red, dotted] (ngs) -- (ass) node [midway, pos=0.3] {};
   \draw [->, draw=black!80] (conf) -- (heur) {};
   \draw [->, draw=black!80] (heur.east|-ass.west) -- (ass.west) {};
   
@@ -819,7 +820,7 @@ Concerning the control flow inside the solver system, we are not concerned with 
   
   \draw [->, draw=black!80] ($(par)+(-3.0cm,0)$) -- (par) node [pos=0.3, above] {Program};
 \end{tikzpicture}
-\caption[Architecture of the Alpha system]{Architecture of the Alpha system \cite[Figure 1]{alpha-techniques}. Data flow is indicated by arrows. Grounder (left) and CDNL-based solver (right) interact cyclically for lazy-grounding. The components implementing Three Watched Literals (Nogood Storage and Assignment) are highlighted in red italics.}
+\caption[Architecture of the Alpha system]{Architecture of the Alpha system \cite[Figure 1]{alpha-techniques}. Data flow is indicated by arrows. Grounder (left) and CDNL-based solver (right) interact cyclically for lazy-grounding. The components implementing Three Watched Literals (Nogood Storage and Assignment) are highlighted in red italics and have dotted borders.}
   \label{fig:arch}
 \end{figure}
 
@@ -827,7 +828,7 @@ Concerning the control flow inside the solver system, we are not concerned with 
 
 % Signed literal vs. boolean signed literal.
 
-In this section we amend the definition of Literals and Nogoods for the purpose of propagation with \emph{\mbt}. Atoms remain the unchanged in their definition, however we will allow literals to not only be \emph{true} and \emph{false} but also \emph{\mbt}. Also, we will use assignments as sequences (not sets) to exploit the ordering of literals in the assignment for our method.
+In this section we amend the definition of literals and nogoods for the purpose of propagation with \emph{\mbt}. Atoms remain unchanged in their definition, however we will allow literals to not only be \emph{true} and \emph{false} but also \emph{\mbt}. Also, we will use assignments as sequences (not sets) to exploit the ordering of literals in the assignment for our method.
 
 %Most of them fundamentally depend on \emph{atoms} (usually denoted $v$) but do not refer to neither a set of atoms nor their domain. This is because all definitions are bound to a logic program $P$ to be solved (i.e.~to find answer sets for). The set of ground atoms wrt.~$P$, effectively its Herbrand Base $\textit{HB}(P)$, is obtained by the grounding process, which is not detailed in this work. What might seem to be lacking from the definitions therefore is the context of the input program $P$ and the domain of atoms. $P$ and its context is omitted in the following.
 
@@ -842,7 +843,7 @@ In this section we amend the definition of Literals and Nogoods for the purpose 
 Amending Definition \ref{def:lit}, for the remainder of the work we consider boolean signed literals, which mean atoms and their negations in the classical sense, and, more generally, signed literals, which also allow for a third sign that allows modeling \emph{\mbt}.
 
 \begin{definition}
-A \emph{boolean signed literal} $\bsgl$ of the form $\bT v$ or $\bF v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, and $\bF v$ that it is \emph{false}.
+A \emph{boolean signed literal} $\bsgl$ is of the form $\bT v$ or $\bF v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, and $\bF v$ that it is \emph{false}.
 \end{definition}
 
 \begin{definition}
@@ -881,19 +882,38 @@ A literal does not only conflict with its strong complement but also with its we
 Two literals $\sgl_1, \sgl_2$ are said to \emph{conflict} in case $\sgl_1 = \negweak{\sgl_2}$ or $\negweak{\sgl_1} = \sgl_2$.
 \end{definition}
 
-Occasionally the notation $\sgl = \bX v$ will be used to express that $\sgl$ is a literal of $v$ where $\bX \in \thrice$, i.e.~$\sgl$ is \enquote{bound} to $v$, but the sign is not important.
+Occasionally the notation $\sgl = \bX v$ will be used to express that $\sgl$ is a literal of $v$ where $\bX \in \thrice$, i.e.~$\sgl$ is over the atom $v$, but the sign is not important.
 
-We define assignments similar to \cite[Section 2, p.~3]{clasp}. However, here assignments contain not only boolean signed literals, but also signed literals, and the notation for expressing a partial assignment differs.
+Also, we will need to find the boolean signed literal for a given signed literal.
 
 \begin{definition}
-An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i = \bX v_i$ with $1 \leq i \leq n$, or \emph{conflict}.
+The \emph{boolean projection} of a signed literal $\sgl$, denoted $\bass(\sgl)$ translates a signed literal into a boolean signed literal and is defined as follows:
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+$\sgl$&$\bass(\sgl)$\\
+\hline
+\hline
+$\bT v$&$\bT v$\\
+$\bM v$&$\bT v$\\
+$\bF v$&$\bF v$\\
+\hline
+\end{tabular}
+\end{center}
+\end{definition}
+
+We define assignments similar to \cite[Section 2, p.~3]{clasp}. However, here assignments contain not boolean signed literals, but signed literals, and the notation for expressing a partial assignment differs.
+
+\begin{definition}
+An \emph{assignment} $\ass$ is a sequence $(\sgl_1, \ldots, \sgl_n)$ of signed literals $\sgl_i = \bX v_i$ with $1 \leq i \leq n$, or the special sequence \emph{conflict}, indicating a conflict.
 \end{definition}
 
 %\begin{remark}
 Below, assignments are sometimes also used as sets, in which case the set represented by some assignment is simply the set of all signed literals contained in the sequence.
 %\end{remark}
 
-For an assignment $\ass = (\sgl_1, \ldots, \sgl_i, \ldots, \sgl_j, \ldots, \sgl_n)$, we denote its size as $|\ass|$ with $|\ass| = n$, and a partial assignment, which is a sub-sequence constructed from an assignment, as $\ass[i,j] = (\sgl_i, \ldots, \sgl_j)$ where $1 \leq i < j \leq n$ and reference a single literal using $A[i] = \sgl_i$ for $1 \leq i \leq n$.
+For an assignment $\ass = (\sgl_1, \ldots, \sgl_i, \ldots, \sgl_j, \ldots, \sgl_n)$, we denote its size as $|\ass|$ with $|\ass| = n$ and $|conflict| = 0$, and a partial assignment, which is a sub-sequence constructed from an assignment, as $\ass[i,j] = (\sgl_i, \ldots, \sgl_j)$ where $1 \leq i < j \leq n$. Furthermore, we reference a single literal using $A[i] = \sgl_i$ for $1 \leq i \leq n$.
 
 The assignment obtained by appending the literal $\sgl$ to $\ass = (\sgl_1, \ldots, \sgl_n)$ is denoted by $$\ass \circ \sgl = \left\{\begin{array}{ll}
         
@@ -906,10 +926,10 @@ The assignment obtained by appending the literal $\sgl$ to $\ass = (\sgl_1, \ldo
 
 %Furthermore $\emph{conflict} \circ \sgl = \emph{conflict}$ for any $\sgl$. 
 
-For every assignment, we can also construct a corresponding boolean assignment, which is obtained by substituting all literals of the form $\bM v$ with $\bT v$. Boolean assignments are just sets, and not sequences like assignments are, because we do not require any ordering in this work.
+For every assignment, we can also construct a corresponding boolean assignment, which is obtained by applying the boolean projection to all contained literals. We overload the function $\bass$ for assignments. Boolean assignments are just sets, and not sequences like assignments are, because we do not require any ordering in this work.
 
 \begin{definition}
-A \emph{boolean assignment} is a set of boolean signed literals derived from an assignment, denoted $\bass(\ass)$ and defined as $\bass(\ass) = \{ \sgl \in \ass \ | \ \sgl = \bT v \textrm{ or } \sgl = \bF v \} \cup \{ \bT v \ | \ \bM v \in \ass \}$.
+A \emph{boolean assignment} is a set of boolean signed literals derived from an assignment, denoted $\bass(\ass)$ and defined as $\bass(\ass) = \{ \bass(\sgl) \in \ass \}$, where $\bass$ applied to literals is the boolean projection.
 \end{definition}
 
 Relating assignments with literals and atoms, we say that an atom $v$ is \emph{assigned} under some assignment $\ass$ if any literal containing it is in $\ass$, i.e.~if $\ass \cap \{\bT v, \bM v, \bF v \} \not = \emptyset$. We say that an atom is unassigned under $A$ if it is not assigned under $A$.
@@ -928,10 +948,10 @@ Relating assignments with literals and atoms, we say that an atom $v$ is \emph{a
 A literal $\sgl_1$ is said to conflict with $\ass$ in case it conflicts with any $\sgl_2 \in \ass$.
 \end{definition}
 
-We extend Definition \ref{def:nogood}. For propagation with \emph{\mbt}, it is important qualify literals in nogoods that correspond to heads of rules, as the head might only propagate to \emph{true} in case all positive literals in the body are \emph{true} as well (but none of them is \emph{\mbt}).
+We extend Definition \ref{def:nogood}. For propagation with \emph{\mbt}, it is important to qualify literals in nogoods that correspond to heads of rules, as the head might only propagate to \emph{true} in case all positive literals in the body are \emph{true} as well (but none of them is \emph{\mbt}). %\todo{Longer introduction to nogoods with head woould be nice. Example maybe?}
 
-\begin{definition}
-The \emph{head} of a nogood $\delta$, is a literal $\headf(\delta)$, for which $\headf(\delta) \in \delta$. Not every nogood must have a head.% and $|\headf(\delta)| \leq 1$.
+\begin{definition}[{cf.~\cite{alpha-techniques}}]
+The \emph{head} of a nogood $\delta$, is a single literal $\headf(\delta)$, for which $\headf(\delta) \in \delta$. Not every nogood must have a head.% and $|\headf(\delta)| \leq 1$.
 \end{definition}
 
 %Note that $\headf(\delta)$ is always of the form $\bF v$. \todo{Why?} Complementary we define the body, as all literals that are not in the head.
@@ -944,10 +964,6 @@ We need two variants of a nogood being unit. One that accounts for \emph{\mbt} a
 
 \begin{definition}
 A nogood $\delta$ is \emph{strongly unit} under an assignment $\ass$ if $\delta \setminus \ass = \headf(\delta)$. Only nogoods with a head can be strongly unit.
-\end{definition}
-
-\begin{definition}
-A nogood $\delta$ is \emph{weakly unit} under an assignment $\ass$ if $\delta \setminus \bass(\ass) = \{ \bsgl \}$
 \end{definition}
 
 Note that any nogood that is strongly unit under some assignment is also weakly unit, but not the other way round. Below, nogoods are sometimes referred to be \emph{unit} which amounts to stating that they are weakly unit. Also, when clear from context, reference to a particular assignment is omitted.
@@ -963,17 +979,42 @@ A nogood $\delta$ is \emph{violated} under an assignment $\ass$ if $\delta \subs
 A nogood $\delta$ is \emph{satisfied} under an assignment $\ass$ if there is no $\ass' \supseteq \ass$ s.t.~$\delta$ is violated under $\ass'$.
 \end{definition}
 
+\begin{definition}
+A nogood $\delta$ is \emph{weakly unit} under an assignment $\ass$ if $\delta \setminus \bass(\ass) = \{ \bsgl \}$
+\end{definition}
+
+\begin{example}
+Consider the nogoods $\delta_1 = \{ \bT a_1, \bF a_2 \}, \delta_2 = \{ \bT a_3, \bF a_4 \}$ with the head of $\delta_2$ being $\headf(\delta_2) = \bF a_4$ and how they relate to the following assignments:
+\begin{center}
+
+\begin{tabular}{|l||c|c|}
+\hline
+Assignment & State of $\delta_1$ & State of $\delta_2$ \\
+\hline\hline
+$\ass_1 = \{ \bT a_1, \bT a_3 \}$ & weakly unit & strongly unit\\
+$\ass_2 = \{ \bM a_1, \bM a_3 \}$ & weakly unit & weakly unit\\
+$\ass_3 = \{ \bF a_1, \bF a_3 \}$ & satisfied & satisfied \\
+$\ass_4 = \{ \bF a_2, \bF a_4 \}$ & weakly unit & weakly unit\\
+$\ass_5 = \{ \bT a_1, \bF a_3 \}$ & violated & \\
+$\ass_6 = \{ \bM a_1, \bF a_3 \}$ & violated & \\
+$\ass_7 = \{ \bT a_3, \bF a_4 \}$ & & violated  \\
+$\ass_8 = \{ \bM a_2, \bT a_4 \}$ & satisfied & satisfied \\
+\hline
+\end{tabular}
+\end{center}
+\end{example}
+
 Note that for an assignment $\ass$, any nogood that is satisfied under $\ass$ will also never be unit, and never propagate, for any $\ass' \supseteq \ass$.
 
 \begin{definition}
 A nogood $\delta$ is \emph{silent} under some assignment $\ass$ if $\delta$ is not violated by $\ass$ and $\delta$ is not unit wrt.~$\ass$.
 \end{definition}
 
-Note the difference between some $\delta$ being silent vs.~satisfied under an assignment: With $\delta$ being silent under $\ass_1$, there might well be some $\ass_1' \supset \ass_1$ under which $\delta$ is unit or violated. However $\delta$ satisfied under $\ass_2$ is stronger and implies that there is no \enquote{larger} assignment $\ass_2' \supset \ass_2$ such that $\delta$ is not satisfied under $\ass_2'$. It follows that $\delta$ can neither be unit nor violated under $\ass_2'$.
+Note the difference between some $\delta$ being silent vs.~satisfied under an assignment: With $\delta$ being silent under $\ass_1$, there might well be some $\ass_1' \supset \ass_1$ under which $\delta$ is unit or violated. However $\delta$ satisfied under $\ass_2$ is stronger and implies that there is no larger assignment $\ass_2' \supset \ass_2$ such that $\delta$ is not satisfied under $\ass_2'$. It follows that $\delta$ can neither be unit nor violated under $\ass_2'$.
 
 \section{Watch Structures}
 
-In Section \ref{sec:2wl} we did not detail how a data structure that stores which two literals are watched for each nogood. References to the watched literals are illustrated in Figure \ref{fig:2wl} as pointers, and indeed we are suggesting some form of lookup table: As a new literal $\sgl$ is added to the assignment, the propagation algorithm will resolve the set of nogoods containing $\sgl$ as a watched literal. We define an abstract data structure for this lookup.
+In Section \ref{sec:2wl} we did not detail how a data structure that stores which two literals are watched for each nogood might look like. References to the watched literals are illustrated in Figure \ref{fig:2wl} as pointers, and indeed we are suggesting some form of lookup table: as a new literal $\sgl$ is added to the assignment, the propagation algorithm will resolve the set of nogoods containing $\sgl$ as a watched literal. We define an abstract data structure for this lookup.
 
 %suggesting some form of lookup table. Indeed, we suggest the 
 
@@ -1041,7 +1082,7 @@ edge [out=east,in=west, above] node {$\alpha$} (v1f)
 ;
 
 \end{tikzpicture}
-  \caption{Example layout of a \emph{watch structure}.}
+  \caption{Example layout of a watch structure}
   \label{fig:watches} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
 
@@ -1074,7 +1115,7 @@ Given $\Delta$ watching $\ass$ and a new assignment for some atom $\sgl$, the no
 
 Note that with $\Delta$ watching $\ass$ and extending the assignment $\ass' = \ass \circ \sgl$, now $\Delta$ does not trivially watch $\ass'$.
 
-Considering a set of ngoods and an assignment, one way to ensure that no nogood will propagate under the assignment is to require all nogoods being silent under the assignment. We combine this condition with a watch structure watching an assignment and use it as the goal state for 3WL.
+Considering a set of nogoods and an assignment, one way to ensure that no nogood will propagate under the assignment is to require all nogoods being silent under the assignment. We combine this condition with a watch structure watching an assignment and use it as the goal state for 3WL.
 
 \begin{definition}
 A watch structure $\Delta$ \emph{silently watches} assignment $\ass$ in case all nogoods $\delta \in \Delta$ are silent under $\ass$ and $\Delta$ watches $\ass$.
@@ -1128,9 +1169,11 @@ In this section we detail Three Watched Literals (3WL). The process is split int
   \label{alg:upsingle}
 \end{algorithm}
 
-The solver component initially and after each decision expands its assignment by inferring new literals through unit propagation. We define Algorithm \ref{alg:up} \enquote{exhaustively}, i.e.~in such a way that it will only terminate when no new assignments can be inferred through unit propagation or a conflict was reached. It takes the current assignment $A$ and a watch structure $\Delta$ that silently watches $A$, and the next literal to be appended to the assignment $\sgl$. In the first line of the algorithm, $A_1$ is generated by appending $\sgl$ to $A$. However, $\Delta$, the input watch structure, equals $\Delta_1$. So while $\Delta$ silently watches $A$, this might not be the case for $\Delta_1$ and $A_1$, because $A_1$ contains one more literal that might lead to some nogood in $\Delta_1$ being unit. This triggers a \enquote{domino effect} of unit propagation.
+The solver component initially and after each decision expands its assignment by inferring new literals through unit propagation. We define Algorithm \ref{alg:up} \enquote{exhaustively}, i.e.~in such a way that it will only terminate when no new assignments can be inferred through unit propagation or a conflict was reached. It takes the current assignment $A$ and a watch structure $\Delta$ that silently watches $A$, and the next literal to be appended to the assignment $\sgl$. In the first line of the algorithm, $A_1$ is generated by appending $\sgl$ to $A$. However, $\Delta$, the input watch structure, equals $\Delta_1$. So while $\Delta$ silently watches $A$, this might not be the case for $\Delta_1$ and $A_1$, because $A_1$ contains one more literal that might lead to some nogood in $\Delta_1$ being unit. This triggers a domino effect of unit propagation.
 
 The loop in lines 3 to 6 will then restore $\Delta_{i+1}$ to silently watch $\ass_{i+1}[1, |A| + 1]$. At the point where all all nogoods are silently watched again, the loop terminates because $|A_i| < |A| + i$. In case a conflict is reached in any iteration, the loop will break, because we carefully defined $|conflict| = 0$ and $i$ is at least one.
+
+Before new assignments are resolved to the nogoods that must be checked, Algorithm \ref{alg:upsingle} is invoked. It serves the purpose to decide which propagation algorithm(s) should be called. Algorithm \ref{alg:upu} is always called, but it is sufficient to Algorithm \ref{alg:upa} only if an atom was assigned to be \emph{true}, i.e. $\sgl$ is of the form $\bT a$. This is because the relevant candidate set $\cdpm(\delta, \ass)$ changes only as atoms are assigned to \emph{true}.
 
 \begin{algorithm}
   \KwIn{An~assignment~$\ass$,
@@ -1174,7 +1217,7 @@ The loop in lines 3 to 6 will then restore $\Delta_{i+1}$ to silently watch $\as
   \label{alg:upu}
 \end{algorithm}
 
-Algorithm \ref{alg:upu} exhibits how unit propagation is used to infer assignments from watched nogoods. Its input is the current assignment $A$, a watch structure $\Delta$ and the literal $\sgl$ that has been newly assigned and should be processed. Tracing the invocation of the algorithm we notice that $\sgl$ in Algorithm \ref{alg:upu} corresponds with $\sgl$ in Algorithm \ref{alg:upsingle} and $A_i[|A| + i]$ in Algorithm \ref{alg:up}.
+Algorithm \ref{alg:upu} shows how unit propagation is used to infer assignments from watched nogoods. Its input is the current assignment $A$, a watch structure $\Delta$ and the literal $\sgl$ that has been newly assigned and should be processed. Tracing the invocation of the algorithm we notice that $\sgl$ in Algorithm \ref{alg:upu} corresponds with $\sgl$ in Algorithm \ref{alg:upsingle} and $A_i[|A| + i]$ in Algorithm \ref{alg:up}.
 
 The set of nogoods that are touched by the algorithm is $\dpm(\sgl)$, i.e.~all nogoods $\delta$ where $\sgl$ is one of the watched literals. In lines 2 to 7 all cases that require no change of watched literals are handled:
 
@@ -1225,10 +1268,10 @@ With the above cases handled, there must be at least two literals in the candida
   \label{alg:upa}
 \end{algorithm}
 
-Algorithm \ref{alg:upa} works in a similar way but without the need to check for violations/conflicts and nogoods being weakly unit, as these cases are handled by Algorithm \ref{alg:upu}. It is only called for assignments to \emph{true}, e.g. $\sgl$ in Algorithm \ref{alg:upsingle} is of the form $\bT a$. This is because the relevant candidate set $\cdpm(\delta, \ass)$ changes only as atoms are assigned to \emph{true}. Further, by the definition of a nogood $\delta$ being strongly unit, we know that all positive literals (except the head literal) of $\delta$ must be assigned to \emph{true}, and not only to \emph{\mbt} for propagation.
+Algorithm \ref{alg:upa} works in a similar way but without the need to check for violations/conflicts and nogoods being weakly unit, as these cases are handled by Algorithm \ref{alg:upu}. Further, by the definition of a nogood $\delta$ being strongly unit, we know that all positive literals (except the head literal) of $\delta$ must be assigned to \emph{true}, and not only to \emph{\mbt} for propagation.
 
 \begin{theorem}
-Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$, a literal $\sgl$, and the following precondition, it results in a new assignment $\ass'$ and a new watch structure $\Delta'$ such that all following postconditions hold:
+Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$, a literal $\sgl$, and the following precondition, it results in a new assignment $\ass'$ and a new watch structure $\Delta'$ such that the following postconditions all hold:
 \begin{enumerate}[label={\normalfont (\textsc{Pre})},ref=(\textsc{Pre})]
 \item $\Delta$ silently watches $A$. \label{up:sound:pre}
 \end{enumerate}
@@ -1252,10 +1295,12 @@ Before establishing \ref{up:sound:post2} and \ref{up:sound:post3} observe the lo
 \begin{description}
 \item[Initialization] Construct $A_1$ by appending $\sgl$ to $\ass$ (line~\ref{alg:up:circ}). Initialize some loop counter $i = 1$ (line~\ref{alg:up:i}). It points at the next literal on which propagation should be performed, i.e.~initially $\sgl = \ass_1[|\ass| + 1]$. 
 
-\item[Iteration] Let the pair $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle = \textsc{UnitPropagate}(\ass_i, \Delta_i, |A| + i)$ (line~\ref{alg:up:loop:prop}) denote the output of the $i$-th iteration which performs propagation on assignment $\ass_i$, watch structure $\Delta_i$ and literal $\ass_i[|A| + i]$ (line~\ref{alg:up:loop:lit}). Conversely $S_i$ can be interpreted as the input for the $i$-th iteration. Analysis of the difference between $\Delta_{i}$ and $\Delta_{i+1}$ is what resembles soundness below.
+\item[Iteration] Let the pair $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle = \textsc{UnitPropagate}(\ass_i, \Delta_i, |A| + i)$ (line~\ref{alg:up:loop:prop}) denote the output of the $i$-th iteration which performs propagation on assignment $\ass_i$, watch structure $\Delta_i$ and literal $\ass_i[|A| + i]$ (line~\ref{alg:up:loop:lit}). Conversely $S_i$ can be interpreted as the input for the $(i+1)$-th iteration. Analysis of the difference between $\Delta_{i}$ and $\Delta_{i+1}$ is what resembles soundness below.
 
 \item[Termination] Because the number of literals in all nogoods $\delta \in \Delta$ is finite, for some $i = k$ the loop invariant (line~\ref{alg:up:loop:begin}) is violated, i.e.~$|\ass_{k}| < |A| + k$. Intuitively, this is the case if no new assignment can be inferred ($S_{k-1} = \langle \ass_{k-1}, \Delta_{k-1} \rangle$ and $S_k = \langle \ass_k, \Delta_k \rangle$ with $\ass_{k-1} = \ass_k$) or a conflict is reached ($\ass_k = \emph{conflict}$). When the loop terminates, $\langle \ass', \Delta' \rangle = S_k$ is returned (line~\ref{alg:up:ret}).
 \end{description}
+
+We consider two subsequences of the assignment $A_n$: $\ass_n^L$ is the \enquote{left} subsequence, which contains all assignments that already are processed and will not cause propagation. Conversely, $\ass_n^R$ is the \enquote{right} subsequence, containing all literals that might still cause unit propagation. As expected, the two subsequences add up to the full sequence $A_n = A_n^L \cup A_n^R$.
 
 Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} from the preconditions, assume that $\sgl$ does not conflict with $\ass$ and let $\mathcal{P}(n) = \textrm{\ref{up:sound:ind:noconflict}} \vee \textrm{\ref{up:sound:ind:conflict}}$ where
 
@@ -1273,7 +1318,7 @@ Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} from the precondit
 	\item $\ass_n = \emph{conflict}$ \label{up:sound:ind:conflict}
 \end{enumerate}
 
-\paragraph{Overview and Intuition} Using $\mathcal{P}(n)$ above, we show that \ref{up:sound:post2} and \ref{up:sound:post3} follow from the preconditions by induction, closely following the structure of Algorithm \ref{alg:up} as outlined above. We consider two subsequences of the assignment $A_n$: $\ass_n^L$ is the \enquote{left} subsequence, which contains all assignments that already are processed and will not cause propagation. Conversely, $\ass_n^R$ is the \enquote{right} subsequence, containing all literals that might still cause unit propagation. As expected, the two subsequences add up to the full sequence $A_n = A_n^L \cup A_n^R$. Initially ($n = 0$, $\ass = \ass_0 = \ass_L^0$ and $\ass_R^0 = \emptyset$), we require the input nogoods $\Delta$ to all be silent through \ref{up:sound:pre} as a \enquote{stable} starting point. While new literals will be appended to the assignment on the \enquote{right} side, we will show that at termination for some $n = k$ as hinted above, $\ass_k^R = \emptyset$ again. From there we establish the postconditions. For the induction step deriving $\mathcal{P}(i + 1)$ from $\mathcal{P}(i)$ we will \enquote{move} exactly on literal $\sgl_i$ from right to left ($\sgl_i \not \in \ass_i^L$, $\sgl_i \in \ass_i^R$ and $\sgl_i \in \ass_{i+1}^L$, $\sgl_i \not \in \ass_{i+1}^R$ as well as $\ass_{i+1}^L = \ass_{i}^L \cup \{ \sgl_i \}$). Here, properties \ref{up:sound:ind:lr} are crucial, as they establish the connection between $A_i^R$ and $A_i^L$ and cover the propagation scenarios for $\sgl_i$. Note that the \enquote{right} subsequence \enquote{grows} (with the exception of $\sgl_i$), i.e.~$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$ because of new literals inferred by propagation.
+\paragraph{Overview and Intuition} Using $\mathcal{P}(n)$ above, we show that \ref{up:sound:post2} and \ref{up:sound:post3} follow from the preconditions by induction, closely following the structure of Algorithm \ref{alg:up} as outlined above. Initially ($n = 0$, $\ass = \ass_0 = \ass_L^0$ and $\ass_R^0 = \emptyset$), we require the input nogoods $\Delta$ to all be silent through \ref{up:sound:pre} as a \enquote{stable} starting point. While new literals will be appended to the assignment on the \enquote{right} side, we will show that at termination for some $n = k$ as hinted above, $\ass_k^R = \emptyset$ again. From there we establish the postconditions. For the induction step deriving $\mathcal{P}(i + 1)$ from $\mathcal{P}(i)$ we will \enquote{move} exactly one literal $\sgl_i$ from right to left ($\sgl_i \not \in \ass_i^L$, $\sgl_i \in \ass_i^R$ and $\sgl_i \in \ass_{i+1}^L$, $\sgl_i \not \in \ass_{i+1}^R$ as well as $\ass_{i+1}^L = \ass_{i}^L \cup \{ \sgl_i \}$). Here, properties \ref{up:sound:ind:lr} are crucial, as they establish the connection between $A_i^R$ and $A_i^L$ and cover the propagation scenarios for $\sgl_i$. Note that the \enquote{right} subsequence \enquote{grows} (with the exception of $\sgl_i$), i.e.~$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$ because of new literals inferred by propagation.
 
 \paragraph{Base Case} Concerning the input assignment $\ass_0 = \ass$ and $\Delta_0 = \Delta$, $\mathcal{P}(0)$ directly follows, because \ref{up:sound:ind:watches} is given by \ref{up:sound:pre}, and all nogoods being silent (also given by \ref{up:sound:pre}) implies that the antecedents of \ref{up:sound:ind:wu}, \ref{up:sound:ind:su}, \ref{up:sound:ind:vio} are false.
 
@@ -1283,20 +1328,20 @@ Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} from the precondit
 
 \paragraph{Induction Hypothesis} $\mathcal{P}(i)$ holds for some $i$.
 
-\paragraph{Induction Step} For two consecutive iteration steps of the loop $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(i)$. For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:
+\paragraph{Induction Step} For two consecutive iteration steps of the loop $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(i)$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:%For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$. 
 
 \begin{enumerate}
 \item To show \ref{up:sound:ind:watches} let $\delta \in \Delta$: %$A_i^L$ differs from $A_{i+i}^L$ only by $\sgl_i$, which is processed by Algorithm \ref{alg:up}. Note that for all $\delta$ in $\Delta$, the candidate sets wrt.~$\ass_i^L$ are at most the size of those wrt.~$\ass_{i+1}^L$, i.e.~candidate sets are monotonically decreasing with growing $A^L$.
-If $\bsgl_i \not \in \delta$, then $\delta$ stays silent and watched. For $\bsgl_i \in \delta$, consider the following two cases:
+If $\bpro(\sgl_i) \not \in \delta$, then $\delta$ stays silent and watched. For $\bpro(\sgl_i) \in \delta$, consider the following two cases:
 \begin{enumerate}
-	\item Assume $\sgl_i \not = \bT v$. Then Algorithm \ref{alg:upu} is invoked and processes all nogoods $\delta \in \dpm(\sgl)$. For any $\delta$, if $|\cdpm(\delta, A)| \geq 2$, then $\delta$ is inserted into the watches for exactly two candidates in lines \ref{alg:upu:move:start}-\ref{alg:upu:move:end}.
-	\item Assume $\sgl_i = \bT v$. Then Algorithm \ref{alg:upu} is invoked and behaves like for the case where $\sgl_i \not = \bT v$, i.e.~if $\cdpm(\delta,\ass) \geq 2$ then $\delta$ is watched. Additionally, Algorithm \ref{alg:upa} is invoked and processes all nogoods $\delta \in \dal(\sgl)$. For any $\delta$, if $|\cdal(\delta, A)| \not = \emptyset$, then $\delta$ is inserted into the watches for exactly one candidate in lines \ref{alg:upa:move:start}-\ref{alg:upa:move:end}. 
+	\item Assume $\sgl_i \not = \bT v$. Then Algorithm \ref{alg:upu} is invoked and processes all nogoods $\delta \in \dpm(\sgl)$. For any $\delta$, if $|\cdpm(\delta, A)| \geq 2$, then $\delta$ is inserted into the watch sets for exactly two candidates in lines \ref{alg:upu:move:start}-\ref{alg:upu:move:end}.
+	\item Assume $\sgl_i = \bT v$. Then Algorithm \ref{alg:upu} is invoked and behaves like for the case where $\sgl_i \not = \bT v$, i.e.~if $\cdpm(\delta,\ass) \geq 2$ then $\delta$ is watched. Additionally, Algorithm \ref{alg:upa} is invoked and processes all nogoods $\delta \in \dal(\sgl)$. For any $\delta$, if $|\cdal(\delta, A)| \not = \emptyset$, then $\delta$ is inserted into the watch set of exactly one candidate in lines \ref{alg:upa:move:start}-\ref{alg:upa:move:end}. 
 \end{enumerate}
 
 If $\sgl_i \in \Delta$ then the premises of the \enquote{watch} property regarding candidate sets are false, or pointers were moved such that $\sgl_i$ does not watch $\delta$ anymore.
 
 \item To show \ref{up:sound:ind:wu}, let $\delta \in \Delta$ and assume $\delta$ is weakly unit under $\ass_{i+1}$ (else, \ref{up:sound:ind:wu} trivially holds):
-\begin{enumerate}
+\begin{enumerate}[label=\alph*),ref=\theenumi.\alph*]
 	\item Assume $\delta$ is weakly unit under $\ass_i$. \label{pr:corr:wu:wu}
 	
 	Then $\exists \sgl \in \ass_i^R : \delta \in \Delta_i^\pm(\sgl)$ by the induction hypothesis. 
@@ -1309,7 +1354,7 @@ If $\sgl_i \in \Delta$ then the premises of the \enquote{watch} property regardi
 	
 	Then $\cdpm(\delta, \ass_{i}) \geq 2$ and because $\Delta_i$ watches $A_i$ (ind.~hyp.), we have $\exists \bsgl_1, \bsgl_2 \in \delta : \bsgl_1 \not = \bsgl_2 \wedge \delta \in \Delta_i^\pm(\bsgl_1) \wedge \delta \in \Delta_i^\pm(\bsgl_2)$. We distinguish on whether $\sgl_i$ coincides with one of the watched literals:
 
-	\begin{enumerate}
+	\begin{enumerate}[label=\roman*.,ref=\theenumii.\roman*]
 		%\item Assume $\sgl_i \not = \bsgl_1$ and $\sgl_i \not = \bsgl_2$ towards a contradiction. As $\bsgl_1, \bsgl_2 \in \cdpm(\delta, \ass_i)$, both $\bsgl_1, \bsgl_2$ are unassigned under $\ass_i$ by definition of $\cdpm$. For $\delta$ to be weakly unit under $\ass_{i+1}$, there must be exactly one $\bsgl' \in \delta$ unassigned under $\ass_{i+1}$.
 		\item Case $\sgl_i \not = \bsgl_1 \wedge \sgl_i \not = \bsgl_2$.
 		
@@ -1318,56 +1363,93 @@ If $\sgl_i \in \Delta$ then the premises of the \enquote{watch} property regardi
 		\item Case either $\sgl_i = \bsgl_1$ or $\sgl_i = \bsgl_2$.
 		\label{sigmaprimes}		
 		
-		Without loss of generality ($\bsgl_1$ and $\bsgl_2$ arbitrary in $\cdpm(\delta, \ass_i)$), let $\sgl_i = \bsgl_1$. Therefore, $\bsgl_1 \not \in A_{i+1}^R$ and $\bsgl_2 \in A_{i+1}^R$. While processing $\delta$, in Algorithm \ref{alg:upu} the branch in line \ref{alg:upu:else} is taken (otherwise $\delta$ cannot be unit under $\ass_{i+1}$. All candidates $\cdpm(\delta, \ass_i)$ except $\bsgl_1$, and therefore any literals $\bsgl_1', \bsgl_2'$ (arbitrarily) chosen in the algorithm, are either unassigned under $\ass_{i+1}$ or in $\ass_{i+1}^R$. As $\delta$ is unit under $\ass_{i+1}$, exactly one of these must be unassigned.
+		This means, processing of $\sgl_i$ makes $\delta$ become unit but while $\delta$ is processed by Algorithm \ref{alg:upu} it is not unit yet, i.e., another nogood processed after $\delta$ is unit and the assignment done there leads to $\delta$ being unit.
+		Without loss of generality ($\bsgl_1$ and $\bsgl_2$ arbitrary in $\cdpm(\delta, \ass_i)$), let $\sgl_i = \bsgl_1$. Therefore, $\bsgl_1 \not \in A_{i+1}^R$. While processing $\delta$, in Algorithm \ref{alg:upu} the branch in line \ref{alg:upu:else} is taken (otherwise $\delta$ cannot be unit under $\ass_{i+1}$). All candidates $\cdpm(\delta, \ass_i)$ except $\bsgl_1$, and therefore any literals $\bsgl_1', \bsgl_2'$ (arbitrarily) chosen in the algorithm, are either unassigned under $\ass_{i+1}$ or in $\ass_{i+1}^R$. As $\delta$ is unit under $\ass_{i+1}$, exactly one of these must be unassigned.
 		Assume (w.l.o.g., symmetric) $\bsgl_1'$ unassigned under $A_{i+1}$ and $\bsgl_2' \in \ass_{i+1}^R$. Then \ref{up:sound:ind:wu} holds for $\bsgl_2'$.
 		
 		\item Case $\bsgl_1 = \sgl_i \wedge \bsgl_2 = \sgl_i$ is impossible because $\bsgl_1 \not = \bsgl_2$.
 		\end{enumerate}
 \end{enumerate}
 
-\item To show \ref{up:sound:ind:su}, let $\delta \in \Delta$ and assume $\delta$ is strongly unit (and therefore also weakly unit or $\headf(\delta) = \bM v$) under $\ass_{i+1}$ (else, \ref{up:sound:ind:su} trivially holds):
+\item To show \ref{up:sound:ind:su}, let $\delta \in \Delta$ and assume $\delta$ is strongly unit (and therefore also weakly unit, i.e.~$\headf(\delta) = \bT v$ and $\bM v \in \ass_{i+1}$) under $\ass_{i+1}$ (else, \ref{up:sound:ind:su} trivially holds): we distinguish whether $\bpro(\sgl_i) \in \delta$, i.e.~whether the literal being processed is a watch for $\delta$.
 \begin{enumerate}
-	\item Case $\delta$ is strongly unit under $\ass_i$. Then $\exists {\bT v_1} \in \ass_i^R : \delta \in \dal_i(v_1)$ or $\exists {\bF v_2} \in \ass_i^R : \delta \in \dpm_i({\bF v_2})$ via induction hypothesis.
+	\item Case $\delta$ is strongly unit under $\ass_i$.
 	\begin{enumerate}
-		\item Case $\sgl_i = {\bT v_1}$. Then Algorithm \ref{alg:upa} appends the strong complement of the head (line \ref{alg:upa:su:circ}), thus $\negstrong{\headf(\delta)} \in A_{i+1}^R$ and therefore $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
-		\item Case $\sgl_i = {\bF v_2}$. Then Algorithm \ref{alg:upu} appends the strong complement of the head (line \ref{alg:upu:su:circ}), thus $\negstrong{\headf(\delta)} \in A_{i+1}^R$ and therefore $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
+		\item Case $\bpro(\sgl_i) \in \delta$, then Algorithm \ref{alg:upu} (line \ref{alg:upu:su:circ}) assigns $\headf(\delta)$, i.e. $\negstrong{\headf(\delta)} \in \ass_{i+1}^R$, and therefore $\delta$ cannot be strongly unit under $\ass_{i+1}$ which contradicts the assumption that $\delta$ is weakly unit under $\ass_{i+1}$.
+		\item Case $\bpro(\sgl_i) \not \in \delta$. Because $\delta$ is strongly unit under $\ass_i$ and by the induction hypothesis we have $\exists {\bT v_1} \in \ass_i^R : \delta \in \dal_i(v_1)$ or $\exists {\bF v_2} \in \ass_i^R : \delta \in \dpm_i({\bF v_2})$.
+		From $\bpro(\sgl_i) \not \in \delta$ it follows that $\sgl_i \not = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$.	
+%		\item Case $\sgl_i = {\bT v_1}$. Then Algorithm \ref{alg:upa} appends the strong complement of the head (line \ref{alg:upa:su:circ}), thus $\negstrong{\headf(\delta)} \in A_{i+1}^R$ and therefore $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
+%		\item Case $\sgl_i = {\bF v_2}$. Then Algorithm \ref{alg:upu} appends the strong complement of the head (line \ref{alg:upu:su:circ}), thus $\negstrong{\headf(\delta)} \in A_{i+1}^R$ and therefore $\delta$ is not strongly unit under $A_{i+1}$. \contradiction
 			%\item Case $\sgl_i = {\bT v_1} \wedge \sgl_i = {\bF v_2}$ is contradictory. \contradiction % Amounts to the case where $\sgl_i = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$ because algorithm \ref{alg:upu} is executed before algorithm \ref{alg:upa}, which degrades to a no-operation, because $\delta$ is neither strongly unit, nor is $C_\alpha(\delta, A)$ (where $A$ is defined in the scope of the algorithm, a hybrid state between $A_i$ and $A_{i+1}$) non-empty when it is executed.
-		\item Case $\sgl_i \not = {\bT v_1} \wedge \sgl_i \not = {\bF v_2}$.
-		From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that if ${\bT v_1}, {\bF v_2}$ exist, they are in $\ass_{i+1}^R$. Also, $\delta \in \dal_i(v_1)$ implies $\delta \in \dal_{i+1}(v_1)$ and $\delta \in \dpm_i({\bF v_2})$ implies $\delta \in \dpm_{i+1}({\bF v_2})$ because $\delta$ is strongly unit and $\sgl_i \not \in \delta$. So we have $\exists {\bT v_1} \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v_1)$ or $\exists {\bF v_2} \in \ass_{i+1}^R : \delta \in \dpm_{i+1}({\bF v_2})$, i.e.~\ref{up:sound:ind:su}. % TODO: \sgl might actually change (pointer move) which is not mentioned here. If this does not get mentioned in the watches section of the proof, add a remark here explaining that \sgl might change in the course of algorithm 3.3 but only in a way that fulfills above criteria.
+
+		From $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that if ${\bT v_1}, {\bF v_2}$ exist, they are in $\ass_{i+1}^R$. Also, $\delta \in \dal_i(v_1)$ implies $\delta \in \dal_{i+1}(v_1)$ and $\delta \in \dpm_i({\bF v_2})$ implies $\delta \in \dpm_{i+1}({\bF v_2})$ because $\delta$ is strongly unit and $\bpro(\sgl_i) \not \in \delta$, i.e. no algorithm will change the watches that contain $\delta$. So we have $\exists {\bT v_1} \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v_1)$ or $\exists {\bF v_2} \in \ass_{i+1}^R : \delta \in \dpm_{i+1}({\bF v_2})$, i.e.~\ref{up:sound:ind:su}. % TODO: \sgl might actually change (pointer move) which is not mentioned here. If this does not get mentioned in the watches section of the proof, add a remark here explaining that \sgl might change in the course of algorithm 3.3 but only in a way that fulfills above criteria.
 	\end{enumerate}
 	
 	
-	\item Case $\delta$ is not strongly unit under $A_i$. Then, $\bodyf(\delta) \setminus A_i \not = \emptyset$.
+	\item Case $\delta$ is not strongly unit under $A_i$. Then, $\bass(\ass_i) \setminus \delta \not = \emptyset$.
 
 
 	\begin{enumerate}
-		\item Case ${\bT v} \in \bodyf(\delta) \setminus A_i$.
+		\item Case $\bpro(\sgl_i) \not \in \bass(A_i)$, i.e., none of the literals of $\delta$ is processed in this step. Since $\delta$ is strongly unit under $\ass_{i+1}$ and not strongly unit under $A_i$ it holds that $\delta \setminus \ass_{i+1}^R \not = \emptyset$.
 		
-		Then, $C^\alpha(\delta, A_{i}) \not = \emptyset$. Because $\Delta_i$ watches $\ass_i$ it follows that $\exists \bsgl \in C_\alpha(\delta, A_i): \delta \in \dal(\sigma)$.
+		Since $\delta$ is strongly unit under $\ass_{i+1}$, it is also weakly unit under $\ass_{i+1}$. Therefore there exists $\sgl' \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl')$.
 		
-		\begin{enumerate}
-			\item Case $\sgl_i = \bsgl$.
-			
-			leads to a contradiction ($\delta$ not strongly unit under $A_{i+1}$)
-			
-			\item Case $\sgl_i \not = \bsgl$.
-			
-			$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, we have $\bsgl \in \ass_{i+1}^R$, thus $\exists \bsgl \in \ass_{i+1}^R : \delta \in \dal_{i+1}(\bsgl)$, i.e.~\ref{up:sound:ind:su}. \todo{Why $\delta \in \dal_{i+1}(\bsgl)$?}
-		\end{enumerate}			
-			
-		\item Case ${\bT v} \not \in \bodyf(\delta) \setminus A_i$.
-			\begin{enumerate}
-				\item Case $\negweak{\headf(\delta)} \not \in A_{i} \wedge \negstrong{\headf(\delta)} \not \in A_{i}$, i.e.~the head is unassigned. Then there are at least two literals in $\delta$ unassigned under $A_i$ (one in the body and the head). From \ref{up:sound:ind:watches} we have $\bsgl_1, \bsgl $
-				\item Case $\negweak{\headf(\delta)} \in A_{i}$.
-				If $|\bodyf(\delta) \setminus A_i| \geq 2$, then there are at least two unassigned literals. Else if $\bodyf(\delta) \setminus A_i = \{ {\bF v} \}$, then $\delta$ is weakly unit.
-			\end{enumerate}
+		\begin{itemize}
+			\item If $\sgl' = \bF v'$, then $\exists \bF v' \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\bF v')$ and \ref{up:sound:ind:su} holds.
+			\item If $\sgl' = \bT v'$, then $\bT v' \not \in \ass_{i+1}^L$ and hence $\bT v' \not \in \ass_i$, which implies that $\cdal(\delta, \ass_i) \supset \{ \bT v' \} \not = \emptyset$. By induction hypothesis it therefore follows that there exists $\bsgl \in \cdal(\delta, \ass_i) : \delta \in \dal(\bsgl)$. By $\cdal(\delta, \ass_i)$ only containing literals of form $\bT v \in \delta$ it follows that $\exists \bT v \in \ass_i^R : \delta \in \dal_i(v)$. Since none of the literals of $\delta$ is processed, it follows that $\delta \in \dal_{i+1}(v)$. Consequently \ref{up:sound:ind:su} holds.
+			\item If $\sgl' = \bM v'$, then it follows that $\bT v' \not \in \ass_{i+1}^L$, because $\bM v'$ can only be added to an assignment in Algorithm \ref{alg:upu} by line \ref{alg:upu:wu:circ}, which is only executed if $v'$ is not assigned false, i.e.~$\bF v'$. From $\bT v' \not \in \ass_{i+1}^L$ the same reasoning as in the previous case applies and it follows that \ref{up:sound:ind:su} holds.
+		\end{itemize}
+	
+	\item 	$\bpro(\sgl_i) \in \delta \setminus \bass(\ass_i)$, i.e. some literal in $\delta$ is processed. If $\delta$ is strongly unit while $\delta$ is processed by Algorithm \ref{alg:upu}, then $\negstrong{\headf(\delta)} \in \ass_{i+1}$ due to line \ref{alg:upu:su:circ} of Algorithm \ref{alg:upu}, which contradicts $\delta$ being strongly unit under $\ass_{i+1}$. Therefore $\delta$ is not yet strongly unit when Algorithm \ref{alg:upu} processes $\delta$.
+	
+
+	\begin{enumerate}
+		\item Case $\delta$ is weakly unit with $\sgl_i$ unassigned: since $\delta$ is strongly unit under $\ass_i$ it must be the case that $\delta$ is weakly unit on $\headf(\delta)$, i.e., $\bsgl$ of line \ref{alg:upu:wu:circ} in Algorithm \ref{alg:upu} is such that $\bsgl = \headf(\delta)$. From $\delta$ not being strongly unit under $\ass_i$  then follows that some $\bT v' \in \delta$ is assigned \emph{\mbt}, i.e.~$\bM v' \in \ass_i^L$.
+	
+	Let $M = \{ \bT v \in \delta \setminus \headf(\delta) \mid \bM v \in \ass_i \}$ be the set of all such \emph{\mbt} assigned literals of $\delta$ except its head. Let $\bT v'$ in the following be the literal of $M$ that is assigned last under $\ass_{i+1}$. Intuitively, $\bT v'$ triggers $\delta$ to be unit.
+	
+	Since $\bT v'$ is the \enquote{last} of $M$ that is assigned, it cannot be the case that $\bT v' = \sgl_i$, as otherwise $\delta$ would be strongly unit while processing $\sgl_i$.
+	
+	We distinguish whether $\sgl_i = \bT w$ for one atom $w$.
+	
+	\begin{itemize}
+		\item If $\sgl_i = \bT w$, then Algorithm \ref{alg:upsingle} is executed and calls Algorithm \ref{alg:upa}. Since $\delta$ is not strongly unit under $\ass_i$ and $\cdal(\delta, \ass_i) \not = \emptyset$ because $\{ \bT v' \} \in \cdal(\delta, \ass_i)$ lines \ref{alg:upa:move:start}-\ref{alg:upa:move:end} are executed and it holds that $\exists \bT v_1 \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v_1)$, i.e.~\ref{up:sound:ind:su} holds.
+	
+		\item If $\sgl_i \not = \bT w$, then Algorithm \ref{alg:upa} is not executed and from $\bT v' \not \in \ass_{i+1}^L$ it follows that $\bT v' \not \in \ass_i$ and $\cdal(\delta, \ass_i) \not = \emptyset$, hence by induction hypothesis $\exists \bsgl \in \cdal(\delta, \ass_i) : \delta \in \dal_i(\bsgl)$ with $\bsgl = \bT v_1$ for some atom $v_1$. Since Algorithm \ref{alg:upa} is not executed, $\delta \in \dal_{i+1}(\bT v_1)$ and $\bT v_1 \in \ass_{i+1}^R$, i.e.~\ref{up:sound:ind:su} holds.
+	
+	\end{itemize}
+	
+	\item Case $\delta$ is not weakly unit with $\sgl_i$ unassigned, then in Algorithm \ref{alg:upu} line \ref{alg:upu:move:start}-\ref{alg:upu:move:end} are executed and there exist $\bsgl_1, \bsgl_2$ with $\bsgl_1, \bsgl_2 \not \in \ass_i : \delta \in \dpm(\bsgl_1) \text{ and } \delta \in \dpm(\bsgl_2)$ to establish that $\delta$ is watched. Similar to the reasoning in \ref{sigmaprimes}, we see that the watches condition ensures that the assignment that leads to $\delta$ being strongly unit will be processed.% If $\bsgl_1 = \bF v$ for some atom $v$, then $\exists \bF \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\bF v)$, i.e., \ref{up:sound:ind:su} holds. If $\bsgl = \bT v$ then $\cdal(\delta, \ass_i) \not = \emptyset$ and by induction hypothesis it follows that $\exists \bT v' \in \ass_{i+1}^R : \delta \in \dal_{i+1}(v')$. Thus \ref{up:sound:ind:su} holds in every case.
+	
 	\end{enumerate}
+	
+%		\item Case ${\bT v} \in \bodyf(\delta) \setminus A_i$.
+		
+%		Then, $C^\alpha(\delta, A_{i}) \not = \emptyset$. Because $\Delta_i$ watches $\ass_i$ it follows that $\exists \bsgl \in C_\alpha(\delta, A_i): \delta \in \dal(\sigma)$.
+		
+%		\begin{enumerate}
+%			\item Case $\sgl_i = \bsgl$.
+			
+%			leads to a contradiction ($\delta$ not strongly unit under $A_{i+1}$)
+			
+%			\item Case $\sgl_i \not = \bsgl$.
+			
+%			$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, we have $\bsgl \in \ass_{i+1}^R$, thus $\exists \bsgl \in \ass_{i+1}^R : \delta \in \dal_{i+1}(\bsgl)$, i.e.~\ref{up:sound:ind:su}. \todo{Why $\delta \in \dal_{i+1}(\bsgl)$?}
+%		\end{enumerate}			
+			
+%		\item Case ${\bT v} \not \in \bodyf(\delta) \setminus A_i$.
+%			\begin{enumerate}
+%				\item Case $\negweak{\headf(\delta)} \not \in A_{i} \wedge \negstrong{\headf(\delta)} \not \in A_{i}$, i.e.~the head is unassigned. Then there are at least two literals in $\delta$ unassigned under $A_i$ (one in the body and the head). From \ref{up:sound:ind:watches} we have $\bsgl_1, \bsgl $
+%				\item Case $\negweak{\headf(\delta)} \in A_{i}$.
+%				If $|\bodyf(\delta) \setminus A_i| \geq 2$, then there are at least two unassigned literals. Else if $\bodyf(\delta) \setminus A_i = \{ {\bF v} \}$, then $\delta$ is weakly unit.
+%			\end{enumerate}
+%	\end{enumerate}
 
 
 %	\begin{enumerate}
 %		\item Case $\bT v \in \bodyf(\delta) \setminus A_i$. If $\headf(\delta) \not \in A_i$ then there are at least two distinct literals $\bsgl_1, \bsgl_2 \in \delta$ (one in the body, and the head) that are unassigned unter  $A_i$ and \ref{up:sound:ind:su} holds for $A_{i+1}$ according to \ref{up:sound:ind:watches} for $A_i$. Else, i.e.~$\headf(\delta) \in A_i$, then $|\bodyf(\delta) \setminus A_i| \geq 2$, thus \ref{up:sound:ind:su} holds for $A_{i+1}$ according to \ref{up:sound:ind:watches} for $A_i$.
-%		\item Case $\bodyf(\delta) \setminus A_i = \{ \bF v' \}$, i.e.~$\delta$ is weakly unit under $A_i$, then according to \ref{up:sound:ind:wu}, $\exists \ \bsgl \in \bass(A_i^R) : \delta \in \Delta_i^\pm(\bsgl)$. From $A_i^R \cap \delta \subseteq \{ \bF v' \}$ follows that $v = v'$ and thus \ref{up:sound:ind:su}.
-%	\end{enumerate}
+%	\item Case $\bodyf(\delta) \setminus A_i = \{ \bF v' \}$, i.e.~$\delta$ is weakly unit under $A_i$, then according to \ref{up:sound:ind:wu}, $\exists \ \bsgl \in \bass(A_i^R) : \delta \in \Delta_i^\pm(\bsgl)$. From $A_i^R \cap \delta \subseteq \{ \bF v' \}$ follows that $v = v'$ and thus \ref{up:sound:ind:su}.
+	\end{enumerate}
 \end{enumerate}
 
 \item To show \ref{up:sound:ind:vio}, let $\delta \in \Delta$ and assume $\delta$ is violated under $A_{i+1}$ (else \ref{up:sound:ind:vio} trivially holds).
@@ -1382,14 +1464,14 @@ Then, according to Algorithm \ref{alg:upu} (line \ref{alg:upu:conflict}) $A_{i+1
 
 \item Case $\sgl \not = \sgl_i$.
 
-Then, from $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$, thus $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$. Also $\delta \in \dpm_i(\sgl)$ implies $\delta \in \dpm_{i+1}(\sgl)$, as watch sets are only modified for nogoods that are watched by $\sgl_i$. So we have $\exists \sgl \in \ass_i^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:vio} holds.
+Then, from $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, it follows that $\sgl \in \ass_{i+1}^R$, thus $\exists \sgl \in \ass_{i+1}^R : \delta \in \dpm_{i+1}(\sgl)$, because $\delta \in \dpm_i(\sgl)$ implies $\delta \in \dpm_{i+1}(\sgl)$, as watch sets are only modified for nogoods that are watched by $\sgl_i$. So we have $\exists \sgl \in \ass_i^R : \delta \in \dpm_{i+1}(\sgl)$, i.e.~\ref{up:sound:ind:vio} holds.
 \end{enumerate}
 \item Assume $\delta$ is not violated under $A_i$. Then $|\bass(A_i) \setminus \delta| \geq 1$  holds by Definition \ref{def:vio}.
 
 \begin{enumerate}
-\item Assume $|\bass(A_i) \setminus \delta| \geq 2$. Then because $\Delta_i$ watches $A_i$ it follows that $\exists \bsgl_1, \bsgl_2 : \delta \in \Delta_i^\pm(\bsgl_1), \Delta_i^\pm(\bsgl_2)$. Further $\bsgl_1 \not = \sgl_i$ or $\bsgl_2 \not = \sgl_i$, so w.l.o.g.~$\bsgl_1 \not = \sgl_i$, so $\exists \ {\bX v} \in X : \delta \in \Delta_{i+1}^\pm(v)$ with a reasoning similar to \ref{sigmaprimes}.
+\item Assume $|\delta \setminus \bass(\ass_i)| \geq 2$. This means that at least on literal in $\delta$ is unassigned. Then because $\Delta_i$ watches $A_i$ it follows that $\exists \bsgl_1, \bsgl_2 : \delta \in \Delta_i^\pm(\bsgl_1), \Delta_i^\pm(\bsgl_2)$. Further $\bsgl_1 \not = \sgl_i$ or $\bsgl_2 \not = \sgl_i$, so w.l.o.g.~$\bsgl_1 \not = \sgl_i$, so $\exists \ {\bX v} \in X : \delta \in \Delta_{i+1}^\pm(v)$ with a reasoning similar to \ref{sigmaprimes}.
 
-\item Assume $|\bass(A_i) \setminus \delta| = 1$. Then $\delta$ is weakly unit under $A_i$, thus this case amounts to \ref{pr:corr:wu:wu}.
+\item Assume $|\delta \setminus \bass(\ass_i)| = 1$. Then $\delta$ is weakly unit under $A_i$, and with reasoning similar to \ref{pr:corr:wu:wu} one can show that $\exists \sgl \in \ass^R_{i+1}$ with $\delta \in \dpm_{i+1}(\sgl)$.
 \end{enumerate}
 
 \end{enumerate}
@@ -1440,7 +1522,7 @@ Above induction step serves as an explanation on how execution of the loop affec
 
 For cases without conflict and the loop terminating at $S_k$, the outcome that $\Delta'$ watches $A'$ directly follows from \ref{up:sound:ind:watches} as $\ass' = \ass_k$ and $\Delta' = \Delta_k$. From termination follows $A_k^R = \emptyset$, i.e.~there are no nogoods $\delta \in \Delta'$ that are weakly unit, strongly unit or violated under $\ass'$, thus all $\delta$ are silent under $\ass'$. Together, this amounts to \ref{up:sound:post2}.
 
-Cases in the induction step leading to show \ref{up:sound:ind:conflict} map to \ref{up:sound:post3}.
+Cases in the induction step leading to \ref{up:sound:ind:conflict} map to \ref{up:sound:post3}.
 
 To show \ref{up:sound:post1} assume $\sgl$ conflicts with $\ass$. Then, on line~\ref{alg:up:circ} of Algorithm \ref{alg:up}, the assignment $A_1$ will be assigned \emph{conflict}. Consequently, the loop in lines~\ref{alg:up:loop:begin}-\ref{alg:up:loop:end} is not executed as $|\emph{conflict}| = 0$ and $i$ must be at least 1, as it is assigned 1 on line \ref{alg:up:i}. $\langle \emph{conflict}, \Delta \rangle$ is returned.
 \end{proof-sketch}
@@ -1462,7 +1544,7 @@ To show \ref{up:sound:post1} assume $\sgl$ conflicts with $\ass$. Then, on line~
 \chapter{Evaluation}
 \label{chap:eval}
 
-To support our results of performance improvement with 3WL compared to naive propagation, and in order to showcase the Alpha system as the first ASP system to combine 3WL with lazy grounding, we evaluated the run time performance for the publicly available\footnote{Concrete instances are available via \url{http://www.kr.tuwien.ac.at/research/systems/alpha/instances.zip}, whereas Java code to generate new instances is can be obtained from \url{https://github.com/alpha-asp/benchmarks}.} set of problem instances used in \cite{alpha-techniques}.
+To support our results of performance improvement with 3WL compared to naive propagation, and in order to showcase the Alpha system as the first ASP system to combine 3WL with lazy grounding, we evaluated the run time performance for the publicly available\footnote{Concrete instances are available via \url{http://www.kr.tuwien.ac.at/research/systems/alpha/instances.zip}, whereas Java code to generate new instances can be obtained from \url{https://github.com/alpha-asp/benchmarks}.} set of problem instances used in \cite{alpha-techniques}.
 
 \paragraph{Setup} The benchmarks were run with Alpha \texttt{v0.2.0}\footnote{Download freely available at \url{http://github.com/alpha-asp/alpha/releases/v0.2.0}.} on a machine with an Intel$^{\text{\tiny{\textregistered}}}$ Core$^{\text{\tiny{TM}}}$ i7-7500U CPU @ 2.7GHz, 16GB main memory, Linux kernel 4.12.5 and Oracle Java$^{\text{\tiny{TM}}}$ SE Runtime Environment (build \texttt{1.8.0\_144-b01}).
 
@@ -1475,11 +1557,11 @@ In the following four paragraphs we discuss the properties of the input problems
 As reported in \cite{alpha-techniques}, significant differences in the results for this benchmark arise from the comparison of ground-and-solve vs.~lazy-grounding systems. Because the difficulty in this benchmark lies in grounding, not in search and propagation, there is no relevant difference in run time expected, which aligns with our results as presented in Table \ref{tbl:gex}.
 
 \item{\bfseries Cutedge} is taken from \cite[Example 1]{omiga}. This problem consists of computing reachability from a graph with exactly one edge removed.
-Our results (see Table \ref{tbl:cut}) show that na\"{i}ve propagation outperforms 3WL, which runs into memory issues: Because of the combinatorial nature of the problem (5.4 million nogoods for 500 vertices and adjacency-probability of 30\%) and the more complex memory layout required by 3WL, it uses up all available memory. Na\"{i}ve propagation performs well, because the search space is quite dense: For many calls to the propagation routine, 83\% to 21\% of nogoods are reported unit (some might be counted twice, as strongly and weakly unit counts were added up during analysis). With that many nogoods being unit, the na\"{i}ve approach is faster because it does not have to do any \enquote{bookkeeping} operations to adjust references to watched literals.
+Our results (see Table \ref{tbl:cut}) show that na\"{i}ve propagation outperforms 3WL, which runs into memory issues: Because of the combinatorial nature of the problem (5.4 million nogoods for 500 vertices and adjacency-probability of 30\%) and the more complex memory layout required by 3WL, it uses up all available memory. Na\"{i}ve propagation performs well, because the search space is quite dense: For many calls to the propagation routine, 83\% to 21\% of nogoods are reported unit (some might be counted twice, as strongly and weakly unit counts were added up during analysis). With that many nogoods being unit, the na\"{i}ve approach is faster because it does not have to do any bookkeeping operations to adjust references to watched literals.
 
-\item{\bfseries Graph 5-Colorability} is the problem problem of assigning one out of five possible colors to each vertex in a graph such that no connected vertices have the same color. Our results (shown in Table \ref{tbl:5col}) clearly show an improvement when using 3WL compared to na\"{i}ve propagation. We see many propagation cycles with just two to six nogoods (out of tens of thousands) being unit. While the na\"{i}ve approach must check all nogoods, 3WL enables targeted propagation.
+\item{\bfseries Graph 5-Colorability} is the problem of assigning one out of five possible colors to each vertex in a graph such that no connected vertices have the same color. Our results (shown in Table \ref{tbl:5col}) clearly show an improvement when using 3WL compared to na\"{i}ve propagation. We see many propagation cycles with just two to six nogoods (out of tens of thousands) being unit. While the na\"{i}ve approach must check all nogoods, 3WL enables targeted propagation.
 
-\item{\bfseries Reachability} instances are positive programs that compute pairwise reachability of nodes in a graph. Again, sometimes as many as 10\% to 20\% of all nogoods are unit (with the possibility duplicates; nogoods that are strongly and weakly unit in one run are counted twice), which makes na\"{i}ve propagation slightly faster than the 3WL approach.
+\item{\bfseries Reachability} instances are positive programs that compute pairwise reachability of nodes in a graph. Again, sometimes as many as 10\% to 20\% of all nogoods are unit (with possible duplicates; nogoods that are strongly and weakly unit in one run are counted twice). This makes na\"{i}ve propagation slightly faster than the 3WL approach.
 For positive programs, which contain no default negated literals, search is not necessary. Other systems such as \texttt{clingo} use \emph{intelligent grounding} for this class of programs which could also be done for Alpha. We therefore include the results for this benchmark (Table \ref{tbl:reach}) primarily for the sake of completeness, as it is not relevant for directly comparing na\"{i}ve propagation with 3WL.
 \end{description}
 
@@ -1511,12 +1593,10 @@ $n$ & $\langle t_{1, \ldots, 10} \rangle$~[s]& $\langle t_{1, \ldots, 10} \rangl
 1000 & 	  1.452 &	  1.626 \\
 \hline
 \end{tabular}
-
-\hspace{3mm}
-
-10 answer sets, all runs in less than 300s and 8GB
+%\hspace{3mm}
+%10 answer sets, all runs in less than 300s and 8GB
 \end{center}
-\caption[Results for grounding explosion benchmark]{Results for grounding explosion benchmark: Time taken compute 10 answer sets, averaged over 10 runs. Size corresponds to size of the domain.}
+\caption[Results for grounding explosion benchmark]{Results for grounding explosion benchmark: Time in seconds taken to compute 10 answer sets, averaged over 10 runs. Size corresponds to size of the domain.}
 \label{tbl:gex}
 \end{table}
 
@@ -1544,14 +1624,11 @@ $|V|$ & $p(e)$& $\langle t_{1, \ldots, 10} \rangle$~[s]&t/o&m/o& $\langle t_{1, 
 500 & 0.5 & 	    n/a & 7 &  3 &	    n/a & 5 & 5 \\
 \hline
 	\end{tabular}
-
-\hspace{3mm}
-
-10 answer sets, time-out at 300s, memory-out at 8GB
-	
+%\hspace{3mm}
+%10 answer sets, time-out at 300s, memory-out at 8GB	
 	\end{center}
 	
-	\caption[Results for cutedge benchmark]{Results for cutedge benchmark: Time taken to compute 10 answer sets, averaged over successful single runs on 10 randomly generated instances. Size is number of vertices combined with probability of any two vertices being connected. Number of timeouts (resp.~memory-outs) is indicated in column t/o (resp.~m/o).}
+	\caption[Results for cutedge benchmark]{Results for cutedge benchmark: Time in seconds taken to compute 10 answer sets, averaged over successful single runs on 10 randomly generated instances. Size is number of vertices combined with probability of any two vertices being connected. Number of timeouts and memory-outs is indicated in columns t/o and m/o, respectively.}
 	\label{tbl:cut}
 \end{table}
 
@@ -1584,12 +1661,10 @@ $|V|$ & $\sfrac{|E|}{|V|}$& $\langle t_{1, \ldots, 10} \rangle$~[s]&t/o&m/o& $\l
 1000 &   4 & 	 39.961 & 0 & 0 &	    n/a & 10 & 0 \\
 \hline
 	\end{tabular}
-	
-\hspace{3mm}
-
-10 answer sets, time-out at 300s, memory-out at 8GB
+%\hspace{3mm}
+%10 answer sets, time-out at 300s, memory-out at 8GB
 	\end{center}
-	\caption[Results for graph 5-colorability benchmark]{Results for graph 5-colorability benchmark: Time taken compute 10 answer sets, averaged over successful single runs on 10 randomly generated instances. Size is number of vertices combined with number of edges in relation to the number of vertices. Number of timeouts (resp.~memory-outs) is indicated in column t/o (resp.~m/o).}
+	\caption[Results for graph 5-colorability benchmark]{Results for graph 5-colorability benchmark: Time taken in seconds to compute 10 answer sets, averaged over successful single runs on 10 randomly generated instances. Size is number of vertices combined with number of edges in relation to the number of vertices. Number of timeouts and memory-outs is indicated in columns t/o and m/o, respectively.}
 	\label{tbl:5col}
 \end{table}
 \begin{table}
@@ -1608,31 +1683,33 @@ $|V|$ & $\sfrac{|E|}{|V|}$& $\langle t_{1, \ldots, 10} \rangle$~[s]& $\langle t_
 10000 & 8 & 	 10.116 &	  8.874 \\
 \hline
 	\end{tabular}
-
-\hspace{3mm}
-
-all runs in less than 300s and 8GB
+%\hspace{3mm}
+%all runs in less than 300s and 8GB
 	\end{center}
 	\caption[Results for reachability benchmark]{Results for reachability benchmark: Time taken compute 10 answer sets, averaged over single runs on 10 randomly generated instances. Size is number of vertices combined with number of edges in relation to the number of vertices.}
 	\label{tbl:reach}
 \end{table}
 
-\paragraph{Summary} Evaluation of 3WL as implemented in the Alpha system has shown that the approach is especially effective when the number of nogoods that are not unit throughout search is low compared to the total set of nogoods. For these instances, speedups of many orders of magnitude were measured (Table \ref{tbl:5col}). In cases where many nogoods propagate, \enquote{bookkeeping} operations (adjustment of watched literals) nullify any gains in run time. Concerning memory usage, there is some overhead for 3WL, so the method generally runs into memory limits faster (e.g.~for smaller instances than the na\"{i}ve approach).
+\paragraph{Summary} Evaluation of 3WL as implemented in the Alpha system has shown that the approach is especially effective when the number of nogoods that are not unit throughout search is low compared to the total set of nogoods. For these instances, speedups of several orders of magnitude were measured (Table \ref{tbl:5col}). In cases where many nogoods propagate, bookkeeping operations (adjustment of watched literals) nullify gains in run time. Concerning memory usage, there is some overhead for 3WL, so the method generally runs into memory limits faster (i.e.,~for smaller instances) than the na\"{i}ve approach.
 
 \chapter{Conclusion}
 \label{chap:conc}
 
-We have presented a new method for unit propagation, tailored for lazy-grounding ASP solvers called Three Watched Literals (3WL). It is an extension of the Two Watched Literals scheme (2WL), prominent in SAT solvers. We extended 2WL for a third truth value \emph{\mbt}, which was found to greatly improve search performance for lazy-grounding in previous works.
+We have presented a new method for unit propagation, tailored for lazy-grounding ASP solvers called Three Watched Literals (3WL). It is an extension of the Two Watched Literals scheme (2WL), prominent in SAT solvers. We extended 2WL for a third truth value \emph{\mbt}, which was found to greatly improve search performance for lazy-grounding in previous works. We introduced watch structures that can be easily implemented as the core data structure to perform 3WL.
 
-Our evaluation shows that 3WL does not strictly perform better than na\"{i}ve approach, but yields considerable improvements when the portion of unit nogoods during search is small.
+Soundness of the new approach was analyzed in great detail and describes how assigning one atom initiates a series of propagation that restore synchronization between assignment and watch structure at the point of termination.
+
+Our evaluation shows that 3WL does not strictly perform better than a na\"{i}ve approach, but yields considerable improvements when the portion of unit nogoods during search is small, which often happens for search intense problems. Here, a run-time improvement of several orders of mangnitude can be expected.
 
 \section{Related Work}
 
 This work heavily relies on previous results as cited. Most notably \citet{effsat,questsat} described 2WL and \citet{dlv-mbt} introduced \emph{\mbt} to ASP solvers.
 
-\section{Open Questions and Future Work}
+\section{Open Questions and Further Work}
 
-The algorithm presented in Chapter \ref{chap:prop} does not consider guessing of assignments for atoms and backtracking in case of guesses leading to conflicts. One possibility for future work therefore is formalization of the behavior of 3WL including backtracking. Note that the implementation in the Alpha system, which was evaluated in Chapter \ref{chap:eval} implements backtracking, so there is some discrepancy between what was described in theory and the concrete implementation. Naturally, we assume that 3WL is sound and complete in combination with backtracking as well.
+The algorithm presented in Chapter \ref{chap:prop} does not consider guessing of assignments for atoms and backtracking in case of guesses leading to conflicts. One possibility for future work therefore is formalization of the behavior of 3WL including backtracking. Note that the implementation in the Alpha system, which was evaluated in Chapter \ref{chap:eval} implements backtracking, so there is some discrepancy between what was described and analysed here, and the concrete implementation. Based on this work, 3WL supporting backtracking was developed and is presented at \cite{alpha-techniques}.
+
+Showing the completeness of 3WL remains open.
 
 Evaluation results show that 3WL is not effective for instances where a \enquote{large} subset of nogoods propagates. Future work might address this issue and attempt to approximate threshold levels for the effectiveness of 3WL based on parameters of the input program. This line of research might lead to adaptive implementations that use heuristics to decide which method of propagation should be used. This proposes interesting challenges in the engineering aspects of solver systems, e.g.~interfacing with different unit propagation modules within the same solver system.
 
@@ -1641,26 +1718,14 @@ Evaluation results show that 3WL is not effective for instances where a \enquote
 One issue that is not directly connected to 3WL, but to addressing the grounding bottleneck more generally, is dynamic deletion of nogoods. By deleting \enquote{inactive} nogoods during search, additional memory might be freed, allowing solvers to work with larger search spaces. As the watch structure holds all nogoods, integrating nogood deletion might well be tightly coupled with propagation.
 
 \backmatter
-
-% Use an optional list of figures.
-\listoffigures % Starred version, i.e., \listoffigures*, removes the toc entry.
-
-% Use an optional list of tables.
-\listoftables % Starred version, i.e., \listoftables*, removes the toc entry.
-
-% Use an optional list of alogrithms.
+\listoffigures*
+\listoftables*
 \listofalgorithms
-\addcontentsline{toc}{chapter}{List of Algorithms}
 
-% Add an index.
-\printindex
-
-% Add a glossary.
-%\printglossaries
-
-% Add a bibliography.
-%\bibliographystyle{alpha}
 \bibliographystyle{plainnat}
+\begingroup
+\renewcommand{\addcontentsline}[3]{}% Remove functionality of \addcontentsline
 \bibliography{thesis}
+\endgroup
 
 \end{document}
