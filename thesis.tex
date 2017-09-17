@@ -1,4 +1,4 @@
-\documentclass{vutinfth} % Remove option 'final' to obtain debug information.
+\documentclass[final]{vutinfth} % Remove option 'final' to obtain debug information.
 
 % Load packages to allow in- and output of non-ASCII characters.
 \usepackage{lmodern}        % Use an extension of the original Computer Modern font to minimize the use of bitmapped letters.
@@ -65,7 +65,7 @@
 
 \setaddress{Engilgasse 3a, 1160 Wien}
 \setregnumber{1127842}
-\setdate{31}{10}{2016} % Set date with 3 arguments: {day}{month}{year}.
+\setdate{18}{09}{2017} % Set date with 3 arguments: {day}{month}{year}.
 \settitle{\thesistitle}{\thesistitle} % Sets English and German version of the title (both can be English or German).
 \setsubtitle{\thesissubtitle}{\thesissubtitle} % Sets English and German version of the subtitle (both can be English or German).
 
@@ -250,10 +250,10 @@ wear(G) \from& \ garment(G), inseason(G). \tag{$r_3$}\label{ex:garments:wear}\\
 \from& \ winter, summer. \tag{$c_1$}\label{ex:garments:seasons}
 \end{align}
 
-The program is made up of eleven rules: \ref{ex:garments:garments:begin} \ldots \ref{ex:garments:garments:end} list the four pieces we have in the wardrobe (a winter jacket, a pair of jeans, a t-shirt and shorts). As these rules have no premises, they are also called \emph{facts}. Rules \ref{ex:garments:style:begin} and \ref{ex:garments:style:end} qualify garments that are light or warm. The current season is encoded in \ref{ex:garments:season}. Through \ref{ex:garments:inseason:begin} and \ref{ex:garments:inseason:end} we define when a garment is \enquote{in season}, i.e.~whether a piece is not light (resp.~not warm) which means it should be worn in winter (resp.~summer). Finally, we express that a garment can be worn in case it is in season in rule \ref{ex:garments:wear}. The last rule \ref{ex:garments:seasons} models a \emph{constraint}: it is unreasonable that it is both winter and summer for one evaluation of the program.
+The program is made up of eleven rules: \ref{ex:garments:garments:begin} \ldots \ref{ex:garments:garments:end} list the four pieces we have in the wardrobe (a winter jacket, a pair of jeans, a t-shirt and shorts). As these rules have no premises, they are also called \emph{facts}. Rules \ref{ex:garments:style:begin} and \ref{ex:garments:style:end} qualify garments that are light or warm. The current season is encoded in \ref{ex:garments:season}. Through \ref{ex:garments:inseason:begin} and \ref{ex:garments:inseason:end} we define when a garment is \enquote{in season}, i.e.~whether a piece is not light (resp.~not warm) which means it should be worn in winter (resp.~summer). Finally, we express that a garment can be worn in case it is in season in rule \ref{ex:garments:wear}. The last rule \ref{ex:garments:seasons} models a \emph{constraint}: It is unreasonable that it is both winter and summer for one evaluation of the program.
 \end{example}
 enquote
-The evaluation of an ASP program is done by an ASP system, which may be comprised of further components. For user and programmer, no detailed knowledge about the system is required. The abstract input/output behaviour of these systems is enough to use them in most cases: given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets. Loosely speaking, answer sets are possible combinations of values that satisfy all requirements that are stated in the program.
+The evaluation of an ASP program is done by an ASP system, which may be comprised of further components. For user and programmer, no detailed knowledge about the system is required. The abstract input/output behaviour of these systems is enough to use them in most cases: Given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets. Loosely speaking, answer sets are possible combinations of values that satisfy all requirements that are stated in the program.
 
 % benuetzen gleiche techniken, es hat sich gezeigt, dass techniken aus dem sat bereich effizient sind
 
@@ -310,7 +310,7 @@ Adding another rule to the program will however cause the size of the ground pro
 Now, the size of the ground program of $P \cup \{ r_3 \}$ will be exponential\footnote{In practice for most ASP systems. \cite{bounded-arities} shows that for programs with bounded predicate arities, polynomial space is sufficient.} in $k$, precisely $n^k + n^2 + 2n$.
 \end{example}
 
-State-of-the-art ASP systems feature two components: The \emph{grounder} takes care of substituting all variables, i.e.~generating the ground program, while the \emph{solver} takes this ground program as input and computes answer sets. Traditionally, the grounder is invoked first, and only after it has output the ground program, the solver starts execution. This two-phased mode of operation is referred to as \emph{ground-and-solve}. With the ground program being exponentially larger than the original input program with variables, these systems are prone to what we call the \emph{grounding bottleneck}: When the ground program is so large that it does not fit into memory, the search for answer sets is impossible in practice. For more examples that exhibit the grounding bottleneck, we refer to \cite[Section 1]{asperix}.
+State-of-the-art ASP systems feature two components: the \emph{grounder} takes care of substituting all variables, i.e.~generating the ground program, while the \emph{solver} takes this ground program as input and computes answer sets. Traditionally, the grounder is invoked first, and only after it has output the ground program, the solver starts execution. This two-phased mode of operation is referred to as \emph{ground-and-solve}. With the ground program being exponentially larger than the original input program with variables, these systems are prone to what we call the \emph{grounding bottleneck}: When the ground program is so large that it does not fit into memory, the search for answer sets is impossible in practice. For more examples that exhibit the grounding bottleneck, we refer to \cite[Section 1]{asperix}.
 
 \section{Motivation}
 \label{sec:motivation}
@@ -334,7 +334,7 @@ For solvers to be efficient, it is crucial to quickly identify which nogoods are
 
 An optimization technique to speed up the solving process, pioneered by the ground-and-solve system \dlv (cf.~\ref{sec:dlv}) is the introduction of a third truth value \emph{\mbt} in addition to the two usual values \emph{true} and \emph{false}. Using a third truth value also is an effective optimization in lazy-grounding systems (cf.~Sections \ref{sec:asperix} and \ref{sec:omiga}). However, 2WL does only account for two truth values, thus cannot be used in conjunction with \emph{\mbt}.
 
-\paragraph{Goal} The goal of this work is to combine the two improvements (2WL for propagation, which was shown to be successfully in SAT solvers as well as ground-and-solve ASP systems, and \emph{\mbt} as a third truth value) within one algorithmic framework, such that it can employed in lazy-grounding ASP systems.
+\paragraph{Goal.} The goal of this work is to combine the two improvements (2WL for propagation, which was shown to be successfully in SAT solvers as well as ground-and-solve ASP systems, and \emph{\mbt} as a third truth value) within one algorithmic framework, such that it can employed in lazy-grounding ASP systems.
 
 Motivation for this is twofold: firstly, enabling lazy-grounding systems to profit from the benefits of 2WL, i.e.~improved propagation speeds, while still using \emph{\mbt}. Secondly, by integrating a procedure very similar to 2WL into a lazy-grounding framework, making it simpler to eventually re-use results that previously were exclusive to ground-and-solve systems in lazy-grounding systems as well.
 
@@ -355,7 +355,7 @@ Motivation for this is twofold: firstly, enabling lazy-grounding systems to prof
 % implementation
 % benchmarks
 
-\paragraph{Contributions} After an analysis of 2WL, algorithms and data structures that account for lazy-grounding are devised and their soundness is shown. We call the new approach Three Watched Literals (3WL). It comes with a description of \emph{watch strctures}, abstract data structures that suggest a memory layout for implementations, as well as a procedural description of the algorithm. It is an extension of 2WL but uses three instead of two watched literals in order to account for the third truth value \emph{\mbt}. An implementation is contributed to the Alpha system, which in turn is compared against a na{\"i}ve approach in form of a benchmark. Instances for the benchmark are taken from previous work in the field to maximize reproducibility.
+\paragraph{Contributions.} After an analysis of 2WL, algorithms and data structures that account for lazy-grounding are devised and their soundness is shown. We call the new approach Three Watched Literals (3WL). It comes with a description of \emph{watch strctures}, abstract data structures that suggest a memory layout for implementations, as well as a procedural description of the algorithm. It is an extension of 2WL but uses three instead of two watched literals in order to account for the third truth value \emph{\mbt}. An implementation is contributed to the Alpha system, which in turn is compared against a na{\"i}ve approach in form of a benchmark. Instances for the benchmark are taken from previous work in the field to maximize reproducibility.
 
 \section{Structure of the Work}
 
@@ -404,7 +404,7 @@ A \emph{rule} $r$ is an expression of the form $$a \from b_1, \ldots, b_m, \fail
 A rule $r$ is \emph{ground} if all atoms in $\headf(r) \cup \bodyf(r)$ are.
 \end{definition}
 
-Note that for a rule $r$ both body and head can be empty: In case $\bodyf(r)$ is empty, we say $r$ is a \emph{fact}, and when $\headf(r)$ is empty, we say that $r$ is a \emph{constraint}. Finally, we arrive at the notion of a logic program.
+Note that for a rule $r$ both body and head can be empty: in case $\bodyf(r)$ is empty, we say $r$ is a \emph{fact}, and when $\headf(r)$ is empty, we say that $r$ is a \emph{constraint}. Finally, we arrive at the notion of a logic program.
 
 \begin{definition}
 A \emph{(logic) program} $P$ is a finite set of rules. It is \emph{ground} if all $r \in P$ are ground.
@@ -466,7 +466,7 @@ Finally, an answer set is a $\subset$-minimal model of the corresponding reduct.
 An interpretation $I$ is an \emph{answer set} of a ground program $P$ if it is a $\subset$-minimal model of $P^I$, i.e. there is no $J \subset I$ which is also a model of $P^I$.
 \end{definition}
 
-Note that the answer sets of some logic program $P$ equal the answer sets of $grnd(P)$.
+Note that the answer sets of some logic program $P$ equal the answer sets of the corresponding ground program.
 
 \begin{example}[{cf.~\cite[Example 16]{DBLP:conf/rweb/EiterIK09}}]
 Consider the following program $P$:
@@ -476,7 +476,7 @@ democrat(C) \from& \ citizen(C),~\fail democrat(C).\\
 republican(C) \from& \ citizen(C),~\fail republican(C).
 \end{align*}
 
-The corresponding ground program $grnd(P)$ is as follows:
+The corresponding ground program is as follows:
 \begin{align}
 citizen(alice)\from& \ . \tag{$f_1$} \\
 democrat(alice) \from& \ citizen(alice),~\fail republican(alice). \tag{$r_1$} \\
@@ -589,11 +589,11 @@ GASP \cite{gasp,gasp2}\footnote{\url{https://users.dimi.uniud.it/~agostino.dovie
 
 As briefly mentioned in Section \ref{sec:motivation}, Two Watched Literals (also \enquote{Two Literal Watching}, 2WL, \cite{effsat,questsat}) is an algorithm for unit propagation commonly used in SAT solvers (cf.~\cite[Section 2.2.2, p.~94]{handbook-sat}). This section is devoted to a description of the method, first in the context of SAT, then about its application in ASP solving.
 
-In SAT solving, formulas are typically input to solvers in conjunctive normal form (CNF), i.e. conjunctions of disjunctive clauses of classical literals\footnote{The DIMACS format is commonly used to encode concrete formulas.}: $\psi = (l_{1,1} \vee \cdots \vee l_{1,k_1}) \wedge \cdots \wedge (l_{n,1} \vee \cdots \vee l_{n,k_n})$. As all disjunctive clauses are connected through conjunction, all of them must evaluate to \emph{true} for the formula to be satisfied. Each disjunctive clause evaluates to \emph{true} if at least one literal does. This property is exploited by SAT solvers to infer assignments. We call a disjunctive clause \emph{unit} if all but one literal in the clause evaluate to \emph{false}, and the last remaining literal has no truth value, i.e.~the variable in the literal is unassigned. In this case, we say that the clause \emph{propagates} and the unassigned varaible is assigned s.t.~the disjunctive clause evaluates to \emph{true}. Consider \ref{ryan} for efficient algorithms in SAT solvers.
+In SAT solving, formulas are typically input to solvers in conjunctive normal form (CNF), i.e. conjunctions of disjunctive clauses of classical literals\footnote{The DIMACS format is commonly used to encode concrete formulas.}: $\psi = (l_{1,1} \vee \cdots \vee l_{1,k_1}) \wedge \cdots \wedge (l_{n,1} \vee \cdots \vee l_{n,k_n})$. As all disjunctive clauses are connected through conjunction, all of them must evaluate to \emph{true} for the formula to be satisfied. Each disjunctive clause evaluates to \emph{true} if at least one literal does. This property is exploited by SAT solvers to infer assignments. We call a disjunctive clause \emph{unit} if all but one literal in the clause evaluate to \emph{false}, and the last remaining literal has no truth value, i.e.~the variable in the literal is unassigned. In this case, we say that the clause \emph{propagates} and the unassigned varaible is assigned s.t.~the disjunctive clause evaluates to \emph{true}. Consider \cite{ryan} for efficient algorithms in SAT solvers.
 
 \begin{example}
 \label{ex:clause-prop}
-Consider the $\psi = (a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4) \wedge (\neg a_1 \vee \neg a_2 \vee a_3 \vee a_4)$ It yields two  disjunctive clauses, $\psi = \phi_1 \wedge \phi_2$ with $\phi_1 = a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4$ and $\phi_2 = \neg a_1 \vee \neg a_2 \vee a_3 \vee a_4$, both of which have to be satisfied in order for $\psi$ to be satisfied. As the solver is evaluating $\psi$ under different (partial) assignments for atoms $a_1, \ldots, a_4$ it \enquote{watches} two literals per clause. This way it can detect whether a clause is unit. Whenever an atom $a$ is assigned it considers the clauses where $a$ is a watched literal for propagation. Conversely, all other clauses, where $a$ is not watched, are guaranteed to not be unit.
+Consider the formula $\psi = (a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4) \wedge (\neg a_1 \vee \neg a_2 \vee a_3 \vee a_4)$ It yields two  disjunctive clauses, $\psi = \phi_1 \wedge \phi_2$ with $\phi_1 = a_1 \vee \neg a_2 \vee a_3 \vee \neg a_4$ and $\phi_2 = \neg a_1 \vee \neg a_2 \vee a_3 \vee a_4$, both of which have to be satisfied in order for $\psi$ to be satisfied. As the solver is evaluating $\psi$ under different (partial) assignments for atoms $a_1, \ldots, a_4$ it \enquote{watches} two literals per clause. This way it can detect whether a clause is unit. Whenever an atom $a$ is assigned it considers the clauses where $a$ is a watched literal for propagation. Conversely, all other clauses, where $a$ is not watched, are guaranteed to not be unit.
 \end{example}
 
 The concept of a nogood originates in constraint programming (CP) (cf.~\cite{clasp,handbook-cp,handbook-kr-cp}), where the goal is to find an assignment for variables such that given constraints are satisfied. SAT and ASP can be viewed as specializations of CP. For example, in a problem containing the variable $x$ and the constraint $x > 1$ one can forbid the value $x = 1$. The assignment $x = 1$ is a nogood. In this work, nogoods are only used as representations of boolean constraints. Unit propagation is sometimes also referred to as boolean constraint propagation.
@@ -617,7 +617,7 @@ The number of nogoods generated from a program is proportional to the size of th
 For each nogood, two distinct and unassigned literals are chosen to be watched. When one of these literals is assigned, a different literal (distinct from the second watched literal) in the nogood is chosen as the new watched literal. This process is continued until there are no two distinct literals available in the nogood. Then the nogood is unit at this point and a new assignment can be generated.
 
 \begin{example}
-Consider Figure \ref{fig:2wl}. It shows the nogood $\delta = \{\bF a_1, \bT a_2, \bF a_3, \bT a_4 \}$ (which might be part of the representation of a rule in an ASP program, or $\phi_1$ from Example \ref{ex:clause-prop} with different semantics) in the context of propagation using 2WL. The watched literals are marked by arrows.
+Consider Figure \ref{fig:2wl}. It shows the nogood $\delta = \{\bF a_1, \bT a_2, \bF a_3, \bT a_4 \}$ (which might be part of the representation of a rule in an ASP program, or the nogood corresponding to $\phi_1$ from Example \ref{ex:clause-prop}) in the context of propagation using 2WL. The watched literals are marked by arrows.
 
 Initially, the two watched literals are selected arbitrarily. Transitioning from State 1 (empty assignment) to State 2, the solver will not check whether $\delta$ is unit, because $\bT a_3$ is not watched. When $a_2$ is assigned to \emph{true}, the solver checks $\delta$. As $a_2$ is assigned, $\bT a_2$ cannot be a watched literal anymore, but $\delta$ also is not unit, because $a_1$ is still unassigned. The pointer that previously pointed at $\bT a_2$ is moved to $\bF a_1$. Note that this is the only option, as the atoms of all other literals are already assigned and $\bT a_4$ is already being pointed at.
 
@@ -750,7 +750,7 @@ $\bF a_1$     % two
 \node(ng5des)[right=1cm of ng5.east, text width=6cm] { $a_4$ was assigned via propagation, s.t.~the nogood is satisfied. };
 
 \end{tikzpicture}
-  \caption{Step-by-step visualization of unit propagation with Two Watched Literals}
+  \caption[Step-by-step visualization of unit propagation with Two Watched Literals]{Step-by-step visualization of unit propagation with Two Watched Literals.}
   \label{fig:2wl} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
 
@@ -840,7 +840,7 @@ In this section we amend the definition of literals and nogoods for the purpose 
 %A \emph{ground atom} (or simply \emph{atom}) wrt.~a logic program $P$ is an element of $\textit{HB}(P)$, usually denoted $v$.
 %\end{definition}
 
-Amending Definition \ref{def:lit}, for the remainder of the work we consider boolean signed literals, which mean atoms and their negations in the classical sense, and, more generally, signed literals, which also allow for a third sign that allows modeling \emph{\mbt}.
+For the remainder of the work we consider boolean signed literals, which mean atoms and their negations in the classical sense, and, more generally, signed literals, which also allow for a third sign that allows modeling \emph{\mbt}.
 
 \begin{definition}
 A \emph{boolean signed literal} $\bsgl$ is of the form $\bT v$ or $\bF v$ where $v$ is an atom and $\bT v$ expresses that $v$ is \emph{true}, and $\bF v$ that it is \emph{false}.
@@ -1014,7 +1014,7 @@ Note the difference between some $\delta$ being silent vs.~satisfied under an as
 
 \section{Watch Structures}
 
-In Section \ref{sec:2wl} we did not detail how a data structure that stores which two literals are watched for each nogood might look like. References to the watched literals are illustrated in Figure \ref{fig:2wl} as pointers, and indeed we are suggesting some form of lookup table: as a new literal $\sgl$ is added to the assignment, the propagation algorithm will resolve the set of nogoods containing $\sgl$ as a watched literal. We define an abstract data structure for this lookup.
+In Section \ref{sec:2wl} we did not detail how a data structure that stores which two literals are watched for each nogood might look like. References to the watched literals are illustrated in Figure \ref{fig:2wl} as pointers, and indeed we are suggesting some form of lookup table: As a new literal $\sgl$ is added to the assignment, the propagation algorithm will resolve the set of nogoods containing $\sgl$ as a watched literal. We define an abstract data structure for this lookup.
 
 %suggesting some form of lookup table. Indeed, we suggest the 
 
@@ -1082,7 +1082,7 @@ edge [out=east,in=west, above] node {$\alpha$} (v1f)
 ;
 
 \end{tikzpicture}
-  \caption{Example layout of a watch structure}
+  \caption[Example layout of a watch structure]{Example layout of a watch structure.}
   \label{fig:watches} % \label has to be placed AFTER \caption (or \subcaption) to produce correct cross-references.
 \end{figure}
 
@@ -1318,17 +1318,17 @@ Towards showing \ref{up:sound:post2} and \ref{up:sound:post3} from the precondit
 	\item $\ass_n = \emph{conflict}$ \label{up:sound:ind:conflict}
 \end{enumerate}
 
-\paragraph{Overview and Intuition} Using $\mathcal{P}(n)$ above, we show that \ref{up:sound:post2} and \ref{up:sound:post3} follow from the preconditions by induction, closely following the structure of Algorithm \ref{alg:up} as outlined above. Initially ($n = 0$, $\ass = \ass_0 = \ass_L^0$ and $\ass_R^0 = \emptyset$), we require the input nogoods $\Delta$ to all be silent through \ref{up:sound:pre} as a \enquote{stable} starting point. While new literals will be appended to the assignment on the \enquote{right} side, we will show that at termination for some $n = k$ as hinted above, $\ass_k^R = \emptyset$ again. From there we establish the postconditions. For the induction step deriving $\mathcal{P}(i + 1)$ from $\mathcal{P}(i)$ we will \enquote{move} exactly one literal $\sgl_i$ from right to left ($\sgl_i \not \in \ass_i^L$, $\sgl_i \in \ass_i^R$ and $\sgl_i \in \ass_{i+1}^L$, $\sgl_i \not \in \ass_{i+1}^R$ as well as $\ass_{i+1}^L = \ass_{i}^L \cup \{ \sgl_i \}$). Here, properties \ref{up:sound:ind:lr} are crucial, as they establish the connection between $A_i^R$ and $A_i^L$ and cover the propagation scenarios for $\sgl_i$. Note that the \enquote{right} subsequence \enquote{grows} (with the exception of $\sgl_i$), i.e.~$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$ because of new literals inferred by propagation.
+\paragraph{Overview and Intuition.} Using $\mathcal{P}(n)$ above, we show that \ref{up:sound:post2} and \ref{up:sound:post3} follow from the preconditions by induction, closely following the structure of Algorithm \ref{alg:up} as outlined above. Initially ($n = 0$, $\ass = \ass_0 = \ass_L^0$ and $\ass_R^0 = \emptyset$), we require the input nogoods $\Delta$ to all be silent through \ref{up:sound:pre} as a \enquote{stable} starting point. While new literals will be appended to the assignment on the \enquote{right} side, we will show that at termination for some $n = k$ as hinted above, $\ass_k^R = \emptyset$ again. From there we establish the postconditions. For the induction step deriving $\mathcal{P}(i + 1)$ from $\mathcal{P}(i)$ we will \enquote{move} exactly one literal $\sgl_i$ from right to left ($\sgl_i \not \in \ass_i^L$, $\sgl_i \in \ass_i^R$ and $\sgl_i \in \ass_{i+1}^L$, $\sgl_i \not \in \ass_{i+1}^R$ as well as $\ass_{i+1}^L = \ass_{i}^L \cup \{ \sgl_i \}$). Here, properties \ref{up:sound:ind:lr} are crucial, as they establish the connection between $A_i^R$ and $A_i^L$ and cover the propagation scenarios for $\sgl_i$. Note that the \enquote{right} subsequence \enquote{grows} (with the exception of $\sgl_i$), i.e.~$\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$ because of new literals inferred by propagation.
 
-\paragraph{Base Case} Concerning the input assignment $\ass_0 = \ass$ and $\Delta_0 = \Delta$, $\mathcal{P}(0)$ directly follows, because \ref{up:sound:ind:watches} is given by \ref{up:sound:pre}, and all nogoods being silent (also given by \ref{up:sound:pre}) implies that the antecedents of \ref{up:sound:ind:wu}, \ref{up:sound:ind:su}, \ref{up:sound:ind:vio} are false.
+\paragraph{Base Case.} Concerning the input assignment $\ass_0 = \ass$ and $\Delta_0 = \Delta$, $\mathcal{P}(0)$ directly follows, because \ref{up:sound:ind:watches} is given by \ref{up:sound:pre}, and all nogoods being silent (also given by \ref{up:sound:pre}) implies that the antecedents of \ref{up:sound:ind:wu}, \ref{up:sound:ind:su}, \ref{up:sound:ind:vio} are false.
 
 %The induction step now consists of observing that the loop in lines 3-10 \enquote{preserves} properties (1.) and (2.) of soundness, i.e.~it argues the transitivity of those properties for iteration steps $S_{i}$ to $S_{i+1}$.
 
 %We show that every nogood $\delta \in \Delta'$ is \welf wrt.~$\Delta'$ and $\ass'$, i.e.~$\Delta'$ is \welf wrt.~$\ass'$, by using that $\Delta$ is \welf wrt.~$\ass$ and the definition of the algorithm.
 
-\paragraph{Induction Hypothesis} $\mathcal{P}(i)$ holds for some $i$.
+\paragraph{Induction Hypothesis.} $\mathcal{P}(i)$ holds for some $i$.
 
-\paragraph{Induction Step} For two consecutive iteration steps of the loop $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(i)$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:%For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$. 
+\paragraph{Induction Step.} For two consecutive iteration steps of the loop $S_{i} = \langle \ass_{i}, \Delta_{i} \rangle$ and $S_{i+1} = \langle \ass_{i+1}, \Delta_{i+1} \rangle$, assume $\mathcal{P}(i)$. Then show $\mathcal{P}(i) \to \mathcal{P}(i + 1)$ as follows:%For readability, let $j = |A| + i$, $\ass_i^L = \ass_i[1, j - 1]$, $\ass_i^R = \ass_i[j, |\ass_i|]$, $\ass_{i+1}^L = \ass_i[1, j]$, $\ass_{i+1}^R = \ass_i[j + 1,|\ass_{i+1}|]$, $\sgl_i = A_i[j]$. 
 
 \begin{enumerate}
 \item To show \ref{up:sound:ind:watches} let $\delta \in \Delta$: %$A_i^L$ differs from $A_{i+i}^L$ only by $\sgl_i$, which is processed by Algorithm \ref{alg:up}. Note that for all $\delta$ in $\Delta$, the candidate sets wrt.~$\ass_i^L$ are at most the size of those wrt.~$\ass_{i+1}^L$, i.e.~candidate sets are monotonically decreasing with growing $A^L$.
@@ -1358,7 +1358,7 @@ If $\sgl_i \in \Delta$ then the premises of the \enquote{watch} property regardi
 		%\item Assume $\sgl_i \not = \bsgl_1$ and $\sgl_i \not = \bsgl_2$ towards a contradiction. As $\bsgl_1, \bsgl_2 \in \cdpm(\delta, \ass_i)$, both $\bsgl_1, \bsgl_2$ are unassigned under $\ass_i$ by definition of $\cdpm$. For $\delta$ to be weakly unit under $\ass_{i+1}$, there must be exactly one $\bsgl' \in \delta$ unassigned under $\ass_{i+1}$.
 		\item Case $\sgl_i \not = \bsgl_1 \wedge \sgl_i \not = \bsgl_2$.
 		
-		$\Delta_i^\pm(\bsgl_1) = \Delta_{i+1}^\pm(\bsgl_1)$ and $\Delta_i^\pm(\bsgl_2) = \Delta_{i+1}^\pm(\bsgl_2)$, as watch sets are only modified in case $\bsgl_1 = \sgl_i$ and respectively $\bsgl_2 = \sgl_i$ (see Algorithm \ref{alg:upu}: only nogoods that are being iterated over in line \ref{alg:upu:it} are being removed from any watch sets in line \ref{alg:upu:rm}). Both $\bsgl_1$ and $\bsgl_2$ are in $A_{i+1}^R$, because $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, thus we have \ref{up:sound:ind:wu}.
+		$\Delta_i^\pm(\bsgl_1) = \Delta_{i+1}^\pm(\bsgl_1)$ and $\Delta_i^\pm(\bsgl_2) = \Delta_{i+1}^\pm(\bsgl_2)$, as watch sets are only modified in case $\bsgl_1 = \sgl_i$ and respectively $\bsgl_2 = \sgl_i$ (see Algorithm \ref{alg:upu}: Only nogoods that are being iterated over in line \ref{alg:upu:it} are being removed from any watch sets in line \ref{alg:upu:rm}). Both $\bsgl_1$ and $\bsgl_2$ are in $A_{i+1}^R$, because $\ass_{i}^R \setminus \{ \sgl_i \} \subseteq \ass_{i+1}^R$, thus we have \ref{up:sound:ind:wu}.
 		
 		\item Case either $\sgl_i = \bsgl_1$ or $\sgl_i = \bsgl_2$.
 		\label{sigmaprimes}		
@@ -1546,9 +1546,9 @@ To show \ref{up:sound:post1} assume $\sgl$ conflicts with $\ass$. Then, on line~
 
 To support our results of performance improvement with 3WL compared to naive propagation, and in order to showcase the Alpha system as the first ASP system to combine 3WL with lazy grounding, we evaluated the run time performance for the publicly available\footnote{Concrete instances are available via \url{http://www.kr.tuwien.ac.at/research/systems/alpha/instances.zip}, whereas Java code to generate new instances can be obtained from \url{https://github.com/alpha-asp/benchmarks}.} set of problem instances used in \cite{alpha-techniques}.
 
-\paragraph{Setup} The benchmarks were run with Alpha \texttt{v0.2.0}\footnote{Download freely available at \url{http://github.com/alpha-asp/alpha/releases/v0.2.0}.} on a machine with an Intel$^{\text{\tiny{\textregistered}}}$ Core$^{\text{\tiny{TM}}}$ i7-7500U CPU @ 2.7GHz, 16GB main memory, Linux kernel 4.12.5 and Oracle Java$^{\text{\tiny{TM}}}$ SE Runtime Environment (build \texttt{1.8.0\_144-b01}).
+\paragraph{Setup.} The benchmarks were run with Alpha \texttt{v0.2.0}\footnote{Download freely available at \url{http://github.com/alpha-asp/alpha/releases/v0.2.0}.} on a machine with an Intel$^{\text{\tiny{\textregistered}}}$ Core$^{\text{\tiny{TM}}}$ i7-7500U CPU @ 2.7GHz, 16GB main memory, Linux kernel 4.12.5 and Oracle Java$^{\text{\tiny{TM}}}$ SE Runtime Environment (build \texttt{1.8.0\_144-b01}).
 
-\paragraph{Method} All measured timings are times until the first 10 (or all, if less than 10) answer sets were found, and the solver used a fixed randomization seed of 0 (via the \texttt{-{}-deterministic} command line switch). The Java virtual machine was instructed to limit memory usage to approximately 8GB (flags \texttt{-XX:MaxRAM=8000M -Xmx3500M}) and the process running the JVM was terminated for time-out after 300 seconds (wall time).
+\paragraph{Method.} All measured timings are times until the first 10 (or all, if less than 10) answer sets were found, and the solver used a fixed randomization seed of 0 (via the \texttt{-{}-deterministic} command line switch). The Java virtual machine was instructed to limit memory usage to approximately 8GB (flags \texttt{-XX:MaxRAM=8000M -Xmx3500M}) and the process running the JVM was terminated for time-out after 300 seconds (wall time).
 
 In the following four paragraphs we discuss the properties of the input problems and briefly comment on the benchmark results.
 
@@ -1690,14 +1690,14 @@ $|V|$ & $\sfrac{|E|}{|V|}$& $\langle t_{1, \ldots, 10} \rangle$~[s]& $\langle t_
 	\label{tbl:reach}
 \end{table}
 
-\paragraph{Summary} Evaluation of 3WL as implemented in the Alpha system has shown that the approach is especially effective when the number of nogoods that are not unit throughout search is low compared to the total set of nogoods. For these instances, speedups of several orders of magnitude were measured (Table \ref{tbl:5col}). In cases where many nogoods propagate, bookkeeping operations (adjustment of watched literals) nullify gains in run time. Concerning memory usage, there is some overhead for 3WL, so the method generally runs into memory limits faster (i.e.,~for smaller instances) than the na\"{i}ve approach.
+\paragraph{Summary.} Evaluation of 3WL as implemented in the Alpha system has shown that the approach is especially effective when the number of nogoods that are not unit throughout search is low compared to the total set of nogoods. For these instances, speedups of several orders of magnitude were measured (Table \ref{tbl:5col}). In cases where many nogoods propagate, bookkeeping operations (adjustment of watched literals) nullify gains in run time. Concerning memory usage, there is some overhead for 3WL, so the method generally runs into memory limits faster (i.e.,~for smaller instances) than the na\"{i}ve approach.
 
 \chapter{Conclusion}
 \label{chap:conc}
 
 We have presented a new method for unit propagation, tailored for lazy-grounding ASP solvers called Three Watched Literals (3WL). It is an extension of the Two Watched Literals scheme (2WL), prominent in SAT solvers. We extended 2WL for a third truth value \emph{\mbt}, which was found to greatly improve search performance for lazy-grounding in previous works. We introduced watch structures that can be easily implemented as the core data structure to perform 3WL.
 
-Soundness of the new approach was analyzed in great detail and describes how assigning one atom initiates a series of propagation that restore synchronization between assignment and watch structure at the point of termination.
+Soundness of the new approach was analyzed in great detail and describes how assigning one atom initiates a series of propagation that restore coherence between assignment and watch structure at the point of termination.
 
 Our evaluation shows that 3WL does not strictly perform better than a na\"{i}ve approach, but yields considerable improvements when the portion of unit nogoods during search is small, which often happens for search intense problems. Here, a run-time improvement of several orders of mangnitude can be expected.
 
