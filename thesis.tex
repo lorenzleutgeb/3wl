@@ -65,7 +65,7 @@
 
 \setaddress{Engilgasse 3a, 1160 Wien}
 \setregnumber{1127842}
-\setdate{18}{09}{2017} % Set date with 3 arguments: {day}{month}{year}.
+\setdate{20}{09}{2017} % Set date with 3 arguments: {day}{month}{year}.
 \settitle{\thesistitle}{\thesistitle} % Sets English and German version of the title (both can be English or German).
 \setsubtitle{\thesissubtitle}{\thesissubtitle} % Sets English and German version of the subtitle (both can be English or German).
 
@@ -192,7 +192,7 @@ I would like to thank Antonius Weinzierl for his consistent and continuous effor
 \selectlanguage{naustrian}
 
 \begin{kurzfassung*}
-Answer Set Programming (ASP) ist eine deklaratives Programmierparadigma in Anlehnung an Prädikatenlogik erster Stufe. ASP-Programme werden üblicherweise durch ASP-Systeme evaluiert, deren Design stark durch Löser (engl.~\enquote{solver}) für das Erfüllbarkeitsproblem der Aussagenlogik (SAT, von engl.~\enquote{satisfiability}) inspiriert ist. Ein zentrales Verfahren in diesen Systemen ist die sogenannte \emph{Einheitsresolution} (engl.~\enquote{unit propagation}), wodurch aus bekannten Wahrheitswerten für Konstanten und der Struktur der Formel neue Wahrheitswerte ableitet werden können.
+Answer Set Programming (ASP) ist ein deklaratives Programmierparadigma in Anlehnung an Prädikatenlogik erster Stufe. ASP-Programme werden üblicherweise durch ASP-Systeme evaluiert, deren Design stark durch Löser (engl.~\enquote{solver}) für das Erfüllbarkeitsproblem der Aussagenlogik (SAT, von engl.~\enquote{satisfiability}) inspiriert ist. Ein zentrales Verfahren in diesen Systemen ist die sogenannte \emph{Einheitsresolution} (engl.~\enquote{unit propagation}), wodurch aus bekannten Wahrheitswerten für Konstanten und der Struktur der Formel neue Wahrheitswerte ableitet werden können.
 
 Im Unterschied zu SAT-Formeln enthalten ASP-Programme jedoch Variablen, wodurch sich das sogenannte \emph{grounding bottleneck} ergibt, welches die praktische Verwendbarkeit von ASP-Systemen einschränkt. An der Entwicklung sogenannter \emph{lazy-grounding} ASP-Systeme wird aktiv geforscht. Durch die Einführung eines dritten Wahrheitswerts \emph{\mbt} (neben den zwei Boolschen Werten \emph{true} und \emph{false}) kann die Suche nach Lösungen beschleunigt werden. Diese Optimierung hat sich für lazy-grounding ASP-Systeme als besonders wirkungsvoll herausgestellt, sie ist allerdings mit den bewährten Varianten der Einheitsresolution nicht kompatibel, da diese nur die zwei Booleschen Wahrheitswerte berücksichtigen.
 
@@ -252,7 +252,7 @@ wear(G) \from& \ garment(G), inseason(G). \tag{$r_3$}\label{ex:garments:wear}\\
 
 The program is made up of eleven rules: \ref{ex:garments:garments:begin} \ldots \ref{ex:garments:garments:end} list the four pieces we have in the wardrobe (a winter jacket, a pair of jeans, a t-shirt and shorts). As these rules have no premises, they are also called \emph{facts}. Rules \ref{ex:garments:style:begin} and \ref{ex:garments:style:end} qualify garments that are light or warm. The current season is encoded in \ref{ex:garments:season}. Through \ref{ex:garments:inseason:begin} and \ref{ex:garments:inseason:end} we define when a garment is \enquote{in season}, i.e.~whether a piece is not light (resp.~not warm) which means it should be worn in winter (resp.~summer). Finally, we express that a garment can be worn in case it is in season in rule \ref{ex:garments:wear}. The last rule \ref{ex:garments:seasons} models a \emph{constraint}: It is unreasonable that it is both winter and summer for one evaluation of the program.
 \end{example}
-enquote
+
 The evaluation of an ASP program is done by an ASP system, which may be comprised of further components. For user and programmer, no detailed knowledge about the system is required. The abstract input/output behaviour of these systems is enough to use them in most cases: Given an input program (and sometimes a few options on which algorithms or data structures to employ) it computes the answer sets. Loosely speaking, answer sets are possible combinations of values that satisfy all requirements that are stated in the program.
 
 % benuetzen gleiche techniken, es hat sich gezeigt, dass techniken aus dem sat bereich effizient sind
@@ -1271,17 +1271,17 @@ With the above cases handled, there must be at least two literals in the candida
 Algorithm \ref{alg:upa} works in a similar way but without the need to check for violations/conflicts and nogoods being weakly unit, as these cases are handled by Algorithm \ref{alg:upu}. Further, by the definition of a nogood $\delta$ being strongly unit, we know that all positive literals (except the head literal) of $\delta$ must be assigned to \emph{true}, and not only to \emph{\mbt} for propagation.
 
 \begin{theorem}
-Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$, a literal $\sgl$, and the following precondition, it results in a new assignment $\ass'$ and a new watch structure $\Delta'$ such that the following postconditions all hold:
-\begin{enumerate}[label={\normalfont (\textsc{Pre})},ref=(\textsc{Pre})]
+Algorithm \ref{alg:up} is sound, i.e.~given an assignment $\ass$, a watch structure $\Delta$, a literal $\sgl$, and the following precondition \textsc{P}, it results in a new assignment $\ass'$ and a new watch structure $\Delta'$ such that the postconditions \textsc{P$'$\textsubscript{1}} through \textsc{P$'$\textsubscript{3}} all hold:
+\begin{enumerate}[label={\normalfont \textsc{P} ~},ref=\textsc{Pre},leftmargin=\widthof{\textsc{P$'$\textsubscript{3}}}+\labelsep]
 \item $\Delta$ silently watches $A$. \label{up:sound:pre}
 \end{enumerate}
-\begin{enumerate}[label={\normalfont (\textsc{Post}\arabic*)},ref=(\textsc{Post}\arabic*)]
+\begin{enumerate}[label={\normalfont \textsc{P$'$\textsubscript{\arabic*}}},ref=\textsc{P$'$\textsubscript{\arabic*}},leftmargin=\widthof{\textsc{P$'$\textsubscript{3}}}+\labelsep]
 \item If $\sgl$ does not conflict with $\ass$ and there are assignments that can be inferred by means of unit propagation without a conflict, then $\Delta'$ silently watches $\ass'$. \label{up:sound:post2}
 \item If $\sgl$ does not conflict with $\ass$ but a literal inferred from $\Delta$ and $\ass \circ \sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$. \label{up:sound:post3}
 \item If $\sgl$ conflicts with $\ass$, then $\ass' = \emph{conflict}$ and $\Delta' = \Delta$. \label{up:sound:post1}% Trivial case.
 \end{enumerate}
 \end{theorem}
-
+\newpage
 \begin{proof-sketch}
 %We show that:
 
@@ -1709,7 +1709,7 @@ This work heavily relies on previous results as cited. Most notably \citet{effsa
 
 The algorithm presented in Chapter \ref{chap:prop} does not consider guessing of assignments for atoms and backtracking in case of guesses leading to conflicts. One possibility for future work therefore is formalization of the behavior of 3WL including backtracking. Note that the implementation in the Alpha system, which was evaluated in Chapter \ref{chap:eval} implements backtracking, so there is some discrepancy between what was described and analysed here, and the concrete implementation. Based on this work, 3WL supporting backtracking was developed and is presented at \cite{alpha-techniques}.
 
-Showing the completeness of 3WL remains open.
+3WL is expected to be complete in the sense that it computes all assignments that can be inferred through unit propagation. Cross-checking the implementation in Alpha in that regard was successful thus far. However, this work did not address completeness, and so a proof remains open as further work.
 
 Evaluation results show that 3WL is not effective for instances where a \enquote{large} subset of nogoods propagates. Future work might address this issue and attempt to approximate threshold levels for the effectiveness of 3WL based on parameters of the input program. This line of research might lead to adaptive implementations that use heuristics to decide which method of propagation should be used. This proposes interesting challenges in the engineering aspects of solver systems, e.g.~interfacing with different unit propagation modules within the same solver system.
 
